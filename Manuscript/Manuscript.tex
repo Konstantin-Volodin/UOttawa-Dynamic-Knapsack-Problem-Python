@@ -23,7 +23,7 @@ State space is defined by current budget for various PPEs for future month, amou
     \item $\vec{bc} = bc_{mp}$ - Expected budget for month $m$, and PPE $p$
     \item $\vec{bu} = bc_{mp}$ - Used budget for month $m$, and PPE $p$
     \item $\vec{pw} = pw_{mdc}$ - Number of patients of difficulty $d$, CPU $c$, on a wait list for $m$ months
-    \item $\vec{pe} = pe_{dc}$ - Number of patients of difficulty $d$, CPU $c$ expected to arrive this month (I don't like having it here, because the way it is in the modelled right now, it is assumed this information is essentially know in advance, while in real world this would be realized over the transition)
+    \item $\vec{pe} = pe_{dc}$ - Number of patients of difficulty $d$, CPU $c$ expected to arrive this month (Not sure if this is good, because right now, it is assumed this information is know in advance, while in real world this would be realized over the transition)
 \end{itemize}
 
 \section{Action Sets}
@@ -59,12 +59,11 @@ These two sources of uncertainty only deal with $pe_{dc}$ and $pw_{mdc}$ part of
 \end{itemize}
     
 \section{Costs}
-I want to try a very simple cost for now, because I think it might be enough. \\\\
 Cost will come only from one source: the number of people unscheduled after action is performed:
 \[ c(\vec{s}, \vec{a}) = \sum_{dc} c_m pw_{mdc} \]
 Where $c_m$ is computed as follows (where $val$ is an arbitrary number that would allow us to describe cost growth well):
 	\[ c_{m} = val^m \quad \forall m \in \{ 0, ..., M-1 \} \]
 	\[ c_{M} = val^m * 100  \]
-The reason there is a very high cost at the last month is because patients are essentially removed if they are unscheduled and they are in the last wait month (in order to be able to have a limit on $m$ while modeling). So theoretically, the model should schedule in such a way that people never reach that point.
+The reason there is a very high cost at the last month is because patients are essentially removed if they are not scheduled and they are in the last wait month (in order to be able to have a limit on $m$ while modeling). So theoretically, the model should schedule in such a way that people never reach that point.
 
 \end{document}
