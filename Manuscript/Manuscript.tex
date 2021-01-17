@@ -1,11 +1,12 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
+\usepackage{amsmath}
 \geometry{margin=1in}
 \setlength\parindent{0pt}
 
 
-\title{Knapsack Dynamic Problem}
+\title{Dynamic Knapsack Problem}
 \author{KV}
 \date{December 2020}
 
@@ -14,56 +15,99 @@
 \maketitle
 
 \section{Decision Epochs}
-Decisions are made at the beginning of each month
+Decisions are made at the beginning of each time period (will be weeks)
 
 \section{State Space}
-State space is defined by current budget for various PPEs for future month, amount of budget already spent on PPEs, current patient waitlist, and expected monthly demand (?)
-\[ \vec{s}  = (\vec{bc}, \vec{bu}, \vec{pw}, \vec{pe})\]
+State space is defined by current units available for various PPEs for future periods, amount of budget already spent on PPEs, current patient waitlist, expected period demand, and number of patients already scheduled
+\[ \vec{s}  = (\vec{be}, \vec{bu}, \vec{pw}, \vec{pe})\]
 \begin{itemize}
-    \item $\vec{bc} = bc_{mp}$ - Expected budget for month $m$, and PPE $p$
-    \item $\vec{bu} = bc_{mp}$ - Used budget for month $m$, and PPE $p$
-    \item $\vec{pw} = pw_{mdc}$ - Number of patients of difficulty $d$, CPU $c$, on a wait list for $m$ months
-    \item $\vec{pe} = pe_{dc}$ - Number of patients of difficulty $d$, CPU $c$ expected to arrive this month (Not sure if this is good, because right now, it is assumed this information is know in advance, while in real world this would be realized over the transition)
+    \item $\vec{be} = be_{mp}$ - Expected unist for period $m$, and PPE $p$
+    \item $\vec{bu} = bu_{mp}$ - Used units for period $m$, and PPE $p$
+    \item $\vec{pw} = pw_{mdc}$ - Number of patients of complexity $d$, CPU $c$, on a wait list for $m$ periods
+    \item $\vec{pe} = pe_{dc}$ - Number of patients of complexity $d$, CPU $c$ expected to arrive this period
+    \item $\vec{ps} = ps_{tmdc}$ - Number of patients of complexity $d$, CPU $c$, scheduled to period $t$, who have been on the waitlist for $m$ periods ($m$ of 0 stands for people who have just arrived)
 \end{itemize}
 
 \section{Action Sets}
-At the beginning of each month, decision maker must decide how to use the PPE budget, ie how many patients of each group to assign to this month.
-\[ \vec{a} = (\vec{s}) \]
+At the beginning of each period, decision maker must cancel appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
+\[ \vec{a} = (\vec{sc}, \vec{usc}) \]
 \begin{itemize}
-    \item $\vec{s} = s_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ month, to schedule in month $t$
+    \item $\vec{sc} = sc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ periods, to schedule in period $t$ ($m$ of 0 stands for people who have just arrived)
+	\item $\vec{usc} = usc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to cancel from period $t$
 \end{itemize}
 The actions must satisfy the following constraints:
 \begin{itemize}
     \item Total allocated budged must not be exceeded ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
-        \[ \sum_{dc}s_{mdc}U_{pdc} >= (bc - bu)\ \quad \forall m, p \]
+        \[ \sum_{dc}s_{mdc}U_{pdc} <= (be - bu)\ \quad \forall m, p \]
+	\item Cannot schedule past waitlist horizon limit
+	\item number of people scheduled/cancelled must be consistent
 \end{itemize}
 
 \section{Transition Probabilities}
 There are three sources of uncertainty: 
 \begin{enumerate}
-    \item Number of patients arriving this month - $pe_{dc}$
-    \item Transition between patient difficulties within the wait list - $pw_{mdc}$
-    \item Amount of resources used during the operation - $U_{pdc}$
+    	
+	\item Number of patients arriving this period - $pe_{dc}$
+		\begin{itemize}
+			\item let's assume $pea_{dc}$ - is the random variable that represents the number of patients arrived this period. It follows a poisson distribution.
+		\end{itemize}
+	
+	\item Transition between patient difficulties within the wait list - $pw_{mdc}$
+		\begin{itemize}
+			\item let's assume $pwfi_{mdc}$ represents an intermediary variable showing the number of patients of complexity $d$, for CPU $c$ entering the waitlist of period $m$ in any way.
+			\item let's assume $pwfo_{mdc}$ represents an intermediary variable showing the number of patients of complexity $d$, for CPU $c$ leaving the waitlist of period $m$  in any way
+			\item let's assume $pwt_{mdc}$ is the random variable that represents the number of patients of priority $d$, CPU $c$, that have been waiting for $m$ period, that have moved a more complex category. It follows binary distribution.
+		\end{itemize}
+
+	\item Amout of expected units of PPE resource for the next time period - $bc_{1dc}$
+		\begin{itemize}
+			\item let's assume $bed_{md}$ is the random variable that represents the deviation of PPE units from the expectation for the next period only. It follows some uniform distribution.
+			\item let's assume $ben_{d}$ is the default value to be used for expected number of PPE units $p$ per period
+		\end{itemize}
 \end{enumerate}
 
 Assume $pe_{dc}$ follows some poisson distribution. \\
 Assume transition within $pw_{mdc}$ follows some binomial distribution with a probability that patient of difficulty $d$ in CPU $c$ moves to a more difficult category at each state transition. \\
-These two sources of uncertainty only deal with $pe_{dc}$ and $pw_{mdc}$ part of the states and must follow the following constraints
+Assume deviation from expected number of PPE units follows a uniform distribution ($bcd_{p}$)\\
+State transitions have the following constraints:
 \begin{itemize}
-	\item Total number of patients on the wait-list must be consistent over time
-	\[ \sum_{d} pw'_{m+1,dc} = \sum_{d} pw_{mdc} - \sum_{td} s_{tmdc}\ \quad \forall m, c \]
-	\item Patients can only get more difficult over time
-	\[ \sum_{di = d}^{D} pw'_{m+1,di,c} \ge \sum_{di = d}^{D} pw_{mdc} - \sum_{t,d=di}^{D} s_{tmdc} \quad \forall m,d,c \]
-	\item  Unscheduled expected arrivals are moved into the wait list
-	\[ pw'_{m=1, dc} = pe_{dc} -\sum_{t} s_{t, m=0, dc} \quad \forall dc \]
+
+	\item Transition from $\vec{bc}$ to $\vec{bc'}$ - Expected Units of PPE
+		\[ be'_{1p} = be_{2p} + bed_{p}\ \quad \forall p \]
+		\[ be'_{m-1,p} = be_{mp}\ \quad \forall m \in \{3...M\}, p \]
+		\[ be'_{Mp} = ben_{d} \quad \forall p \]
+	
+	\item Transition from $\vec{bu}$ to $\vec{bu'}$ - Used Units of PPE
+		\[ bu'_{m-1,p} = bu	_{mp} - \sum_{tdc} ( sc_{t,m-1,dc}U_{pdc} ) + \sum_{tdc} ( usc_{t,m-1,dc}U_{pdc} )  \quad \forall m \in \{2...M\}, p \]
+		\[ bu'_{Mp} = 0 \quad \forall p \]
+
+	\item Transition from $\vec{pe}$ to $\vec{pe'}$ - Expected number of patients for this month
+		\[\ pe_{dc} = pea_{dc} \quad \forall dc \]
+
+	\item Transition from $\vec{pw}$ to $\vec{pw'}$ - Flow of patients between difficulties/scheduling/cancelling for waitlist
+		\[ pw'_{1dc} = pe_{dc} - \sum_{t} sc_{t0dc} + \sum_{t} usc_{t0dc} \quad \forall dc \]
+		\[ pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + pwt_{m,d-1,c} - pwt_{m,d,c} \quad \forall m \in \{1...M-1 \}, dc \]
+		\[ pw'_{Mdc} = 0 \quad \forall dc \]
+
+	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patients between difficulties/scheduling/cancelling for scheduled appointments
+		\[ ps'_{t-1,m+1,dc} = ps_{tmdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + inflow - outflow \quad \forall t \in {2 ... T},  m \in \{0... M-1 \}, dc \]
+		\[ ps'_{Tmdc} = 0 \quad \forall mdc \]
+
 \end{itemize}
     
 \section{Costs}
-Cost will come only from one source: the number of people unscheduled after action is performed:
-\[ c(\vec{s}, \vec{a}) = \sum_{dc} c_m pw_{mdc} \]
-Where $c_m$ is computed as follows (where $val$ is an arbitrary number that would allow us to describe cost growth well):
-	\[ c_{m} = val^m \quad \forall m \in \{ 0, ..., M-1 \} \]
-	\[ c_{M} = val^m * 100  \]
+Cost will come from two source:  
+\begin{itemize} 
+	\item cost of having patients wait ($cw$)
+		\begin{itemize}
+			\item this cost will apply to 2 things: number of patients remaining on the waitlist, and number of patients scheduled in advance
+		\end{itemize}
+	\item cancellation cost ($cc$)
+\end{itemize}
+\[ c(\vec{s}, \vec{a}) = \sum_{dc} cw_{m} pw_{mdc} + \sum_{tdc} cw_{m} ps_{tmdc} + \sum_{tmdc} cc * usc_{tmdc}\]
+Where $cw_{m}$ (wait cost) is computed as follows (where $val$ is an arbitrary number that would allow us to describe cost growth well):
+	\[ cc_{m} = val^m \quad \forall m \in \{ 0, ..., M-1 \} \]
+	\[ cc_{M} = val^m * 100  \]
 The reason there is a very high cost at the last month is because patients are essentially removed if they are not scheduled and they are in the last wait month (in order to be able to have a limit on $m$ while modeling). So theoretically, the model should schedule in such a way that people never reach that point.
 
 \end{document}
