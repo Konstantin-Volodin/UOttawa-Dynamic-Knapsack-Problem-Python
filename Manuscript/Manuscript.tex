@@ -29,22 +29,31 @@ State space is defined by current units available for various PPEs for future pe
 \end{itemize}
 
 \section{Action Sets}
+
+\subsection{Description}
 At the beginning of each period, decision maker must cancel appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
 \[ \vec{a} = (\vec{sc}, \vec{usc}) \]
 \begin{itemize}
     \item $\vec{sc} = sc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ periods, to schedule in period $t$ ($m$ of 0 stands for people who have just arrived)
 	\item $\vec{usc} = usc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to cancel from period $t$
 \end{itemize}
-The actions must satisfy the following constraints:
+
+\subsection{Action Constraints}
 \begin{itemize}
-    \item Total allocated budged must not be exceeded ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
-        \[ \sum_{dc}s_{mdc}U_{pdc} <= (be - bu)\ \quad \forall m, p \]
+    \item Total number of units cannot be exceeded ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
+        \[ \sum_{tdc}(sc_{tmdc} - usc_{tmdc})U_{pdc} <= (be_{mp} - bu_{mp})\ \quad \forall mp \]
 	\item Cannot schedule past waitlist horizon limit
+		\[ sc_{tmdc} = 0 \quad \forall tmdc, \text{where } ((t-1)+m) > T \]
 	\item number of people scheduled/cancelled must be consistent
+		\[ usc_{t0dc} = 0 \quad \forall tdc \]
+		\[ usc_{tmdc} \le ps_{tmdc} \quad \forall t, m \in \{1...M \}, dc \]
+		\[ \sum_{t} sc_{t0dc} \le pe_{dc} \quad \forall dc \]
+		\[ \sum_{t} sc_{tmdc} \le pw_{mdc} + \sum_{t} usc_{tmdc} \quad \forall m \in \{1...M \}, dc \]
 \end{itemize}
 
 \section{Transition Probabilities}
-There are three sources of uncertainty: 
+
+\subsection{Uncertainty Sources}
 \begin{enumerate}
     	
 	\item Number of patients arriving this period - $pe_{dc}$
@@ -54,9 +63,12 @@ There are three sources of uncertainty:
 	
 	\item Transition between patient difficulties within the wait list - $pw_{mdc}$
 		\begin{itemize}
-			\item let's assume $pwfi_{mdc}$ represents an intermediary variable showing the number of patients of complexity $d$, for CPU $c$ entering the waitlist of period $m$ in any way.
-			\item let's assume $pwfo_{mdc}$ represents an intermediary variable showing the number of patients of complexity $d$, for CPU $c$ leaving the waitlist of period $m$  in any way
 			\item let's assume $pwt_{mdc}$ is the random variable that represents the number of patients of priority $d$, CPU $c$, that have been waiting for $m$ period, that have moved a more complex category. It follows binary distribution.
+		\end{itemize}
+		
+	\item Transition between patient difficulties within the scheduled list - $ps_{tmdc}$
+		\begin{itemize}
+			\item let's assume $pst_{tmdc}$ is the random variable that represents the number of patients of priority $d$, CPU $c$, that have been waiting for $m$ period, that have been scheduled into period $t$, that have moved a more complex category. It follows binary distribution.
 		\end{itemize}
 
 	\item Amout of expected units of PPE resource for the next time period - $bc_{1dc}$
@@ -66,11 +78,8 @@ There are three sources of uncertainty:
 		\end{itemize}
 \end{enumerate}
 
-Assume $pe_{dc}$ follows some poisson distribution. \\
-Assume transition within $pw_{mdc}$ follows some binomial distribution with a probability that patient of difficulty $d$ in CPU $c$ moves to a more difficult category at each state transition. \\
-Assume deviation from expected number of PPE units follows a uniform distribution ($bcd_{p}$)\\
-State transitions have the following constraints:
-\begin{itemize}
+\subsection{Transition Constraints}
+\begin{enumerate}
 
 	\item Transition from $\vec{bc}$ to $\vec{bc'}$ - Expected Units of PPE
 		\[ be'_{1p} = be_{2p} + bed_{p}\ \quad \forall p \]
@@ -78,7 +87,7 @@ State transitions have the following constraints:
 		\[ be'_{Mp} = ben_{d} \quad \forall p \]
 	
 	\item Transition from $\vec{bu}$ to $\vec{bu'}$ - Used Units of PPE
-		\[ bu'_{m-1,p} = bu	_{mp} - \sum_{tdc} ( sc_{t,m-1,dc}U_{pdc} ) + \sum_{tdc} ( usc_{t,m-1,dc}U_{pdc} )  \quad \forall m \in \{2...M\}, p \]
+		\[ bu'_{m-1,p} = bu	_{mp} + \sum_{tdc} ( sc_{t,m-1,dc}U_{pdc} ) - \sum_{tdc} ( usc_{t,m-1,dc}U_{pdc} )  \quad \forall m \in \{2...M\}, p \]
 		\[ bu'_{Mp} = 0 \quad \forall p \]
 
 	\item Transition from $\vec{pe}$ to $\vec{pe'}$ - Expected number of patients for this month
@@ -86,28 +95,28 @@ State transitions have the following constraints:
 
 	\item Transition from $\vec{pw}$ to $\vec{pw'}$ - Flow of patients between difficulties/scheduling/cancelling for waitlist
 		\[ pw'_{1dc} = pe_{dc} - \sum_{t} sc_{t0dc} + \sum_{t} usc_{t0dc} \quad \forall dc \]
-		\[ pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + pwt_{m,d-1,c} - pwt_{m,d,c} \quad \forall m \in \{1...M-1 \}, dc \]
-		\[ pw'_{Mdc} = 0 \quad \forall dc \]
+		\[ pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + pwt_{m,d-1,c} - pwt_{mdc} \quad \forall m \in \{1...M-2 \}, dc \]
+		\[ pw'_{Mdc} = \sum_{M-1}^M pw_{mdc} - \sum_{t,M-1}^{M} sc_{tmdc} +  \sum_{t, M-1}^{M} usc_{tmdc} + \sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}\quad \forall dc \]
 
 	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patients between difficulties/scheduling/cancelling for scheduled appointments
-		\[ ps'_{t-1,m+1,dc} = ps_{tmdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + inflow - outflow \quad \forall t \in {2 ... T},  m \in \{0... M-1 \}, dc \]
+		\[ ps'_{t-1,m+1,dc} = ps_{tmdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + pst_{tm,d-1,c} - pst_{tmdc} \quad \forall t \in \{2 ... T\},  m \in \{0... M-2 \}, dc \]
+		\[ ps'_{t-1,Mdc} = \sum_{M-1}^M ps_{mdc}  - \sum_{t,M-1}^{M} sc_{tmdc} +  \sum_{t, M-1}^{M} usc_{tmdc} + \sum_{M-1}^{M} pst_{tm,d-1,c} - \sum_{M-1}^{M} pst_{tm,d,c}\quad \forall t \in \{2...T \}, dc \]
 		\[ ps'_{Tmdc} = 0 \quad \forall mdc \]
-
-\end{itemize}
+\end{enumerate}
     
 \section{Costs}
 Cost will come from two source:  
 \begin{itemize} 
-	\item cost of having patients wait ($cw$)
+	\item cost of waiting ($cw$) (comes from 2 things)
 		\begin{itemize}
-			\item this cost will apply to 2 things: number of patients remaining on the waitlist, and number of patients scheduled in advance
+			\item number of patients remaining on the wait list 
+			\item number of patients scheduled in advance
 		\end{itemize}
-	\item cancellation cost ($cc$)
+	\item cost of canceling ($cc$)
 \end{itemize}
-\[ c(\vec{s}, \vec{a}) = \sum_{dc} cw_{m} pw_{mdc} + \sum_{tdc} cw_{m} ps_{tmdc} + \sum_{tmdc} cc * usc_{tmdc}\]
-Where $cw_{m}$ (wait cost) is computed as follows (where $val$ is an arbitrary number that would allow us to describe cost growth well):
-	\[ cc_{m} = val^m \quad \forall m \in \{ 0, ..., M-1 \} \]
-	\[ cc_{M} = val^m * 100  \]
-The reason there is a very high cost at the last month is because patients are essentially removed if they are not scheduled and they are in the last wait month (in order to be able to have a limit on $m$ while modeling). So theoretically, the model should schedule in such a way that people never reach that point.
+\[ c(\vec{s}, \vec{a}) = \sum_{mdc} cw_{m} pw_{mdc} + \sum_{tmdc} cw_{m} (ps_{tmdc} + sc_{tmdc} ) + \sum_{tmdc} cc * usc_{tmdc}\]
+$cw_{m}$ is computed as follows ($val$ is arbitrary number that describes cost growth):
+	\[ cw_{m} = val^m \quad \forall m \]
+$cc$ is some arbitrary value
 
 \end{document}
