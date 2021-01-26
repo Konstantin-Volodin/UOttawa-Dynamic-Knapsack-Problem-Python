@@ -18,11 +18,11 @@
 Decisions are made at the beginning of each time period (will be weeks)
 
 \section{State Space}
-State space is defined by current units available for various PPEs for future periods, amount of budget already spent on PPEs, current patient waitlist, expected period demand, and number of patients already scheduled
-\[ \vec{s}  = (\vec{be}, \vec{bu}, \vec{pw}, \vec{pe})\]
+State space is defined by current units available for various PPEs for future periods, amount of units already used for various PPEs, current patient waitlist, expected period demand, and number of patients already scheduled
+\[ \vec{s}  = (\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps})\]
 \begin{itemize}
-    \item $\vec{be} = be_{mp}$ - Expected unist for period $m$, and PPE $p$
-    \item $\vec{bu} = bu_{mp}$ - Used units for period $m$, and PPE $p$
+    \item $\vec{ue} = ue_{tp}$ - Expected unist for period $t$, and PPE $p$
+    \item $\vec{uu} = uu_{tp}$ - Used units for period $t$, and PPE $p$
     \item $\vec{pw} = pw_{mdc}$ - Number of patients of complexity $d$, CPU $c$, on a wait list for $m$ periods
     \item $\vec{pe} = pe_{dc}$ - Number of patients of complexity $d$, CPU $c$ expected to arrive this period
     \item $\vec{ps} = ps_{tmdc}$ - Number of patients of complexity $d$, CPU $c$, scheduled to period $t$, who have been on the waitlist for $m$ periods ($m$ of 0 stands for people who have just arrived)
@@ -31,24 +31,32 @@ State space is defined by current units available for various PPEs for future pe
 \section{Action Sets}
 
 \subsection{Description}
-At the beginning of each period, decision maker must cancel appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
-\[ \vec{a} = (\vec{sc}, \vec{usc}) \]
+At the beginning of each period, decision maker must reschedule appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
+\[ \vec{a} = (\vec{sc}, \vec{rsc}) \]
 \begin{itemize}
     \item $\vec{sc} = sc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ periods, to schedule in period $t$ ($m$ of 0 stands for people who have just arrived)
-	\item $\vec{usc} = usc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to cancel from period $t$
+	\item $\vec{rsc} = rsc_{tt'mdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to reschedule from period $t$ to period $t'$
 \end{itemize}
 
 \subsection{Action Constraints}
 \begin{itemize}
-    \item Total number of units cannot be exceeded ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
-        \[ \sum_{tdc}(sc_{tmdc} - usc_{tmdc})U_{pdc} <= (be_{mp} - bu_{mp})\ \quad \forall mp \]
-	\item Cannot schedule past waitlist horizon limit
+    \item Total number of PPE units cannot be exceeded  
+    \begin{itemize}
+    	\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
+    	\item ($uv_{tp}$ - goal variable, unit violation for period $t$, of PPE $p$ )
+    \end{itemize}
+        \[ \sum_{mdc}(sc_{tmdc})U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp \]
+	\item Cannot schedule/reschedule past wait list horizon limit
 		\[ sc_{tmdc} = 0 \quad \forall tmdc, \text{where } ((t-1)+m) > T \]
-	\item number of people scheduled/cancelled must be consistent
-		\[ usc_{t0dc} = 0 \quad \forall tdc \]
-		\[ usc_{tmdc} \le ps_{tmdc} \quad \forall t, m \in \{1...M \}, dc \]
+		\[ rsc_{tt'mdc} = 0 \quad \forall tt'mdc, \text{where } ((t'-1)+m) > T \]
+	\item Bounds on when reschedules are allowed
+		\[ rsc_{tt'mdc} = 0 \quad \forall t \in \{ 2...T \}, t' \in \{ 2...T \}, mdc \]
+		\[ rsc_{tt'mdc} = 0 \quad \forall tt'mdc, \text{where } t=t' \]
+	
+	\item number of people scheduled/rescheduled must be consistent
+		\[ \sum_{t'} rsc_{tt'mdc} \le ps_{tmdc} \quad \forall tmdc \]
 		\[ \sum_{t} sc_{t0dc} \le pe_{dc} \quad \forall dc \]
-		\[ \sum_{t} sc_{tmdc} \le pw_{mdc} + \sum_{t} usc_{tmdc} \quad \forall m \in \{1...M \}, dc \]
+		\[ \sum_{t} sc_{tmdc} \le pw_{mdc} \quad \forall m \in \{1...M \}, dc \]
 \end{itemize}
 
 \section{Transition Probabilities}
@@ -73,8 +81,8 @@ At the beginning of each period, decision maker must cancel appointments as nece
 
 	\item Amout of expected units of PPE resource for the next time period - $bc_{1dc}$
 		\begin{itemize}
-			\item let's assume $bed_{md}$ is the random variable that represents the deviation of PPE units from the expectation for the next period only. It follows some uniform distribution.
-			\item let's assume $ben_{d}$ is the default value to be used for expected number of PPE units $p$ per period
+			\item let's assume $ued_{md}$ is the random variable that represents the deviation of PPE units from the expectation for the next period only. It follows some uniform distribution.
+			\item let's assume $uen_{d}$ is the default value to be used for expected number of PPE units $p$ per period
 		\end{itemize}
 \end{enumerate}
 
@@ -82,25 +90,29 @@ At the beginning of each period, decision maker must cancel appointments as nece
 \begin{enumerate}
 
 	\item Transition from $\vec{bc}$ to $\vec{bc'}$ - Expected Units of PPE
-		\[ be'_{1p} = be_{2p} + bed_{p}\ \quad \forall p \]
-		\[ be'_{m-1,p} = be_{mp}\ \quad \forall m \in \{3...M\}, p \]
-		\[ be'_{Mp} = ben_{d} \quad \forall p \]
+		\[ ue'_{1p} = ue_{2p} + ued_{p}\ \quad \forall p \]
+		\[ ue'_{m-1,p} = ue_{mp}\ \quad \forall m \in \{3...M\}, p \]
+		\[ ue'_{Mp} = uen_{d} \quad \forall p \]
 	
-	\item Transition from $\vec{bu}$ to $\vec{bu'}$ - Used Units of PPE
-		\[ bu'_{m-1,p} = bu	_{mp} + \sum_{tdc} ( sc_{t,m-1,dc}U_{pdc} ) - \sum_{tdc} ( usc_{t,m-1,dc}U_{pdc} )  \quad \forall m \in \{2...M\}, p \]
-		\[ bu'_{Mp} = 0 \quad \forall p \]
+	\item Transition from $\vec{uu}$ to $\vec{uu'}$ - Used Units of PPE
+		\[ uu'_{t-1,p} = uu	_{tp} + \sum_{mdc} ( sc_{t-1,mdc}U_{pdc} ) - \sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc})  \quad \forall t \in \{2...T\}, p \]
+		\[ uu'_{Tp} = 0 \quad \forall p \]
 
 	\item Transition from $\vec{pe}$ to $\vec{pe'}$ - Expected number of patients for this month
 		\[\ pe_{dc} = pea_{dc} \quad \forall dc \]
 
 	\item Transition from $\vec{pw}$ to $\vec{pw'}$ - Flow of patients between difficulties/scheduling/cancelling for waitlist
-		\[ pw'_{1dc} = pe_{dc} - \sum_{t} sc_{t0dc} + \sum_{t} usc_{t0dc} \quad \forall dc \]
-		\[ pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + pwt_{m,d-1,c} - pwt_{mdc} \quad \forall m \in \{1...M-2 \}, dc \]
-		\[ pw'_{Mdc} = \sum_{M-1}^M pw_{mdc} - \sum_{t,M-1}^{M} sc_{tmdc} +  \sum_{t, M-1}^{M} usc_{tmdc} + \sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}\quad \forall dc \]
+		\[ pw'_{1dc} = pe_{dc} - \sum_{t} sc_{t0dc} \quad \forall dc \]
+		\[ pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + pwt_{m,d-1,c} - pwt_{mdc} \quad \forall m \in \{1...M-2 \}, dc \]
+		\[ pw'_{Mdc} = \sum_{M-1}^M pw_{mdc} - \sum_{t,M-1}^{M} sc_{tmdc} + \sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}\quad \forall dc \]
 
 	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patients between difficulties/scheduling/cancelling for scheduled appointments
-		\[ ps'_{t-1,m+1,dc} = ps_{tmdc} - \sum_{t} sc_{tmdc} + \sum_{t} usc_{tmdc} + pst_{tm,d-1,c} - pst_{tmdc} \quad \forall t \in \{2 ... T\},  m \in \{0... M-2 \}, dc \]
-		\[ ps'_{t-1,Mdc} = \sum_{M-1}^M ps_{mdc}  - \sum_{t,M-1}^{M} sc_{tmdc} +  \sum_{t, M-1}^{M} usc_{tmdc} + \sum_{M-1}^{M} pst_{tm,d-1,c} - \sum_{M-1}^{M} pst_{tm,d,c}\quad \forall t \in \{2...T \}, dc \]
+		\[ ps'_{t-1,m+1,dc} = ps_{tmdc} +  \sum_{t} sc_{tmdc} - 
+		\sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc}) \] 
+		\[+ pst_{tm,d-1,c} - pst_{tmdc} \quad \forall t \in \{2 ... T\},  m \in \{0... M-2 \}, dc \]
+		\[ ps'_{t-1,Mdc} = \sum_{M-1}^M ps_{mdc}  - \sum_{t,M-1}^{M} sc_{tmdc} -
+		\sum_{t',M-1,dc}^M (rsc_{tt'mdc} U_{pdc}) + \sum_{t,M-1,dc}^M (rsc_{tt'mdc} U_{pdc}) \]
+		\[ + \sum_{M-1}^{M} pst_{tm,d-1,c} - \sum_{M-1}^{M} pst_{tm,d,c}\quad \forall t \in \{2...T \}, dc \]
 		\[ ps'_{Tmdc} = 0 \quad \forall mdc \]
 \end{enumerate}
     
@@ -108,13 +120,10 @@ At the beginning of each period, decision maker must cancel appointments as nece
 Cost will come from two source:  
 \begin{itemize} 
 	\item cost of waiting ($cw$) (comes from 2 things)
-		\begin{itemize}
-			\item number of patients remaining on the wait list 
-			\item number of patients scheduled in advance
-		\end{itemize}
 	\item cost of canceling ($cc$)
+	\item goal variable (to eliminate constraint violation, but still allow it if necessary)
 \end{itemize}
-\[ c(\vec{s}, \vec{a}) = \sum_{mdc} cw_{m} pw_{mdc} + \sum_{tmdc} cw_{m} (ps_{tmdc} + sc_{tmdc} ) + \sum_{tmdc} cc * usc_{tmdc}\]
+\[ c(\vec{s}, \vec{a}) = \sum_{mdc} cw_{m} (pw_{mdc}- \sum_{t} sc_{tmdc}) + cc \sum_{tt`mdc} rsc_{tt'mdc} + M (uv_{tp})\]
 $cw_{m}$ is computed as follows ($val$ is arbitrary number that describes cost growth):
 	\[ cw_{m} = val^m \quad \forall m \]
 $cc$ is some arbitrary value
