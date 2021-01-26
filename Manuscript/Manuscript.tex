@@ -32,10 +32,11 @@ State space is defined by current units available for various PPEs for future pe
 
 \subsection{Description}
 At the beginning of each period, decision maker must reschedule appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
-\[ \vec{a} = (\vec{sc}, \vec{rsc}) \]
+\[ \vec{a} = (\vec{sc}, \vec{rsc}, \vec{uv}) \]
 \begin{itemize}
     \item $\vec{sc} = sc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ periods, to schedule in period $t$ ($m$ of 0 stands for people who have just arrived)
 	\item $\vec{rsc} = rsc_{tt'mdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to reschedule from period $t$ to period $t'$
+	\item $uv_{tp}$ - goal variable, violation on number of resources used for period $t$, of PPE $p$
 \end{itemize}
 
 \subsection{Action Constraints}
@@ -43,7 +44,6 @@ At the beginning of each period, decision maker must reschedule appointments as 
     \item Total number of PPE units cannot be exceeded  
     \begin{itemize}
     	\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
-    	\item ($uv_{tp}$ - goal variable, unit violation for period $t$, of PPE $p$ )
     \end{itemize}
         \[ \sum_{mdc}(sc_{tmdc})U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp \]
 	\item Cannot schedule/reschedule past wait list horizon limit
