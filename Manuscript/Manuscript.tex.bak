@@ -8,11 +8,47 @@
 
 \title{Dynamic Knapsack Problem}
 \author{KV}
-\date{December 2020}
+\date{February 2021}
 
 \begin{document}
 
 \maketitle
+
+\section{Assumptions} 
+\begin{itemize}
+	\item Assume all new patients are arriving at the beginning of the period 
+	\begin{itemize}
+		\item Assume arrivals follow poisson distribution
+	\end{itemize}		
+	
+	\item It is assumed that there is no difference between how long a patient waits for their appointment within some limit ($TL$). 
+	\begin{itemize}
+		\item Let's assume our limit is 10 periods, there is no difference in terms of cost between patients who has been waiting for 1 period and patients waiting 9 period for their appointment (assuming they are the same category).  
+		\item However, if a patient waits for 11 period for their appointment there should be some kind of penalty for the wait
+		\item The penalty comes from increasing patient complexity. Higher complexities require more resources and are thus more costly overall in the system
+	\end{itemize}		
+	
+	\item We assume patient complexity transitions follow binary distribution - each period a patient can become more complex with a certain probability
+		\begin{itemize}
+			\item While patient is waiting less that $TL$, the transition probability is 0.
+			\item After $TL$, transition probability is some arbitrary percentage
+		\end{itemize}
+	
+	\item It is assumed if a patient is scheduled in period one, it means they are served "immediately", regardless if in practice the appointment is at the beginning or end of the period.
+	\item We distinguish between two types of reschedules: good and bad reschedules
+	\begin{itemize}
+		\item Good reschedules are reschedules where a patient is rescheduled to an earlier period (they improve cost)
+		\item Bad reschedules are reschedules where a patient is rescheduled to a later period (they worsen cost)
+	\end{itemize}
+
+	\item We assume that only specific reschedules are allowed (to simplify the model, and remove  redundancies)
+		\begin{itemize}
+			\item Good reschedules are allowed from any period after 2 into period 1
+			\item Bad reschedules are only allowed from period 1 to period 2
+		\end{itemize}
+		
+	\item We assume there is no seasonality in periods and 
+\end{itemize}
 
 \section{Decision Epochs}
 Decisions are made at the beginning of each time period (will be weeks)
@@ -32,10 +68,11 @@ State space is defined by current units available for various PPEs for future pe
 
 \subsection{Description}
 At the beginning of each period, decision maker must reschedule appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
-\[ \vec{a} = (\vec{sc}, \vec{rsc}) \]
+\[ \vec{a} = (\vec{sc}, \vec{rsc}, \vec{uv}) \]
 \begin{itemize}
     \item $\vec{sc} = sc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ periods, to schedule in period $t$ ($m$ of 0 stands for people who have just arrived)
 	\item $\vec{rsc} = rsc_{tt'mdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to reschedule from period $t$ to period $t'$
+	\item $uv_{tp}$ - goal variable, violation on number of resources used for period $t$, of PPE $p$
 \end{itemize}
 
 \subsection{Action Constraints}
@@ -43,15 +80,12 @@ At the beginning of each period, decision maker must reschedule appointments as 
     \item Total number of PPE units cannot be exceeded  
     \begin{itemize}
     	\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
-    	\item ($uv_{tp}$ - goal variable, unit violation for period $t$, of PPE $p$ )
     \end{itemize}
         \[ \sum_{mdc}(sc_{tmdc})U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp \]
-	\item Cannot schedule/reschedule past wait list horizon limit
-		\[ sc_{tmdc} = 0 \quad \forall tmdc, \text{where } ((t-1)+m) > T \]
-		\[ rsc_{tt'mdc} = 0 \quad \forall tt'mdc, \text{where } ((t'-1)+m) > T \]
 	\item Bounds on when reschedules are allowed
-		\[ rsc_{tt'mdc} = 0 \quad \forall t \in \{ 2...T \} \]
-		\[ rsc_{tt'mdc} = 0 \quad \forall t' \in \{ 1 \} \]
+		\[ rsc_{tt'mdc} = 0 \quad \forall t \in \{ 2...T \}, t' \in \{2...T\} mdc \]
+		\[ rsc_{tt'mdc} = 0 \quad \forall t \in \{ 1 \}, t'\in \{ 3...T \} mdc \]
+		\[ rsc_{tt'mdc} = 0 \quad \forall tt'mdc, \text{where } t=t' \]
 	
 	\item number of people scheduled/rescheduled must be consistent
 		\[ \sum_{t'} rsc_{tt'mdc} \le ps_{tmdc} \quad \forall tmdc \]
