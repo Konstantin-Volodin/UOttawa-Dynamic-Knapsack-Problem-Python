@@ -31,14 +31,14 @@
 	\item We assume patient complexity transitions follow binary distribution - each period a patient can become more complex with a certain probability
 		\begin{itemize}
 			\item While patient is waiting less that $TL$, the transition probability is 0.
-			\item After $TL$, transition probability is some arbitrary percentage
+			\item After $TL$, transition probability is some arbitrary value
 		\end{itemize}
 	
 	\item It is assumed if a patient is scheduled in period one, it means they are served "immediately", regardless if in practice the appointment is at the beginning or end of the period.
 	\item We distinguish between two types of reschedules: good and bad reschedules
 	\begin{itemize}
-		\item Good reschedules are reschedules where a patient is rescheduled to an earlier period (they improve cost)
-		\item Bad reschedules are reschedules where a patient is rescheduled to a later period (they worsen cost)
+		\item Good reschedules are reschedules where a patient is rescheduled to an earlier period
+		\item Bad reschedules are reschedules where a patient is rescheduled to a later period
 	\end{itemize}
 
 	\item We assume that only specific reschedules are allowed (to simplify the model, and remove  redundancies)
@@ -161,7 +161,8 @@ Cost will come from two source:
 	\item cost of canceling ($cc$)
 	\item goal variable (to eliminate constraint violation, but still allow it if necessary)
 \end{itemize}
-\[ c(\vec{s}, \vec{a}) = \sum_{mdc} cw_{m} (pw_{mdc}- \sum_{t} sc_{tmdc}) + cc \sum_{tt`mdc} rsc_{tt'mdc} + M (uv_{tp})\]
+\[ c(\vec{s}, \vec{a}) = \sum_{mdc} cw_{m} (pw_{mdc}- \sum_{t} sc_{tmdc}) + cc \sum_{tt`mdc, \text{where } t' > t} rsc_{tt'mdc} 
+- cc \sum_{tt`mdc, \text{where } t' < t} rsc_{tt'mdc} + M (uv_{tp})\]
 $cw_{m}$ is computed as follows ($val$ is arbitrary number that describes cost growth):
 	\[ cw_{m} = val^m \quad \forall m \]
 $cc$ is some arbitrary value
