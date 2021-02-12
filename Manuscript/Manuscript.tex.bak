@@ -18,6 +18,14 @@
 
 \maketitle
 
+\section{Questions/Comments}
+\begin{itemize}
+	\item \textbf{COMMENT}: In constraints for transition between $uu$ and $uu'$ - missing change in usage due to complexity transition
+	\item \textbf{QUESTION}: How to incorporate goal variable $uv$ properly into transition, ADP, etc.?
+	\item \textbf{QUESTION}: Does the ADP look correct to you so far?
+\end{itemize}
+
+
 \section{Assumptions} 
 \begin{itemize}
 	\item Assume all new patients are arriving at the beginning of the period 
