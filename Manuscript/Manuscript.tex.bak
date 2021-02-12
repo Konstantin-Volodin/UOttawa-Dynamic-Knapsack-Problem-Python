@@ -1,7 +1,11 @@
 \documentclass{article}
+
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+
 \geometry{margin=1in}
 \setlength\parindent{0pt}
 
@@ -21,7 +25,7 @@
 		\item Assume arrivals follow poisson distribution
 	\end{itemize}		
 	
-	\item It is assumed that there is no difference between how long a patient waits for their appointment within some limit ($TL$). 
+	\item It is assumed that there is no difference between how long a patient waits for their appointment within some limit ($Tl$). 
 	\begin{itemize}
 		\item Let's assume our limit is 10 periods, there is no difference in terms of cost between patients who has been waiting for 1 period and patients waiting 9 period for their appointment (assuming they are the same category).  
 		\item However, if a patient waits for 11 period for their appointment there should be some kind of penalty for the wait
@@ -30,15 +34,15 @@
 	
 	\item We assume patient complexity transitions follow binary distribution - each period a patient can become more complex with a certain probability
 		\begin{itemize}
-			\item While patient is waiting less that $TL$, the transition probability is 0.
-			\item After $TL$, transition probability is some arbitrary percentage
+			\item While patient is waiting less that $Tl$, the transition probability is 0.
+			\item After $Tl$, transition probability is some arbitrary value
 		\end{itemize}
 	
 	\item It is assumed if a patient is scheduled in period one, it means they are served "immediately", regardless if in practice the appointment is at the beginning or end of the period.
 	\item We distinguish between two types of reschedules: good and bad reschedules
 	\begin{itemize}
-		\item Good reschedules are reschedules where a patient is rescheduled to an earlier period (they improve cost)
-		\item Bad reschedules are reschedules where a patient is rescheduled to a later period (they worsen cost)
+		\item Good reschedules are reschedules where a patient is rescheduled to an earlier period
+		\item Bad reschedules are reschedules where a patient is rescheduled to a later period
 	\end{itemize}
 
 	\item We assume that only specific reschedules are allowed (to simplify the model, and remove  redundancies)
@@ -46,16 +50,21 @@
 			\item Good reschedules are allowed from any period after 2 into period 1
 			\item Bad reschedules are only allowed from period 1 to period 2
 		\end{itemize}
-		
-	\item We assume there is no seasonality in periods and 
+	
+	\item It is assumed that there is a certain default expected number of PPE units available for all periods
+		\begin{itemize}
+			\item However, in the period 1, there is some random deviation from the expected number of units
+			\item This random deviation follows some uniform distribution
+		\end{itemize}
 \end{itemize}
 
-\section{Decision Epochs}
+\section{MDP Model}
+\subsection{Decision Epochs}
 Decisions are made at the beginning of each time period (will be weeks)
 
-\section{State Space}
+\subsection{State Space}
 State space is defined by current units available for various PPEs for future periods, amount of units already used for various PPEs, current patient waitlist, expected period demand, and number of patients already scheduled
-\[ \vec{s}  = (\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps})\]
+\[  \vec{S}  = (\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \]
 \begin{itemize}
     \item $\vec{ue} = ue_{tp}$ - Expected unist for period $t$, and PPE $p$
     \item $\vec{uu} = uu_{tp}$ - Used units for period $t$, and PPE $p$
@@ -64,38 +73,62 @@ State space is defined by current units available for various PPEs for future pe
     \item $\vec{ps} = ps_{tmdc}$ - Number of patients of complexity $d$, CPU $c$, scheduled to period $t$, who have been on the waitlist for $m$ periods ($m$ of 0 stands for people who have just arrived)
 \end{itemize}
 
-\section{Action Sets}
+\subsection{Action Sets}
 
-\subsection{Description}
+\subsubsection{Description}
 At the beginning of each period, decision maker must reschedule appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
-\[ \vec{a} = (\vec{sc}, \vec{rsc}, \vec{uv}) \]
+\[  \vec{A} = (\vec{sc}, \vec{rsc}, \vec{uv}) \] 
 \begin{itemize}
     \item $\vec{sc} = sc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ periods, to schedule in period $t$ ($m$ of 0 stands for people who have just arrived)
 	\item $\vec{rsc} = rsc_{tt'mdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to reschedule from period $t$ to period $t'$
 	\item $uv_{tp}$ - goal variable, violation on number of resources used for period $t$, of PPE $p$
 \end{itemize}
 
-\subsection{Action Constraints}
+\subsubsection{Action Constraints}
 \begin{itemize}
     \item Total number of PPE units cannot be exceeded  
     \begin{itemize}
-    	\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
+    		\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
     \end{itemize}
-        \[ \sum_{mdc}(sc_{tmdc})U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp \]
-	\item Bounds on when reschedules are allowed
-		\[ rsc_{tt'mdc} = 0 \quad \forall t \in \{ 2...T \}, t' \in \{2...T\} mdc \]
-		\[ rsc_{tt'mdc} = 0 \quad \forall t \in \{ 1 \}, t'\in \{ 3...T \} mdc \]
-		\[ rsc_{tt'mdc} = 0 \quad \forall tt'mdc, \text{where } t=t' \]
+        \begin{equation} 
+			\sum_{mdc}(sc_{tmdc})U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp
+		\end{equation}
 	
+	\item Bounds on when reschedules are allowed
+		\begin{equation}  
+			rsc_{tt'mdc} = 0 \quad \forall t \in \{ 2...T \}, t' \in \{2...T\} mdc 
+		\end{equation} 
+		\begin{equation}  
+			rsc_{tt'mdc} = 0 \quad \forall t \in \{ 1 \}, t'\in \{ 3...T \} mdc 
+		\end{equation} 
+		\begin{equation}  
+			rsc_{tt'mdc} = 0 \quad \forall tt'mdc, \text{where } t=t' 
+		\end{equation} 
+
+	\item Cap on max schedule/reschedule wait time
+		\begin{equation}  
+			\sum_{tmdc} sc_{tmdc} = 0 \quad \text{where } t+m-1 > 2Tl 
+		\end{equation} 
+		\begin{equation}  
+			\sum_{tt'mdc} rsc_{tt'mdc} \quad \text{where } t'+m+1 > 2Tl 
+		\end{equation} 
+
 	\item number of people scheduled/rescheduled must be consistent
-		\[ \sum_{t'} rsc_{tt'mdc} \le ps_{tmdc} \quad \forall tmdc \]
-		\[ \sum_{t} sc_{t0dc} \le pe_{dc} \quad \forall dc \]
-		\[ \sum_{t} sc_{tmdc} \le pw_{mdc} \quad \forall m \in \{1...M \}, dc \]
+		\begin{equation}  
+			\sum_{t'} rsc_{tt'mdc} \le ps_{tmdc} \quad \forall tmdc 
+		\end{equation} 
+		\begin{equation}  
+			\sum_{t} sc_{t0dc} \le pe_{dc} \quad \forall dc 
+		\end{equation} 
+		\begin{equation}  
+			\sum_{t} sc_{tmdc} \le pw_{mdc} \quad \forall m \in \{1...M \}, dc 
+		\end{equation} 
+
 \end{itemize}
 
-\section{Transition Probabilities}
+\subsection{Transition Probabilities}
 
-\subsection{Uncertainty Sources}
+\subsubsection{Uncertainty Sources}
 \begin{enumerate}
     	
 	\item Number of patients arriving this period - $pe_{dc}$
@@ -120,46 +153,198 @@ At the beginning of each period, decision maker must reschedule appointments as 
 		\end{itemize}
 \end{enumerate}
 
-\subsection{Transition Constraints}
+\subsubsection{Transition Constraints}
+
+\textit{\textbf{FROM CONSTRAINT SET \#2 MISSING RESOURCE USAGE DUE TO TRANSITION IN DIFFICULTIES}}
 \begin{enumerate}
 
-	\item Transition from $\vec{bc}$ to $\vec{bc'}$ - Expected Units of PPE
-		\[ ue'_{1p} = ue_{2p} + ued_{p}\ \quad \forall p \]
-		\[ ue'_{m-1,p} = ue_{mp}\ \quad \forall m \in \{3...M\}, p \]
-		\[ ue'_{Mp} = uen_{d} \quad \forall p \]
+	\item Transition from $\vec{ue}$ to $\vec{ue'}$ - Expected Units of PPE
+		\begin{equation}  
+			ue'_{1p} = ue_{2p} + ued_{p}\ \quad \forall p 
+		\end{equation} 
+		\begin{equation}  
+			ue'_{t-1,p} = ue_{tp}\ \quad \forall t \in \{3...T\}, p
+		 \end{equation} 
+		\begin{equation}  
+			ue'_{Tp} = uen_{d} \quad \forall p 
+		\end{equation} 
 	
-	\item Transition from $\vec{uu}$ to $\vec{uu'}$ - Used Units of PPE
-		\[ uu'_{t-1,p} = uu	_{tp} + \sum_{mdc} ( sc_{t-1,mdc}U_{pdc} ) - \sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc})  \quad \forall t \in \{2...T\}, p \]
-		\[ uu'_{Tp} = 0 \quad \forall p \]
+	\item Transition from $\vec{uu}$ to $\vec{uu'}$ - Used Units of PPE		
+		\begin{align} \begin{split}  
+			uu'_{t-1,p} = &  uu	_{tp} + \sum_{mdc} ( sc_{tmdc} U_{pdc} ) - \\ 
+								&	- \sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc}) \quad \forall t \in \{2...T\}, p 
+		\end{split} \end{align}
+		\begin{equation}  
+			uu'_{Tp} = 0 \quad \forall p 
+		\end{equation} 
 
 	\item Transition from $\vec{pe}$ to $\vec{pe'}$ - Expected number of patients for this month
-		\[\ pe_{dc} = pea_{dc} \quad \forall dc \]
+		\begin{equation} 
+			\ pe_{dc} = pea_{dc} \quad \forall dc 
+		\end{equation} 
 
 	\item Transition from $\vec{pw}$ to $\vec{pw'}$ - Flow of patients between difficulties/scheduling/cancelling for waitlist
-		\[ pw'_{1dc} = pe_{dc} - \sum_{t} sc_{t0dc} \quad \forall dc \]
-		\[ pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + pwt_{m,d-1,c} - pwt_{mdc} \quad \forall m \in \{1...M-2 \}, dc \]
-		\[ pw'_{Mdc} = \sum_{M-1}^M pw_{mdc} - \sum_{t,M-1}^{M} sc_{tmdc} + \sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}\quad \forall dc \]
+		\begin{equation}  
+			pw'_{1dc} = pe_{dc} - \sum_{t} sc_{t0dc} \quad \forall dc 
+		\end{equation} 
+		\begin{equation}  
+			pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + pwt_{m,d-1,c} - pwt_{mdc} \quad \forall m \in \{1...M-2 \}, dc 
+		\end{equation} 
+		\begin{equation}  
+			pw'_{Mdc} = \sum_{M-1}^M pw_{mdc} - \sum_{t,M-1}^{M} sc_{tmdc} + \sum_{M-1}^{M} pwt_{m,d-1,c} - 
+			\sum_{M-1}^{M} pwt_{mdc}\quad \forall dc 
+		\end{equation} 
 
-	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patients between difficulties/scheduling/cancelling for scheduled appointments
-		\[ ps'_{t-1,m+1,dc} = ps_{tmdc} +  \sum_{t} sc_{tmdc} - 
-		\sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc}) \] 
-		\[+ pst_{tm,d-1,c} - pst_{tmdc} \quad \forall t \in \{2 ... T\},  m \in \{0... M-2 \}, dc \]
-		\[ ps'_{t-1,Mdc} = \sum_{M-1}^M ps_{mdc}  - \sum_{t,M-1}^{M} sc_{tmdc} -
-		\sum_{t',M-1,dc}^M (rsc_{tt'mdc} U_{pdc}) + \sum_{t,M-1,dc}^M (rsc_{tt'mdc} U_{pdc}) \]
-		\[ + \sum_{M-1}^{M} pst_{tm,d-1,c} - \sum_{M-1}^{M} pst_{tm,d,c}\quad \forall t \in \{2...T \}, dc \]
-		\[ ps'_{Tmdc} = 0 \quad \forall mdc \]
+	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patiensts between difficulties/scheduling/cancelling for scheduled appointments
+		\begin{align}  \begin{split}
+			ps'_{t-1,m+1,dc} = & ps_{tmdc} +  \sum_{t} sc_{tmdc} - \sum_{t'} rsc_{tt'mdc} + \sum_{t} rsc_{tt'mdc} +\\ 
+										& + pst_{tm,d-1,c} - pst_{tmdc} \quad \forall t \in \{2 ... T\},  m \in \{0... M-2 \}, dc 
+		\end{split} \end{align} 
+		\begin{align} \begin{split}  
+			ps'_{t-1,Mdc} = & \sum_{M-1}^M ps_{mdc}  - \sum_{t,M-1}^{M} sc_{tmdc}  - \sum_{t'M-1}^M rsc_{tt'mdc} + \\
+									& \sum_{t,M-1}^M rsc_{tt'mdc} + \sum_{M-1}^{M} pst_{tm,d-1,c} - \sum_{M-1}^{M} pst_{tm,d,c}
+									\quad \forall t \in \{2...T \}, dc 
+		\end{split} \end{align}		
+		\begin{equation}  
+			ps'_{Tmdc} = 0 \quad \forall mdc 
+		\end{equation} 
 \end{enumerate}
     
-\section{Costs}
+\subsection{Costs}
 Cost will come from two source:  
 \begin{itemize} 
 	\item cost of waiting ($cw$) (comes from 2 things)
 	\item cost of canceling ($cc$)
 	\item goal variable (to eliminate constraint violation, but still allow it if necessary)
 \end{itemize}
-\[ c(\vec{s}, \vec{a}) = \sum_{mdc} cw_{m} (pw_{mdc}- \sum_{t} sc_{tmdc}) + cc \sum_{tt`mdc} rsc_{tt'mdc} + M (uv_{tp})\]
+
+\begin{align} \begin{split}  
+	\vec{C} = c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) = & \sum_{mdc} cw_{m} (pw_{mdc} - \sum_{t} sc_{tmdc}) +  \\
+		& + cc \sum_{tt`mdc, \text{where } t' > t} rsc_{tt'mdc} - cc \sum_{tt`mdc, \text{where } t' < t} rsc_{tt'mdc} + \\ 
+		& + M (uv_{tp})
+\end{split} \end{align} 
 $cw_{m}$ is computed as follows ($val$ is arbitrary number that describes cost growth):
-	\[ cw_{m} = val^m \quad \forall m \]
+	\begin{equation}  cw_{m} = val^m \quad \forall m \end{equation} 
 $cc$ is some arbitrary value
+
+\section{LP Model}
+
+Given a full MDP model, the equivalent LP would look as follows 
+(Note: there is a lot left out. $\vec{C}$ is defined above, all states, actions, and next states are all defined above). Probability distribution is not explicitly defined, but I am not sure if it is necessary
+\begin{equation}
+	\max_{\vec{v}} \sum \alpha (\vec{S}) v(\vec{S}) 
+\end{equation}
+
+subject to
+\begin{equation}
+	\vec{C} + \gamma \sum_{\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) v( \vec{S'} | \vec{S}, \vec{A}, \vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) \quad \forall \vec{S} \vec{A}
+\end{equation}
+
+Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximation as follows:
+\begin{align} \begin{split}
+	v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) =  & \beta^0 +
+		\sum_{tp} \beta_{tp}^{ue} ue_{tp} +
+		\sum_{tp} \beta_{tp}^{uu} uu_{tp} + \\
+		& + \sum_{mdc} \beta_{mdc}^{pw} pw_{mdc}  + 
+		\sum_{dc} \beta_{dc}^{pe} pe_{dc} + 
+		\sum_{tmdc} \beta_{tmdc}^{ps} ps_{tmdc}
+\end{split} \end{align}
+
+This gives the following LP
+\begin{equation}
+	\max_{\vec{\beta}} \sum \alpha (\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps})
+\end{equation}
+Subject to:
+\begin{align*}
+	& c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) +  \\ 
+	& \gamma \sum_{\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued})  *  \\
+		\beta^{0} \quad & v \Bigg( \beta^{0} + \\
+		\beta^{ue} \quad & 
+				\sum_{p} \beta_{1p}^{ue} (ue_{2p} + ued_{p}) + 
+				\sum_{t=2,p}^{T-1} \beta_{tp}^{ue} ue_{t+1,p} + 
+				\sum_{p} \beta_{Tp}^{ue} uen_{d} + \\
+		\beta^{uu} \quad & 
+				\sum_{tp}^{T-1} \beta_{tp}^{uu} 
+				\bigg( uu_{t+1,p} + \sum_{mdc} (sc_{t+1,mdc}U_{pdc})  - 
+				\sum_{t'mdc} (rsc_{t+1,t'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'+1,mdc} U_{pdc}) \bigg) \\
+		\beta^{uu} \quad & 
+			\sum_{p} \beta_{Tp} * 0 + \\
+		\beta^{pe} \quad & 
+			\sum_{dc} \beta_{dc}^{pe} {\color{red} pea_{dc}}+ \\
+		\beta^{pw} \quad & 
+			\sum_{dc} \beta_{1dc}^{pw} 
+			(pe_{dc} - \sum_{t} sc_{t0dc}) + \\
+		\beta^{pw} \quad & 
+			\sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} 
+			(pw_{m-1,dc} - \sum_{t} sc_{t,m-1,dc} + pwt_{m-1,d-1,c} - pwt_{m-1,dc}) + \\
+		\beta^{pw} \quad & 
+			\sum_{dc} \beta_{Mdc}^{pw} 
+			(\sum_{M-1}^{M} pw_{mdc} - \sum_{M-1,t}^{M} sc_{tmdc} + 
+			\sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}) + \\
+		\beta^{ps} \quad & 
+			\sum_{mdc} \beta_{Tmdc}^{ps} * 0 + \\
+		\beta^{ps} \quad & 
+			\sum_{t=1,m=1,dc}^{T-1,M-1} \beta_{tmdc}^{ps} 
+			\bigg( ps_{t+1,m-1,dc} - \sum_{t} sc_{t+1,m-1,dc} + 
+			pst_{t+1,m-1,d-1,c} - pst_{t+1,m-1,dc} - \\ 
+			&- \sum_{t'} rsc_{t+1,t'm-1,dc} +  \sum_{t} rsc_{t,t'+1,m-1,dc} \bigg) + \\
+			& \text{where }m=0 \text{ is patients who just arrived} \\ 
+		\beta^{ps} \quad & 
+			\sum_{t=1dc}^{T-1} \beta_{tMdc}^{ps} 
+			\bigg( \sum_{M-1}^{M} ps_{t+1,mdc} - \sum_{M-1,t}^{M} sc_{t+1,mdc} + 
+			\sum_{M-1}^{M} pst_{t+1,m,d-1,c} - \sum_{M-1}^{M} pst_{t+1,mdc} + \\ 
+			&- \sum_{M-1,t'}^{M} rsc_{t+1,t'mdc} +  \sum_{M-1,t}^{M} rsc_{t,t'+1,mdc} \bigg) \\
+			& \text{where }m=0 \text{ is patients who just arrived} \\ 
+		& \Bigg) \\
+	& \ge v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \quad \forall \vec{S} \vec{A}
+\end{align*}
+
+\newpage 
+Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merging it with $v({\vec{S}})$:
+\begin{itemize}
+	\item $\beta^{0}$ - no adjustments for expectation for $v(\vec{S'})$ 
+	\begin{equation*}
+		\beta^{0} - \gamma \beta^{0} = (1-\gamma) \beta^{0}
+	\end{equation*}
+	
+	\item $\beta_{tp}^{ue}$
+	\begin{equation*}
+		E[ued_{p}] = 0 \quad \therefore \quad
+		\sum_{p} \beta_{1p}^{ue} (ue_{2p} + ued_{p}) \rightarrow 
+		\sum_{p} \beta_{1p}^{ue} (ue_{2p}) \rightarrow
+		\sum \beta_{tp}^{ue} uen_{d}
+	\end{equation*}
+	\begin{equation*}
+		\sum_{tp} \beta_{tp}^{ue} ue_{tp} - \gamma (\sum_{tp} \beta_{tp}^{ue} uen_{d}) = 
+		(1-\gamma) \beta_{tp}^{ue} \sum_{tp} (ue_{tp} - uen_{d})
+	\end{equation*}
+		
+	\item $\beta_{tp}^{uu}$ - no adjustments for expectation
+	\begin{equation*}
+		uu_{Tp} = 0 \quad \therefore \quad \beta_{Tp}^{uu} uu_{Tp} = 0
+	\end{equation*}
+	\begin{equation*}
+		\sum_{tp}^{T-1} \beta_{tp}^{uu} uu_{tp} - \gamma \sum_{tp}^{T-1} \beta_{tp}^{uu} 
+		\bigg( uu_{t+1p} + \sum_{mdc} (sc_{t+1mdc}U)  - \sum_{tmdc} (rsc_{t+1t'mdc} U) + \sum_{t'mdc} (rsc_{tt'+1mdc} U) \bigg)
+	\end{equation*}
+	\begin{equation*}
+		\sum_{tp}^{T-1} \beta_{tp}^{uu} \bigg( 
+			uu_{tp}	 - \gamma uu_{t} - 
+			\gamma U_{pdc} \Big( \sum_{mdc} sc_{t+1mdc}  - \sum_{t'mdc} rsc_{t+1t'mdc} + \sum_{tmdc} rsc_{tt'+1mdc} \Big) 
+		\bigg)
+	\end{equation*}
+	
+	\item $\beta_{dc}^{pe}$
+	\begin{equation*}
+		\sum_{dc} \beta_{dc}^{pe} pe_{dc} - \gamma \sum_{dc} \beta_{dc}^{pe} E[pea_{dc}] = 
+		\sum_{dc} \beta_{dc}^{pe} (pe_{dc} - \gamma E[pea_{dc}])
+	\end{equation*}	
+	
+	\item $\beta_{mdc}^{pw}$ - Let's assume $pwp_{mdc}$ - is the probability of a patient transitioning to a higher complexity
+	\begin{equation*}
+		E[pwt_{mdc}] = pw_{mdc} pwp_{mdc}		
+	\end{equation*}
+	
+\end{itemize}
 
 \end{document}

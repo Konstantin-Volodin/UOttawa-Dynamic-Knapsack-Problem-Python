@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{xcolor}
 
 \geometry{margin=1in}
@@ -16,6 +17,14 @@
 \begin{document}
 
 \maketitle
+
+\section{Questions/Comments}
+\begin{itemize}
+	\item \textbf{COMMENT}: In constraints for transition between $uu$ and $uu'$ - missing change in usage due to complexity transition
+	\item \textbf{QUESTION}: How to incorporate goal variable $uv$ properly into transition, ADP, etc.?
+	\item \textbf{QUESTION}: Does the ADP look correct to you so far?
+\end{itemize}
+
 
 \section{Assumptions} 
 \begin{itemize}
@@ -153,6 +162,8 @@ At the beginning of each period, decision maker must reschedule appointments as 
 \end{enumerate}
 
 \subsubsection{Transition Constraints}
+
+\textit{\textbf{FROM CONSTRAINT SET \#2 MISSING RESOURCE USAGE DUE TO TRANSITION IN DIFFICULTIES}}
 \begin{enumerate}
 
 	\item Transition from $\vec{ue}$ to $\vec{ue'}$ - Expected Units of PPE
@@ -160,15 +171,15 @@ At the beginning of each period, decision maker must reschedule appointments as 
 			ue'_{1p} = ue_{2p} + ued_{p}\ \quad \forall p 
 		\end{equation} 
 		\begin{equation}  
-			ue'_{m-1,p} = ue_{mp}\ \quad \forall m \in \{3...M\}, p
+			ue'_{t-1,p} = ue_{tp}\ \quad \forall t \in \{3...T\}, p
 		 \end{equation} 
 		\begin{equation}  
-			ue'_{Mp} = uen_{d} \quad \forall p 
+			ue'_{Tp} = uen_{d} \quad \forall p 
 		\end{equation} 
 	
 	\item Transition from $\vec{uu}$ to $\vec{uu'}$ - Used Units of PPE		
 		\begin{align} \begin{split}  
-			uu'_{t-1,p} = &  uu	_{tp} + \sum_{mdc} ( {\color{red} sc_{t-1 \text{ or } tmdc} } U_{pdc} ) - \\ 
+			uu'_{t-1,p} = &  uu	_{tp} + \sum_{mdc} ( sc_{tmdc} U_{pdc} ) - \\ 
 								&	- \sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc}) \quad \forall t \in \{2...T\}, p 
 		\end{split} \end{align}
 		\begin{equation}  
@@ -194,12 +205,12 @@ At the beginning of each period, decision maker must reschedule appointments as 
 
 	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patiensts between difficulties/scheduling/cancelling for scheduled appointments
 		\begin{align}  \begin{split}
-			ps'_{t-1,m+1,dc} = & ps_{tmdc} +  \sum_{t} sc_{tmdc} - \sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc}) +\\ 
+			ps'_{t-1,m+1,dc} = & ps_{tmdc} +  \sum_{t} sc_{tmdc} - \sum_{t'} rsc_{tt'mdc} + \sum_{t} rsc_{tt'mdc} +\\ 
 										& + pst_{tm,d-1,c} - pst_{tmdc} \quad \forall t \in \{2 ... T\},  m \in \{0... M-2 \}, dc 
 		\end{split} \end{align} 
 		\begin{align} \begin{split}  
-			ps'_{t-1,Mdc} = & \sum_{M-1}^M ps_{mdc}  - \sum_{t,M-1}^{M} sc_{tmdc}  - \sum_{t',M-1,dc}^M (rsc_{tt'mdc} U_{pdc}) + \\
-									& \sum_{t,M-1,dc}^M (rsc_{tt'mdc} U_{pdc}) + \sum_{M-1}^{M} pst_{tm,d-1,c} - \sum_{M-1}^{M} pst_{tm,d,c}
+			ps'_{t-1,Mdc} = & \sum_{M-1}^M ps_{mdc}  - \sum_{t,M-1}^{M} sc_{tmdc}  - \sum_{t'M-1}^M rsc_{tt'mdc} + \\
+									& \sum_{t,M-1}^M rsc_{tt'mdc} + \sum_{M-1}^{M} pst_{tm,d-1,c} - \sum_{M-1}^{M} pst_{tm,d,c}
 									\quad \forall t \in \{2...T \}, dc 
 		\end{split} \end{align}		
 		\begin{equation}  
@@ -253,19 +264,95 @@ This gives the following LP
 \end{equation}
 Subject to:
 \begin{align*}
-	& c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) +  & \\
-	& \gamma \sum_{\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued})  * &  \\
+	& c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) +  \\ 
+	& \gamma \sum_{\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued})  *  \\
 		\beta^{0} \quad & v \Bigg( \beta^{0} + \\
-		\beta^{ue} \quad & \sum_{p} \beta_{1p}^{ue} (ue_{2p} + {\color{red} ued_{p}}) + \sum_{m=2,p}^{M-1} \beta_{mp}^{ue} ue_{m+1,p} + \sum_{p} \beta_{Mp} uen_{d} + \\
-		\beta^{uu} \quad & \sum_{tp}^{T-1} \beta_{tp}^{uu} \bigg( uu_{t+1,p} + \sum_{mdc} (sc_{t+1,mdc}U_{pdc})  - \sum_{t''mdc} (rsc_{t+1,t'mdc} U_{pdc}) + \sum_{t''mdc} (rsc_{t,t'+1,mdc} U_{pdc}) \bigg) \\
-		\beta^{uu} \quad & \sum_{p} \beta_{Tp} * 0 + \\
-		\beta^{pe} \quad & \sum_{dc} \beta_{dc}^{pe} {\color{red} pea_{dc}}+ \\
-		\beta^{pw} \quad & \sum_{dc} \beta_{1dc}^{pw} (pe_{dc} - \sum_{t} sc_{t0dc}) + \\
-		\beta^{pw} \quad & \sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} (pw_{m-1,dc} - \sum_{t} sc_{t,m-1,dc}) \dots + \\
-		\beta^{ps} \quad & + \\
+		\beta^{ue} \quad & 
+				\sum_{p} \beta_{1p}^{ue} (ue_{2p} + ued_{p}) + 
+				\sum_{t=2,p}^{T-1} \beta_{tp}^{ue} ue_{t+1,p} + 
+				\sum_{p} \beta_{Tp}^{ue} uen_{d} + \\
+		\beta^{uu} \quad & 
+				\sum_{tp}^{T-1} \beta_{tp}^{uu} 
+				\bigg( uu_{t+1,p} + \sum_{mdc} (sc_{t+1,mdc}U_{pdc})  - 
+				\sum_{t'mdc} (rsc_{t+1,t'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'+1,mdc} U_{pdc}) \bigg) \\
+		\beta^{uu} \quad & 
+			\sum_{p} \beta_{Tp} * 0 + \\
+		\beta^{pe} \quad & 
+			\sum_{dc} \beta_{dc}^{pe} {\color{red} pea_{dc}}+ \\
+		\beta^{pw} \quad & 
+			\sum_{dc} \beta_{1dc}^{pw} 
+			(pe_{dc} - \sum_{t} sc_{t0dc}) + \\
+		\beta^{pw} \quad & 
+			\sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} 
+			(pw_{m-1,dc} - \sum_{t} sc_{t,m-1,dc} + pwt_{m-1,d-1,c} - pwt_{m-1,dc}) + \\
+		\beta^{pw} \quad & 
+			\sum_{dc} \beta_{Mdc}^{pw} 
+			(\sum_{M-1}^{M} pw_{mdc} - \sum_{M-1,t}^{M} sc_{tmdc} + 
+			\sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}) + \\
+		\beta^{ps} \quad & 
+			\sum_{mdc} \beta_{Tmdc}^{ps} * 0 + \\
+		\beta^{ps} \quad & 
+			\sum_{t=1,m=1,dc}^{T-1,M-1} \beta_{tmdc}^{ps} 
+			\bigg( ps_{t+1,m-1,dc} - \sum_{t} sc_{t+1,m-1,dc} + 
+			pst_{t+1,m-1,d-1,c} - pst_{t+1,m-1,dc} - \\ 
+			&- \sum_{t'} rsc_{t+1,t'm-1,dc} +  \sum_{t} rsc_{t,t'+1,m-1,dc} \bigg) + \\
+			& \text{where }m=0 \text{ is patients who just arrived} \\ 
+		\beta^{ps} \quad & 
+			\sum_{t=1dc}^{T-1} \beta_{tMdc}^{ps} 
+			\bigg( \sum_{M-1}^{M} ps_{t+1,mdc} - \sum_{M-1,t}^{M} sc_{t+1,mdc} + 
+			\sum_{M-1}^{M} pst_{t+1,m,d-1,c} - \sum_{M-1}^{M} pst_{t+1,mdc} + \\ 
+			&- \sum_{M-1,t'}^{M} rsc_{t+1,t'mdc} +  \sum_{M-1,t}^{M} rsc_{t,t'+1,mdc} \bigg) \\
+			& \text{where }m=0 \text{ is patients who just arrived} \\ 
 		& \Bigg) \\
-	& \ge v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps})
+	& \ge v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \quad \forall \vec{S} \vec{A}
 \end{align*}
 
+\newpage 
+Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merging it with $v({\vec{S}})$:
+\begin{itemize}
+	\item $\beta^{0}$ - no adjustments for expectation for $v(\vec{S'})$ 
+	\begin{equation*}
+		\beta^{0} - \gamma \beta^{0} = (1-\gamma) \beta^{0}
+	\end{equation*}
+	
+	\item $\beta_{tp}^{ue}$
+	\begin{equation*}
+		E[ued_{p}] = 0 \quad \therefore \quad
+		\sum_{p} \beta_{1p}^{ue} (ue_{2p} + ued_{p}) \rightarrow 
+		\sum_{p} \beta_{1p}^{ue} (ue_{2p}) \rightarrow
+		\sum \beta_{tp}^{ue} uen_{d}
+	\end{equation*}
+	\begin{equation*}
+		\sum_{tp} \beta_{tp}^{ue} ue_{tp} - \gamma (\sum_{tp} \beta_{tp}^{ue} uen_{d}) = 
+		(1-\gamma) \beta_{tp}^{ue} \sum_{tp} (ue_{tp} - uen_{d})
+	\end{equation*}
+		
+	\item $\beta_{tp}^{uu}$ - no adjustments for expectation
+	\begin{equation*}
+		uu_{Tp} = 0 \quad \therefore \quad \beta_{Tp}^{uu} uu_{Tp} = 0
+	\end{equation*}
+	\begin{equation*}
+		\sum_{tp}^{T-1} \beta_{tp}^{uu} uu_{tp} - \gamma \sum_{tp}^{T-1} \beta_{tp}^{uu} 
+		\bigg( uu_{t+1p} + \sum_{mdc} (sc_{t+1mdc}U)  - \sum_{tmdc} (rsc_{t+1t'mdc} U) + \sum_{t'mdc} (rsc_{tt'+1mdc} U) \bigg)
+	\end{equation*}
+	\begin{equation*}
+		\sum_{tp}^{T-1} \beta_{tp}^{uu} \bigg( 
+			uu_{tp}	 - \gamma uu_{t} - 
+			\gamma U_{pdc} \Big( \sum_{mdc} sc_{t+1mdc}  - \sum_{t'mdc} rsc_{t+1t'mdc} + \sum_{tmdc} rsc_{tt'+1mdc} \Big) 
+		\bigg)
+	\end{equation*}
+	
+	\item $\beta_{dc}^{pe}$
+	\begin{equation*}
+		\sum_{dc} \beta_{dc}^{pe} pe_{dc} - \gamma \sum_{dc} \beta_{dc}^{pe} E[pea_{dc}] = 
+		\sum_{dc} \beta_{dc}^{pe} (pe_{dc} - \gamma E[pea_{dc}])
+	\end{equation*}	
+	
+	\item $\beta_{mdc}^{pw}$ - Let's assume $pwp_{mdc}$ - is the probability of a patient transitioning to a higher complexity
+	\begin{equation*}
+		E[pwt_{mdc}] = pw_{mdc} pwp_{mdc}		
+	\end{equation*}
+	
+\end{itemize}
 
 \end{document}
