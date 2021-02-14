@@ -6,6 +6,15 @@
 \usepackage{amssymb}
 \usepackage{xcolor}
 
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
 \geometry{margin=1in}
 \setlength\parindent{0pt}
 
@@ -17,12 +26,20 @@
 \begin{document}
 
 \maketitle
+\tableofcontents
 
 \section{Questions/Comments}
+
+\subsection{Questions}
 \begin{itemize}
-	\item \textbf{COMMENT}: In constraints for transition between $uu$ and $uu'$ - missing change in usage due to complexity transition
-	\item \textbf{QUESTION}: How to incorporate goal variable $uv$ properly into transition, ADP, etc.?
-	\item \textbf{QUESTION}: Does the ADP look correct to you so far?
+	\item  How to incorporate goal variable $uv$ properly into transition, ADP, etc.?
+	\item Does the ADP look correct to you so far?
+	\item Is it safe to remove $\beta_{Tp}^{uu}$ and $\beta_{Tmdc}^{ps}$ since they are \textit{supposed} to be zero always
+\end{itemize}
+
+\subsection{Comments}
+\begin{itemize}
+	\item In constraints for transition between $uu$ and $uu'$ - missing change in usage due to complexity transition
 \end{itemize}
 
 
@@ -180,7 +197,8 @@ At the beginning of each period, decision maker must reschedule appointments as 
 	\item Transition from $\vec{uu}$ to $\vec{uu'}$ - Used Units of PPE		
 		\begin{align} \begin{split}  
 			uu'_{t-1,p} = &  uu	_{tp} + \sum_{mdc} ( sc_{tmdc} U_{pdc} ) - \\ 
-								&	- \sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc}) \quad \forall t \in \{2...T\}, p 
+								&	- \sum_{t'mdc} (rsc_{tt'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'mdc} U_{pdc}) + \\ 
+								& 	+ \sum_{mdc} pst_{tmdc} (U_{pd+1c} - U_{pdc})  \quad \forall t \in \{2...T\}, p  
 		\end{split} \end{align}
 		\begin{equation}  
 			uu'_{Tp} = 0 \quad \forall p 
@@ -237,6 +255,7 @@ $cc$ is some arbitrary value
 
 \section{LP Model}
 
+\subsection{Full LP} 
 Given a full MDP model, the equivalent LP would look as follows 
 (Note: there is a lot left out. $\vec{C}$ is defined above, all states, actions, and next states are all defined above). Probability distribution is not explicitly defined, but I am not sure if it is necessary
 \begin{equation}
@@ -245,9 +264,10 @@ Given a full MDP model, the equivalent LP would look as follows
 
 subject to
 \begin{equation}
-	\vec{C} + \gamma \sum_{\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) v( \vec{S'} | \vec{S}, \vec{A}, \vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) \quad \forall \vec{S} \vec{A}
+	c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) v( \vec{S'} | \vec{S}, \vec{A}, \vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) \ge v(\vec{S}) \quad \forall \vec{S} \vec{A}
 \end{equation}
 
+\subsection{Full ADP LP }
 Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximation as follows:
 \begin{align} \begin{split}
 	v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) =  & \beta^0 +
@@ -264,55 +284,45 @@ This gives the following LP
 \end{equation}
 Subject to:
 \begin{align*}
-	& c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) +  \\ 
-	& \gamma \sum_{\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued})  *  \\
-		\beta^{0} \quad & v \Bigg( \beta^{0} + \\
-		\beta^{ue} \quad & 
-				\sum_{p} \beta_{1p}^{ue} (ue_{2p} + ued_{p}) + 
+	& c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued})  *  \\
+		& * \Bigg( \beta^{0} +
+		\bigg( \sum_{p} \beta_{1p}^{ue} (ue_{2p} + ued_{p}) + 
 				\sum_{t=2,p}^{T-1} \beta_{tp}^{ue} ue_{t+1,p} + 
-				\sum_{p} \beta_{Tp}^{ue} uen_{d} + \\
-		\beta^{uu} \quad & 
-				\sum_{tp}^{T-1} \beta_{tp}^{uu} 
-				\bigg( uu_{t+1,p} + \sum_{mdc} (sc_{t+1,mdc}U_{pdc})  - 
-				\sum_{t'mdc} (rsc_{t+1,t'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'+1,mdc} U_{pdc}) \bigg) \\
-		\beta^{uu} \quad & 
-			\sum_{p} \beta_{Tp} * 0 + \\
-		\beta^{pe} \quad & 
-			\sum_{dc} \beta_{dc}^{pe} {\color{red} pea_{dc}}+ \\
-		\beta^{pw} \quad & 
-			\sum_{dc} \beta_{1dc}^{pw} 
-			(pe_{dc} - \sum_{t} sc_{t0dc}) + \\
-		\beta^{pw} \quad & 
-			\sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} 
-			(pw_{m-1,dc} - \sum_{t} sc_{t,m-1,dc} + pwt_{m-1,d-1,c} - pwt_{m-1,dc}) + \\
-		\beta^{pw} \quad & 
-			\sum_{dc} \beta_{Mdc}^{pw} 
+				\sum_{p} \beta_{Tp}^{ue} uen_{d} \bigg) +
+		\bigg( \sum_{p} \beta_{Tp}^{uu} * 0 \bigg) + \\
+		& \bigg( \sum_{tp}^{T-1} \beta_{tp}^{uu} 
+				\Big( uu_{t+1,p} + \sum_{mdc} (sc_{t+1,mdc}U_{pdc})  - 
+				\sum_{t'mdc} (rsc_{t+1,t'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'+1,mdc} U_{pdc})  + \\ 
+				& \quad \quad \quad \quad \quad \sum_{mdc} pst_{tmdc} (U_{pd+1c} - U_{pdc}) \Big) \bigg) +  \\
+		& \bigg( \sum_{dc} \beta_{dc}^{pe} pea_{dc} \bigg) + 
+			\bigg( \sum_{dc} \beta_{1dc}^{pw} (pe_{dc} - \sum_{t} sc_{t0dc}) \bigg) + \\
+		&  \bigg( \sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} 
+			(pw_{m-1,dc} - \sum_{t} sc_{t,m-1,dc} + pwt_{m-1,d-1,c} - pwt_{m-1,dc}) \bigg) + \\
+		& \bigg( \sum_{dc} \beta_{Mdc}^{pw} 
 			(\sum_{M-1}^{M} pw_{mdc} - \sum_{M-1,t}^{M} sc_{tmdc} + 
-			\sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}) + \\
-		\beta^{ps} \quad & 
-			\sum_{mdc} \beta_{Tmdc}^{ps} * 0 + \\
-		\beta^{ps} \quad & 
-			\sum_{t=1,m=1,dc}^{T-1,M-1} \beta_{tmdc}^{ps} 
-			\bigg( ps_{t+1,m-1,dc} - \sum_{t} sc_{t+1,m-1,dc} + 
-			pst_{t+1,m-1,d-1,c} - pst_{t+1,m-1,dc} - \\ 
-			&- \sum_{t'} rsc_{t+1,t'm-1,dc} +  \sum_{t} rsc_{t,t'+1,m-1,dc} \bigg) + \\
-			& \text{where }m=0 \text{ is patients who just arrived} \\ 
-		\beta^{ps} \quad & 
-			\sum_{t=1dc}^{T-1} \beta_{tMdc}^{ps} 
-			\bigg( \sum_{M-1}^{M} ps_{t+1,mdc} - \sum_{M-1,t}^{M} sc_{t+1,mdc} + 
-			\sum_{M-1}^{M} pst_{t+1,m,d-1,c} - \sum_{M-1}^{M} pst_{t+1,mdc} + \\ 
-			&- \sum_{M-1,t'}^{M} rsc_{t+1,t'mdc} +  \sum_{M-1,t}^{M} rsc_{t,t'+1,mdc} \bigg) \\
-			& \text{where }m=0 \text{ is patients who just arrived} \\ 
-		& \Bigg) \\
-	& \ge v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \quad \forall \vec{S} \vec{A}
+			\sum_{M-1}^{M} pwt_{m,d-1,c} - \sum_{M-1}^{M} pwt_{mdc}) \bigg) + \\
+		& \bigg( \sum_{mdc} \beta_{Tmdc}^{ps} * 0  \bigg) + \\
+		& \bigg( \sum_{t=1,m=1,dc}^{T-1,M-1} \beta_{tmdc}^{ps} 
+			\Big( ps_{t+1m-1dc} - \sum_{t} sc_{t+1,m-1,dc} + 
+			pst_{t+1,m-1,d-1,c} - pst_{t+1,m-1,dc} - \\
+		& \quad \quad \quad \quad \quad \quad  \quad \quad- \sum_{t'} rsc_{t+1,t'm-1,dc} +  \sum_{t} rsc_{t,t'+1,m-1,dc} \Big) \bigg) + \\
+		& \bigg( \sum_{t=1dc}^{T-1} \beta_{tMdc}^{ps} 
+			\Big( \sum_{M-1}^{M} ps_{t+1,mdc} - \sum_{M-1,t}^{M} sc_{t+1,mdc} + 
+			\sum_{M-1}^{M} pst_{t+1,m,d-1,c} - \sum_{M-1}^{M} pst_{t+1,mdc} - \\ 
+			& \quad \quad \quad \quad \quad \quad \quad - \sum_{M-1,t'}^{M} rsc_{t+1,t'mdc} +  \sum_{M-1,t}^{M} rsc_{t,t'+1,mdc} \Big) \bigg) \\
+		& \Bigg) \ge v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \quad \forall \vec{S} \vec{A}
 \end{align*}
+\begin{equation*}
+	\vec{\beta} \ge 0 \quad \forall \beta
+\end{equation*}
 
-\newpage 
+
+\subsection{Expectation ADP LP}
 Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merging it with $v({\vec{S}})$:
 \begin{itemize}
 	\item $\beta^{0}$ - no adjustments for expectation for $v(\vec{S'})$ 
 	\begin{equation*}
-		\beta^{0} - \gamma \beta^{0} = (1-\gamma) \beta^{0}
+		\beta^{0} - \gamma \beta^{0} = \color{red} (1-\gamma) \beta^{0}
 	\end{equation*}
 	
 	\item $\beta_{tp}^{ue}$
@@ -324,7 +334,7 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 	\end{equation*}
 	\begin{equation*}
 		\sum_{tp} \beta_{tp}^{ue} ue_{tp} - \gamma (\sum_{tp} \beta_{tp}^{ue} uen_{d}) = 
-		(1-\gamma) \beta_{tp}^{ue} \sum_{tp} (ue_{tp} - uen_{d})
+		\color{red} (1-\gamma) \sum_{tp} \beta_{tp}^{ue} (ue_{tp} - uen_{d})
 	\end{equation*}
 		
 	\item $\beta_{tp}^{uu}$ - no adjustments for expectation
@@ -336,23 +346,84 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 		\bigg( uu_{t+1p} + \sum_{mdc} (sc_{t+1mdc}U)  - \sum_{tmdc} (rsc_{t+1t'mdc} U) + \sum_{t'mdc} (rsc_{tt'+1mdc} U) \bigg)
 	\end{equation*}
 	\begin{equation*}
-		\sum_{tp}^{T-1} \beta_{tp}^{uu} \bigg( 
-			uu_{tp}	 - \gamma uu_{t} - 
-			\gamma U_{pdc} \Big( \sum_{mdc} sc_{t+1mdc}  - \sum_{t'mdc} rsc_{t+1t'mdc} + \sum_{tmdc} rsc_{tt'+1mdc} \Big) 
+		\color{red} \sum_{tp}^{T-1} \beta_{tp}^{uu} \bigg( 
+			uu_{tp}	 - \gamma \Big( uu_{t+1p} + \sum_{mdc} pst_{tmdc} (U_{pd+1c} - U_{pdc}) + 
+			U_{pdc} \big( \sum_{mdc} sc_{t+1mdc}  - \sum_{t'mdc} rsc_{t+1t'mdc} + \sum_{tmdc} rsc_{tt'+1mdc} \big) \Big)
 		\bigg)
 	\end{equation*}
 	
 	\item $\beta_{dc}^{pe}$
 	\begin{equation*}
 		\sum_{dc} \beta_{dc}^{pe} pe_{dc} - \gamma \sum_{dc} \beta_{dc}^{pe} E[pea_{dc}] = 
-		\sum_{dc} \beta_{dc}^{pe} (pe_{dc} - \gamma E[pea_{dc}])
+		\color{red} \sum_{dc} \beta_{dc}^{pe} (pe_{dc} - \gamma E[pea_{dc}])
 	\end{equation*}	
 	
 	\item $\beta_{mdc}^{pw}$ - Let's assume $pwp_{mdc}$ - is the probability of a patient transitioning to a higher complexity
 	\begin{equation*}
 		E[pwt_{mdc}] = pw_{mdc} pwp_{mdc}		
 	\end{equation*}
+	{ \color{red} \begin{align*}
+		\Bigg( \sum _{dc} \beta_{1dc}^{pw}& ( pw_{1dc} - \gamma (pe_{dc} - \sum_{t} sc_{t0dc})) + \\
+		\sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} & ( pw_{mdc} - \gamma 
+			\big( pw_{m-1dc} (1 - pwp) + pw_{m-1d-1c} pwp - \sum_{t} sc_{tm-1dc} \big) + \\
+		\sum_{dc} \beta_{Mdc}^{pw} & ( pw_{Mdc} - \gamma \sum_{M-1}^{M}
+			\big( pw_{mdc} (1 - pwp) + pw_{md-1c} pwp - \sum_{t} sc_{tmdc} \big) \Bigg)
+	\end{align*} }
+
+	\item $\beta_{mdc}^{pw}$
+	\begin{equation*}
+		E[pst_{tmdc}] = ps_{tmdc} pwp_{mdc}		
+	\end{equation*}
+	{ \color{red} \begin{align*}
+		\Bigg( \sum _{t=1 m=1 dc}^{T-1 M-1} \beta_{tmdc}^{ps} & 
+			\bigg( ps_{tmdc} - 
+				\gamma \Big( ps_{t+1m-1dc}(1-pwp) + ps_{t+1m-1d-1c} pwp - \sum_{t} sc_{t+1m-1dc} + \\ 
+				&  - \sum_{t'} rsc_{t+1t'm-1dc} + \sum_{t} rsc_{tt'+1m-1dc} \Big) \bigg) + \\
+		\sum _{t=1dc}^{T-1} \beta_{tMdc}^{ps} & 
+			\bigg( ps_{tMdc} - 
+				\gamma \sum_{M-1}^{M} \Big( ps_{t+1mdc}(1-pwp) + ps_{t+1md-1c} pwp - \sum_{t} sc_{t+1mdc} + \\ 
+				&  - \sum_{t'} rsc_{t+1t'mdc} + \sum_{t} rsc_{tt'+1mdc} \Big) \bigg) \Bigg)
+	\end{align*} }
 	
 \end{itemize}
+
+Let's say $E[V]$ is the addition of all the red parts above. In that case the ADP model converted to expectation would look as follows:
+\begin{equation}
+	\max_{\vec{\beta}} \sum \beta^{0} + \sum \beta^{ue} E[ue] + \sum \beta^{uu} E[uu] + 
+		\sum \beta^{pe} E[pe] + \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps]
+\end{equation}
+Subject to:
+\begin{equation}
+	E[V] \le c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) \quad \forall \vec{S} \vec{A} 
+\end{equation}
+
+
+\subsection{Dual of ADP LP}
+Converting to Dual
+\begin{equation}
+	\min_{w} \sum_{\vec{S} \vec{A}} w(\vec{S} \vec{A}) c(\vec{S} \vec{A})
+\end{equation}
+Subject To:
+	\begin{equation}
+		\sum_{\vec{S}\vec{A}}\vec{w} (1 - \gamma) \ge 1 
+	\end{equation}
+	\begin{equation}
+		\sum_{\vec{S}\vec{A}}\vec{w} \Big( (1-\gamma) (ue_{tp} - uen_{tp}) \Big) \ge E[ue_{tp}] \quad \forall tp
+	\end{equation}	
+	\begin{multline}
+		\sum_{\vec{S}\vec{S}} \vec{w} \bigg( 
+			uu_{tp}	 - \gamma \Big( uu_{t+1p} + \sum_{mdc} pst_{tmdc} (U_{pd+1c} - U_{pdc}) + \\ 
+			U_{pdc} \big( \sum_{mdc} sc_{t+1mdc}  - \sum_{t'mdc} rsc_{t+1t'mdc} + \sum_{tmdc} rsc_{tt'+1mdc} \big) \Big)
+		\bigg) \\
+		\quad \forall T \in \{1...T-1\}p
+	\end{multline}
+	\begin{equation}
+		\sum_{\vec{S}\vec{A}} \vec{w} (pe_{dc} - \gamma E[pea_{dc}])  \ge E[pe_{dc}] \quad \forall dc
+	\end{equation}
+	\begin{equation}
+		w \ge 0 \quad \forall w
+	\end{equation}
+
+\subsection{Finding most violated constraints of ADP LP}
 
 \end{document}
