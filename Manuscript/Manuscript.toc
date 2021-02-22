@@ -17,4 +17,6 @@
 \contentsline {subsection}{\numberline {4.2}Full ADP LP }{6}{subsection.4.2}
 \contentsline {subsection}{\numberline {4.3}Expectation ADP LP}{7}{subsection.4.3}
 \contentsline {subsection}{\numberline {4.4}Dual of ADP LP}{9}{subsection.4.4}
-\contentsline {subsection}{\numberline {4.5}Finding most violated constraints of ADP LP}{9}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.5}Finding most violated constraints of ADP LP}{10}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}Algorithm for solving}{10}{subsection.4.6}
+\contentsline {subsection}{\numberline {4.7}Generating an Action}{11}{subsection.4.7}
