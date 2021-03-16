@@ -27,5 +27,6 @@ class constraint_parameter:
     name:  Dict[ Tuple[str],str ]
 
 
-def generate_sub_problem(beta):
-    pass
+def generate_sub_problem(input_data, beta):
+
+    # Generates Decision Variables
