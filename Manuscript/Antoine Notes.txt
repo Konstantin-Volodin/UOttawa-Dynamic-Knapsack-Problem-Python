@@ -1,0 +1,11 @@
+Sunday - 8:30 PM
+
+think about cost of cw (pw - sc) - create a timeline 
+
+flow conservation of PPEs
+
+phase 1 approach for finding a feasible solution
+
+need to add upper bounds on states
+
+add uv as a state and E(uv)
