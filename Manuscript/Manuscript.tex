@@ -33,7 +33,6 @@
 \begin{itemize}
 	\item  NEED TO MOVE $uv$ TO STATES AND ADJUST ALL THE RELEVANT EQUATIONS FOR IT
 	\item Need to change generating an action section (4.7)
-	\item Potentially add a new action - to remove patients, with very high cost - in order to have an easily feasible state-action
 \end{itemize}
 
 \subsection{Comments}
@@ -101,11 +100,10 @@ State space is defined by current units available for various PPEs for future pe
 
 \subsubsection{Description}
 At the beginning of each period, decision maker must reschedule appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
-\[  \vec{A} = (\vec{sc}, \vec{rsc}, \vec{uv}) \] 
+\[  \vec{A} = (\vec{sc}, \vec{rsc}) \] 
 \begin{itemize}
     \item $\vec{sc} = sc_{tmdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been in wait list for $m$ periods, to schedule in period $t$ ($m$ of 0 stands for people who have just arrived)
 	\item $\vec{rsc} = rsc_{tt'mdc}$ - Number of patients of difficulty $d$, CPU $c$, who have been on the waitlist for $m$ periods, to reschedule from period $t$ to period $t'$
-	\item $uv_{tp}$ - goal variable, violation on number of resources used for period $t$, of PPE $p$
 \end{itemize}
 
 \subsubsection{Action Constraints}
@@ -182,11 +180,12 @@ At the beginning of each period, decision maker must reschedule appointments as 
 \begin{enumerate}
 
 	\item Transition from $\vec{ue}$ to $\vec{ue'}$ - Expected Units of PPE
+		\begin{align} \begin{split}  
+			ue'_{1p} = & ue_{2p} + ued_{p} + ue_{1p} - uu_{1p} - \\
+				& - \sum_{mdc} sc_{1mdc}U_{pdc} + \sum_{t'mdc} rsc_{1t'mdc}U_{pdc} - \sum_{tmdc} rsc_{t1mdc}U_{pdc} \quad \forall p 
+		\end{split} \end{align} 
 		\begin{equation}  
-			ue'_{1p} = ue_{2p} + ued_{p}\ \quad \forall p 
-		\end{equation} 
-		\begin{equation}  
-			ue'_{t-1,p} = ue_{tp}\ \quad \forall t \in \{3...T\}, p
+			ue'_{t-1,p} = ue_{tp} \quad \forall t \in \{3...T\}, p
 		 \end{equation} 
 		\begin{equation}  
 			ue'_{Tp} = uen_{p} \quad \forall p 
@@ -281,7 +280,8 @@ Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximati
 \begin{align} \begin{split}
 	v(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) =  & \beta^0 +
 		\sum_{tp} \beta_{tp}^{ue} ue_{tp} +
-		\sum_{tp} \beta_{tp}^{uu} uu_{tp} + \\
+		\sum_{tp} \beta_{tp}^{uu} uu_{tp} + 
+		\sum_{tp} \beta_{tp}^{uv} uv_{tp} + \\
 		& + \sum_{mdc} \beta_{mdc}^{pw} pw_{mdc}  + 
 		\sum_{dc} \beta_{dc}^{pe} pe_{dc} + 
 		\sum_{tmdc} \beta_{tmdc}^{ps} ps_{tmdc}
@@ -294,15 +294,17 @@ This gives the following LP
 Subject to:
 \begin{align*}
 	& c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued})  *  \\
-		& * \Bigg( \beta^{0} +
-		\bigg( \sum_{p} \beta_{1p}^{ue} (ue_{2p} + ued_{p}) + 
-				\sum_{t=2,p}^{T-1} \beta_{tp}^{ue} ue_{t+1,p} + 
-				\sum_{p} \beta_{Tp}^{ue} uen_{d} \bigg) +
-		\bigg( \sum_{p} \beta_{Tp}^{uu} * 0 \bigg) + \\
+		& \Bigg( \beta^{0} + \\ 
+		& \bigg( \sum_{p} \beta_{1p}^{ue} 
+			(ue_{2p} + ued_{p} + ue_{1p} - uu_{1p} - \sum_{mdc} sc_{1mdc}U_{pdc} + \sum_{t'mdc} rsc_{1t'mdc}U_{pdc} - \sum_{tmdc} rsc_{t1mdc}U_{pdc}) \bigg)  \\ 
+		& \bigg( \sum_{t=2,p}^{T-1} \beta_{tp}^{ue} ue_{t+1,p} + 
+				\sum_{p} \beta_{Tp}^{ue} uen_{d} \bigg) + \\
+		& \bigg( \sum_{p} \beta_{Tp}^{uu} * 0 \bigg) + \\
 		& \bigg( \sum_{tp}^{T-1} \beta_{tp}^{uu} 
 				\Big( uu_{t+1,p} + \sum_{mdc} (sc_{t+1,mdc}U_{pdc})  - 
 				\sum_{t'mdc} (rsc_{t+1,t'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'+1,mdc} U_{pdc})  + \\ 
 				& \quad \quad \quad \quad \quad \sum_{mdc} pst_{tmdc} (U_{pd+1c} - U_{pdc}) \Big) \bigg) +  \\
+		& \bigg( \sum_{tp} uv'_{tp} \bigg) + \\ 
 		& \bigg( \sum_{dc} \beta_{dc}^{pe} pea_{dc} \bigg) + 
 			\bigg( \sum_{dc} \beta_{1dc}^{pw} (pe_{dc} - \sum_{t} sc_{t0dc}) \bigg) + \\
 		&  \bigg( \sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} 
@@ -341,10 +343,13 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 		\sum_{p} \beta_{1p}^{ue} (ue_{2p}) \rightarrow
 		\sum \beta_{tp}^{ue} uen_{p}
 	\end{equation*}
-	\begin{equation*}
-		\sum_{tp} \beta_{tp}^{ue} ue_{tp} - \gamma (\sum_{tp} \beta_{tp}^{ue} uen_{p}) = 
-		\color{red} \sum_{tp} \beta_{tp}^{ue} (ue_{tp} - \gamma (uen_{p}))
-	\end{equation*}
+	{ \color{red} \begin{align*}
+		 \Bigg( 
+			& \bigg( \sum_{p} \beta_{1p}^{ue} (ue_{1p} - 
+				\gamma \Big( uen_{p} + ue_{1p} - uu_{1p} - 
+				\sum_{dc} U_{pdc} (\sum_{m} sc_{mdc} + \sum_{t'm} rsc_{1t'mdc} - \sum_{tm} rsc_{t1mdc}) \Big) \bigg) + \\
+			& \bigg(\sum_{t=2p}^{T} \beta_{tp}^{ue} (ue_{tp} - \gamma (uen_{p}) \bigg) \Bigg)
+	\end{align*} }
 		
 	\item $\beta_{tp}^{uu}$ - no adjustments for expectation
 	\begin{equation*}
@@ -362,6 +367,15 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 		\beta_{Tp}^{uu} (uu_{Tp}) \Bigg)
 	\end{align*} }
 	
+	\item $\beta_{tp}^{uv}$
+	\begin{equation*}
+		E[uv_{tp}] = 0
+	\end{equation*}
+	\begin{equation*}
+		\sum_{tp} \beta_{tp}^{uv} (uv_{tp} - \gamma (E[uv_{tp}])) = 
+		\color{red} \sum_{tp} \beta_{tp}^{uv} uv_{tp} 
+	\end{equation*}
+
 	\item $\beta_{dc}^{pe}$
 	\begin{equation*}
 		\sum_{dc} \beta_{dc}^{pe} pe_{dc} - \gamma \sum_{dc} \beta_{dc}^{pe} E[pea_{dc}] = 
@@ -401,7 +415,7 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 
 Let's say $E[V]$ is the addition of all the red parts above. In that case the ADP model converted to expectation would look as follows:
 \begin{equation}
-	\max_{\vec{\beta}} \sum \beta^{0} + \sum \beta^{ue} E[ue] + \sum \beta^{uu} E[uu] + 
+	\max_{\vec{\beta}} \sum \beta^{0} + \sum \beta^{ue} E[ue] + \sum \beta^{uu} E[uu] + \sum \beta^{uv} E[uv] 
 		\sum \beta^{pe} E[pe] + \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps]
 \end{equation}
 Subject to:
@@ -424,8 +438,14 @@ Subject To:
 	\end{equation}
 	
 	\item $\beta^{ue}$ constraints	
+	\begin{multline}
+		\sum_{\vec{S}\vec{A}}\vec{w} \bigg(ue_{1p} - 
+			\gamma \Big( uen_{p} + ue_{1p} - uu_{1p} - 
+			\sum_{dc} U_{pdc} ( \sum_{m} sc_{mdc} + \sum_{t'm} rsc_{1t'mdc} - \sum_{tm} rsc_{t1mdc}) \Big) \bigg) \\ 
+		\ge E[ue_{1p}] \quad \forall p
+	\end{multline}
 	\begin{equation}
-		\sum_{\vec{S}\vec{A}}\vec{w} \Big(ue_{tp} - \gamma (uen_{tp}) \Big) \ge E[ue_{tp}] \quad \forall tp
+		\sum_{\vec{S}\vec{A}}\vec{w} \Big(ue_{tp} - \gamma (uen_{p}) \Big) \ge E[ue_{tp}] \quad \forall t \in (2...T) p
 	\end{equation}	
 	
 	\item $\beta^{uu}$ constraints
@@ -438,6 +458,11 @@ Subject To:
 	\end{multline}
 	\begin{equation}
 		\sum_{\vec{S}\vec{A}} \vec{w} (uu_{Tp}) \ge E[uu_{Tp}] \quad \forall p
+	\end{equation}
+
+	\item $\beta^{uv} constraints$
+	\begin{equation}
+		\sum_{\vec{S}\vec{A}} \vec{w} (uv_{tp}) \ge 0 \quad \forall tp
 	\end{equation}
 	
 	\item $\beta^{pe}$ constraints
