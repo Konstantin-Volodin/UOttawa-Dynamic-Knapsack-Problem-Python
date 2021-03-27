@@ -15,8 +15,10 @@ generate_master_model = timer(generate_master_model)
 
 init_state, init_action = generate_initial_state_action(input_data)
 state_action_list = [(init_state, init_action)]
-mast_model = generate_master_model(input_data, state_action_list)
+mast_model, variables, constraints = generate_master_model(input_data, state_action_list)
 mast_model.write('mast.lp')
+
+# %% Phase 1 Model
 
 # %% Execution Algorithm
 for i in range(10):

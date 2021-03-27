@@ -85,7 +85,47 @@ def generate_initial_state_action(input_data):
     )
     return test_state, test_action
 
-# Generates Initial Master model
+# Generate Phase 1 Master Model (finding initial feasible solution)
+def generate_phase1_master_model(input_data,state_action_data):
+    indices = input_data.indices
+    arrival = input_data.arrival
+    ppe_data = input_data.ppe_data
+    model_param = input_data.model_param
+    transition = input_data.transition
+    usage = input_data.usage
+
+    M = model_param.M
+    gamma = model_param.gamma
+    
+    mast_model, variables, constraints = generate_master_model(input_data, state_action_data)
+    
+    # Goal variables
+    gv_0 = mast_model.addVar(name=f'gv_beta_0')
+    gv_ue = []
+    gv_uu = []
+    gv_uv = []
+    gv_pw = []
+    gv_pe = []
+    gv_ps = []
+    for tp in itertools.product(indices['t'], indices['p']):
+        gv_ue.append(mast_model.addVar(name=f'gv_beta_ue_tp_{tp}'))
+        gv_uu.append(mast_model.addVar(name=f'gv_beta_uu_tp_{tp}'))
+        gv_uv.append(mast_model.addVar(name=f'gv_beta_uv_tp_{tp}'))
+    for dc in itertools.product(indices['d'], indices['d']):
+        gv_pe.append(mast_model.addVar(name=f'gv_beta_pe_dc_{dc}'))
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        if mdc[0] == 0: continue
+        gv_pw.append(mast_model.addVar(name=f'gv_beta_pw_mdc_{mdc}'))
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        gv_ps.append(mast_model.addVar(name=f'gv_beta_ps_tmdc_{tmdc}'))
+
+    # Modifies Constraints to include goal variables
+
+    # New Objective Function 
+
+    return mast_model, variables, constraints
+
+# Generates Master model (finding optimal solution)
 def generate_master_model(input_data, state_action_data):
     indices = input_data.indices
     arrival = input_data.arrival
@@ -206,6 +246,25 @@ def generate_master_model(input_data, state_action_data):
             sign[tp] = ">="
             name[tp] = f"beta_uu_tp_{tp[0]}_{tp[1].replace(' ', '-')}"
         
+        # Returns Data
+        constr_data = constraint_parameter(lhs,rhs,sign,name)
+        return constr_data
+
+    # Generates beta uv constraint data
+    def b_uv_constraint(state: state, action: action) -> constraint_parameter:
+        # Initializes Data
+        lhs = {}
+        rhs = {}
+        sign = {}
+        name = {}
+
+        # Creates Data
+        for tp in itertools.product(indices['t'], indices['p']):
+            lhs[tp] = state.uv_tp[tp]
+            rhs[tp] = input_data.expected_state_values['uv'][tp]
+            sign[tp] = ">="
+            name[tp] = f"beta_uv_tp_{tp[0]}_{tp[1].replace(' ', '-')}"
+
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
         return constr_data
@@ -341,9 +400,18 @@ def generate_master_model(input_data, state_action_data):
     b0_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_0_constraint)
     ue_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_ue_constraint)
     uu_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_uu_constraint)
+    uv_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_uv_constraint)
     pe_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_pe_constraint)
     pw_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_pw_constraint)
     # ps_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_ps_constraint)
+    constraints = {
+        'b0': b0_constr,
+        'ue': ue_constr,
+        'uu': uu_constr,
+        'uv': uv_constr,
+        'pe': pe_constr,
+        'pw': pw_constr
+    }
 
     # Generates Objective Function
     obj_expr = gp.LinExpr()
@@ -353,5 +421,5 @@ def generate_master_model(input_data, state_action_data):
     mast_model.setObjective(obj_expr, GRB.MINIMIZE)
 
     # Returns model
-    return mast_model
+    return mast_model, w_sa_var, constraints
 # %%

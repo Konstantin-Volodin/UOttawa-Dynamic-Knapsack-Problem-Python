@@ -93,7 +93,7 @@ def read_data(data_file_path):
     # Patient Transitions
     transition_sheet = book.get_sheet_by_name('Patient Transitions')
     transition = {}
-    for row in transition_sheet.iter_rows(min_row=2, min_col=1, max_col=4, values_only=True):
+    for row in transition_sheet.iter_rows(min_row=2, min_col=2, max_col=5, values_only=True):
         if row[0] == None: break
 
         transition[

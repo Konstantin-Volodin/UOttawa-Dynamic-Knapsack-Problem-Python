@@ -1,7 +1,4 @@
-think about cost of cw (pw - sc) - create a timeline 
-
-phase 1 approach for finding a feasible solution
-
-need to add upper bounds on states
-
-add uv as a state and E(uv)
+- think about cost of cw (pw - sc) - create a timeline 
+- phase 1 approach for finding a feasible solution
+- need to add upper bounds on states
+- need to add cost of scheduling past this TL window

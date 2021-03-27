@@ -1,0 +1,12 @@
+1) Need to consider prioritization
+	- easy - just one index
+2) Differentiating between CPUs
+	- Add OR time - usually very rigid
+	- don't need to differentiate between CPU specific resources, because we are only looking at 1 CPU
+3) Case Study
+	- Stephen's practice
+
+maybe we should focus the model on spine specifically
+we have a simulation resources that simulates distribution between CPUs
+TL is 6 weeks
+	
