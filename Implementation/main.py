@@ -9,7 +9,14 @@ my_path = os.path.dirname(__file__)
 read_data = timer(read_data)
 input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
 
-# %% Initializes Parameters
+# %% Generate Initial States (Phase 1)
+init_state, init_action = generate_initial_state_action(input_data)
+state_action_list = [(init_state, init_action)]
+p1_mast_model, p1_variables, p1_constraints = generate_phase1_master_model(input_data, state_action_list)
+p1_mast_model.write('mast_p1.lp')
+
+
+# %% Solve the problem (Phase 2?)
 generate_initial_state_action = timer(generate_initial_state_action)
 generate_master_model = timer(generate_master_model)
 
@@ -17,10 +24,6 @@ init_state, init_action = generate_initial_state_action(input_data)
 state_action_list = [(init_state, init_action)]
 mast_model, variables, constraints = generate_master_model(input_data, state_action_list)
 mast_model.write('mast.lp')
-
-# %% Phase 1 Model
-
-# %% Execution Algorithm
 for i in range(10):
 
     # Solves Updated Master Problem

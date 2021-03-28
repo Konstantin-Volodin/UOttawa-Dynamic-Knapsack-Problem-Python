@@ -1,14 +1,12 @@
-# %%
 from dataclasses import dataclass
 from typing import Dict, Tuple, List, Callable
-
 
 import itertools
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
-# %%
+# Data Classes
 @dataclass(frozen=True)
 class state:
     ue_tp: Dict[ Tuple[str],float ] # units expected on time t, ppe p
@@ -28,7 +26,7 @@ class constraint_parameter:
     sign: Dict[ Tuple[str],str ]
     name:  Dict[ Tuple[str],str ]
 
-
+# Initialization
 def generate_initial_state_action(input_data):
     # Input Data
     indices = input_data.indices
@@ -38,7 +36,7 @@ def generate_initial_state_action(input_data):
     # Patient States
     pe = {}
     for dc in itertools.product(indices['d'], indices['c']):
-        pe[dc] = arrival[dc]
+        pe[dc] = 0
     pw = {}
     for mdc in itertools.product(indices['m'],indices['d'], indices['c']):
         if mdc[0] == 0: continue
@@ -50,78 +48,78 @@ def generate_initial_state_action(input_data):
 
     # Unit States
     ue = {}
-    for tp in itertools.product(indices['t'], indices['p']):
-        expected_units = ppe_data[tp[1]].expected_units
-        ue[tp] = expected_units
     uu = {}
-    for tp in itertools.product(indices['t'], indices['p']):
-        uu[tp] = 0
     uv = {}
     for tp in itertools.product(indices['t'], indices['p']):
+        ue[tp] = ppe_data[tp[1]].expected_units
+        uu[tp] = 0
         uv[tp] = np.max((0, uu[tp] - ue[tp]))
 
     # Actions
     sc = {}
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         sc[tmdc] = 0
-        if tmdc[0] == 1 & tmdc[1] == 0:
-            sc[tmdc] = arrival[(tmdc[2], tmdc[3])]
     rsc = {}
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[2] == 0: continue
-        if ttpmdc[0] != 1: rsc[ttpmdc] = 0
-        elif ttpmdc[1] != 1: rsc[ttpmdc] = 0
-        else: rsc[ttpmdc] = 0
+        rsc[ttpmdc] = 0
 
-    # test_state = state(ue, uu, uv, pe, pw, ps)
+    # Returns
+    test_state = state(ue, uu, uv, pe, pw, ps)
     test_action = action(sc, rsc)
-    test_state = state(
-        input_data.expected_state_values['ue'],
-        input_data.expected_state_values['uu'],
-        input_data.expected_state_values['uv'],
-        input_data.expected_state_values['pe'],
-        input_data.expected_state_values['pw'],
-        input_data.expected_state_values['ps']
-    )
     return test_state, test_action
 
 # Generate Phase 1 Master Model (finding initial feasible solution)
 def generate_phase1_master_model(input_data,state_action_data):
-    indices = input_data.indices
-    arrival = input_data.arrival
-    ppe_data = input_data.ppe_data
-    model_param = input_data.model_param
-    transition = input_data.transition
-    usage = input_data.usage
-
-    M = model_param.M
-    gamma = model_param.gamma
-    
+    indices = input_data.indices    
     mast_model, variables, constraints = generate_master_model(input_data, state_action_data)
-    
+
+    # Resets objective function
+    obj_expr = gp.LinExpr()
+    mast_model.setObjective(obj_expr, GRB.MINIMIZE)
+
     # Goal variables
-    gv_0 = mast_model.addVar(name=f'gv_beta_0')
-    gv_ue = []
-    gv_uu = []
-    gv_uv = []
-    gv_pw = []
-    gv_pe = []
-    gv_ps = []
+    gv_0 = {}
+    gv_ue = {}
+    gv_uu = {}
+    gv_uv = {}
+    gv_pw = {}
+    gv_pe = {}
+    gv_ps = {}
+
+    # Adds variables to model, updates constraints, and adds to objective function
+        # Beta 0
+    gv_0['b_0']= mast_model.addVar(name=f'gv_b_0', obj=1)
+    mast_model.chgCoeff(constraints['b0']['b_0'], gv_0['b_0'], 1)
+
     for tp in itertools.product(indices['t'], indices['p']):
-        gv_ue.append(mast_model.addVar(name=f'gv_beta_ue_tp_{tp}'))
-        gv_uu.append(mast_model.addVar(name=f'gv_beta_uu_tp_{tp}'))
-        gv_uv.append(mast_model.addVar(name=f'gv_beta_uv_tp_{tp}'))
-    for dc in itertools.product(indices['d'], indices['d']):
-        gv_pe.append(mast_model.addVar(name=f'gv_beta_pe_dc_{dc}'))
+        # Beta ue
+        gv_ue[tp] = mast_model.addVar(name=f'gv_b_ue_{tp}', obj=1)
+        mast_model.chgCoeff(constraints['ue'][tp], gv_ue[tp], 1)
+        
+        # Beta uu
+        gv_uu[tp] = mast_model.addVar(name=f'gv_b_uu_{tp}', obj=1)
+        mast_model.chgCoeff(constraints['uu'][tp], gv_uu[tp], 1)
+        
+        # Beta uv
+        gv_uv[tp] = mast_model.addVar(name=f'gv_b_uv__{tp}', obj=1)
+        mast_model.chgCoeff(constraints['uv'][tp], gv_uv[tp], 1)
+
+    # Beta pe
+    for dc in itertools.product(indices['d'], indices['c']):
+        gv_pe[dc] = mast_model.addVar(name=f'gv_b_pe_{dc}', obj=1)
+        mast_model.chgCoeff(constraints['pe'][dc], gv_pe[dc], 1)
+    
+    # Beta pw
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         if mdc[0] == 0: continue
-        gv_pw.append(mast_model.addVar(name=f'gv_beta_pw_mdc_{mdc}'))
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        gv_ps.append(mast_model.addVar(name=f'gv_beta_ps_tmdc_{tmdc}'))
-
-    # Modifies Constraints to include goal variables
-
-    # New Objective Function 
+        gv_pw[mdc] = mast_model.addVar(name=f'gv_b_pw_{mdc}', obj=1)
+        mast_model.chgCoeff(constraints['pw'][mdc], gv_pw[mdc], 1)
+    
+    # Beta ps
+    # for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+    #     gv_ps[tmdc] = mast_model.addVar(name=f'gv_b_ps_{tmdc}', obj=1)
+    #     mast_model.chgCoeff(constraints['pw'][mdc], gv_pw[mdc], 1)
 
     return mast_model, variables, constraints
 
@@ -175,7 +173,7 @@ def generate_master_model(input_data, state_action_data):
             {"b_0": 1-gamma}, 
             {"b_0": 1},
             {"b_0": '='},
-            {"b_0": 'beta_0'},
+            {"b_0": 'b_0'},
         )
         return constr_data
 
@@ -192,7 +190,7 @@ def generate_master_model(input_data, state_action_data):
             lhs[tp] = state.ue_tp[tp] - gamma*(ppe_data[tp[1]].expected_units)
             rhs[tp] = input_data.expected_state_values['ue'][tp]
             sign[tp] = ">="
-            name[tp] = f"beta_ue_tp_{tp[0]}_{tp[1].replace(' ', '-')}"
+            name[tp] = f"b_ue_{tp[0]}_{tp[1].replace(' ', '-')}"
 
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
@@ -244,7 +242,7 @@ def generate_master_model(input_data, state_action_data):
             
             rhs[tp] = input_data.expected_state_values['uu'][tp]
             sign[tp] = ">="
-            name[tp] = f"beta_uu_tp_{tp[0]}_{tp[1].replace(' ', '-')}"
+            name[tp] = f"b_uu_{tp[0]}_{tp[1].replace(' ', '-')}"
         
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
@@ -263,7 +261,7 @@ def generate_master_model(input_data, state_action_data):
             lhs[tp] = state.uv_tp[tp]
             rhs[tp] = input_data.expected_state_values['uv'][tp]
             sign[tp] = ">="
-            name[tp] = f"beta_uv_tp_{tp[0]}_{tp[1].replace(' ', '-')}"
+            name[tp] = f"b_uv_{tp[0]}_{tp[1].replace(' ', '-')}"
 
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
@@ -282,7 +280,7 @@ def generate_master_model(input_data, state_action_data):
             lhs[dc] = state.pe_dc[dc] - gamma*(arrival[dc])
             rhs[dc] = input_data.expected_state_values['pe'][dc]
             sign[dc] = ">="
-            name[dc] = f"beta_pe_dc_{dc[0].replace(' ','-')}_{dc[1].replace(' ', '-')}"
+            name[dc] = f"b_pe_{dc[0].replace(' ','-')}_{dc[1].replace(' ', '-')}"
         
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
@@ -345,7 +343,7 @@ def generate_master_model(input_data, state_action_data):
 
                 rhs[mdc] = input_data.expected_state_values['pw'][mdc]
                 sign[mdc] = ">="
-                name[mdc] = f"beta_pw_mdc_{mdc[0]}_{mdc[1].replace(' ', '-')}_{mdc[2].replace(' ', '-')}"
+                name[mdc] = f"b_pw_{mdc[0]}_{mdc[1].replace(' ', '-')}_{mdc[2].replace(' ', '-')}"
             
             # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
@@ -422,4 +420,55 @@ def generate_master_model(input_data, state_action_data):
 
     # Returns model
     return mast_model, w_sa_var, constraints
-# %%
+
+# Generates Beta Parameters
+def generate_beta_values(input_data, constraints):
+    indices = input_data.indices
+
+    # Beta Values
+    b_0_dual = {}
+    b_ue_dual = {}
+    b_uu_dual = {}
+    b_uv_dual = {}
+    b_pw_dual = {}
+    b_pe_dual = {}
+    b_ps_dual = {}
+
+    # Beta 0
+    b_0_dual['b_0'] = constraints['b0']['b_0'].Pi
+
+    for tp in itertools.product(indices['t'], indices['p']):
+        # Beta ue
+        b_ue_dual[tp] = constraints['ue'][tp].Pi
+        
+        # Beta uu
+        b_uu_dual[tp] = constraints['uu'][tp].Pi
+        
+        # Beta uv
+        b_uv_dual[tp] = constraints['uv'][tp].Pi
+
+    # Beta pe
+    for dc in itertools.product(indices['d'], indices['c']):
+        b_pe_dual[dc] = constraints['pe'][dc].Pi
+    
+    # Beta pw
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        if mdc[0] == 0: continue
+        b_pw_dual[mdc] = constraints['pw'][mdc].Pi
+
+    # Beta ps
+    # for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+    #     b_ps_dual[tmdc] = constraints['ps'][tmdc].Pi
+
+    # Combines beta values
+    betas = {
+        'b0': b_0_dual,
+        'ue': b_ue_dual,
+        'uu': b_uu_dual,
+        'uv': b_uv_dual,
+        'pe': b_pe_dual,
+        'pw': b_pw_dual,
+        'ps': b_ps_dual
+    }
+
+    return betas
