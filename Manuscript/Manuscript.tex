@@ -31,8 +31,11 @@
 
 \subsection{Questions}
 \begin{itemize}
-	\item  NEED TO MOVE $uv$ TO STATES AND ADJUST ALL THE RELEVANT EQUATIONS FOR IT
 	\item Need to change generating an action section (4.7)
+	\item Priority need to be added
+	\item PPE resources need to include OR time
+	\item Add cost of scheduling past the window
+	\item Evaluate cost of waiting
 \end{itemize}
 
 \subsection{Comments}
@@ -47,17 +50,17 @@
 		\item Assume arrivals follow poisson distribution
 	\end{itemize}		
 	
-	\item It is assumed that there is no difference between how long a patient waits for their appointment within some limit ($Tl$). 
+	\item It is assumed that there is no difference between how long a patient waits for their appointment within some limit ($TL$). 
 	\begin{itemize}
-		\item Let's assume our limit is 10 periods, there is no difference in terms of cost between patients who has been waiting for 1 period and patients waiting 9 period for their appointment (assuming they are the same category).  
+		\item Let's assume our limit is 10 periods, there is no difference in terms of cost between patients who has been waiting for 1 period and patients waiting 10 period for their appointment (assuming they are the same category).  
 		\item However, if a patient waits for 11 period for their appointment there should be some kind of penalty for the wait
 		\item The penalty comes from increasing patient complexity. Higher complexities require more resources and are thus more costly overall in the system
 	\end{itemize}		
 	
 	\item We assume patient complexity transitions follow binary distribution - each period a patient can become more complex with a certain probability
 		\begin{itemize}
-			\item While patient is waiting less that $Tl$, the transition probability is 0.
-			\item After $Tl$, transition probability is some arbitrary value
+			\item While patient is waiting less that $TL$, the transition probability is 0.
+			\item After $TL$, transition probability is some arbitrary value
 		\end{itemize}
 	
 	\item It is assumed if a patient is scheduled in period one, it means they are served "immediately", regardless if in practice the appointment is at the beginning or end of the period.
@@ -85,6 +88,7 @@
 Decisions are made at the beginning of each time period (will be weeks)
 
 \subsection{State Space}
+\subsubsection{Description}
 State space is defined by current units available for various PPEs for future periods, amount of units already used for various PPEs, current patient waitlist, expected period demand, and number of patients already scheduled
 \[  \vec{S}  = (\vec{ue}, \vec{uu}, \vec{uv}, \vec{pw}, \vec{pe}, \vec{ps}) \]
 \begin{itemize}
@@ -95,9 +99,17 @@ State space is defined by current units available for various PPEs for future pe
     \item $\vec{pe} = pe_{dc}$ - Number of patients of complexity $d$, CPU $c$ expected to arrive this period
     \item $\vec{ps} = ps_{tmdc}$ - Number of patients of complexity $d$, CPU $c$, scheduled to period $t$, who have been on the waitlist for $m$ periods ($m$ of 0 stands for people who have just arrived)
 \end{itemize}
+\subsubsection{Bounds on States}
+\begin{itemize}
+	\item $ue_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
+	\item $uu_{tp} \le 2(uen_{p} + max(ued_p)) \quad \forall tp$
+	\item $uv_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
+	\item $pe_{dc} \le pea_{dc} * 4 \quad \forall dc$
+	\item $pw_{mdc} \le pea_{dc} * 4 \quad \forall mdc$
+	\item $ps_{tmdc} \le pea_{dc} * 4 \quad \forall tmdc$
+\end{itemize}
 
 \subsection{Action Sets}
-
 \subsubsection{Description}
 At the beginning of each period, decision maker must reschedule appointments as necessary (if patient complexity increased and too much PPE is being used, or if expected units of PPE have changed negatively). And decision maker must also schedule patients to surgeries
 \[  \vec{A} = (\vec{sc}, \vec{rsc}) \] 
@@ -114,7 +126,7 @@ At the beginning of each period, decision maker must reschedule appointments as 
     		\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
     \end{itemize}
         \begin{equation} 
-			\sum_{mdc}(sc_{tmdc})U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp
+			( \sum_{mdc}sc_{tmdc} + \sum_{tmdc} rsc_{tt'mdc} )U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp
 		\end{equation}
 	
 	\item Bounds on when reschedules are allowed
@@ -170,8 +182,8 @@ At the beginning of each period, decision maker must reschedule appointments as 
 
 	\item Amout of expected units of PPE resource for the next time period - $ue_{1p}$
 		\begin{itemize}
-			\item let's assume $ued_{d}$ is the random variable that represents the deviation of PPE units from the expectation for the next period only. It follows some uniform distribution.
-			\item let's assume $uen_{d}$ is the default value to be used for expected number of PPE units $p$ per period
+			\item let's assume $ued_{p}$ is the random variable that represents the deviation of PPE units $p$ from the expectation for the next period only. It follows some uniform distribution.
+			\item let's assume $uen_{p}$ is the default value to be used for expected number of PPE units $p$ per period
 		\end{itemize}
 \end{enumerate}
 
@@ -253,7 +265,9 @@ Cost will come from two source:
 \end{itemize}
 
 \begin{align} \begin{split}  
-	\vec{C} = c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) = & \sum_{mdc} cw_{m} (pw_{mdc} - \sum_{t} sc_{tmdc}) +  \\
+	\vec{C} = c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) = 
+		& \sum_{mdc} cw_{m} (pw_{mdc}) +  \\
+		& \sum_{tdc} cw_{M} (ps_{tMdc}) (\text{ to prevent infinite rescheduling })+ \\
 		& + cc \sum_{tt`mdc, \text{where } t' > t} rsc_{tt'mdc} - cc \sum_{tt`mdc, \text{where } t' < t} rsc_{tt'mdc} + \\ 
 		& + M (uv_{tp})
 \end{split} \end{align} 
@@ -347,7 +361,7 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 		 \Bigg( 
 			& \bigg( \sum_{p} \beta_{1p}^{ue} (ue_{1p} - 
 				\gamma \Big( uen_{p} + ue_{1p} - uu_{1p} - 
-				\sum_{dc} U_{pdc} (\sum_{m} sc_{mdc} + \sum_{t'm} rsc_{1t'mdc} - \sum_{tm} rsc_{t1mdc}) \Big) \bigg) + \\
+				\sum_{dc} U_{pdc} (\sum_{m} sc_{1mdc} + \sum_{t'm} rsc_{1t'mdc} - \sum_{tm} rsc_{t1mdc}) \Big) \bigg) + \\
 			& \bigg(\sum_{t=2p}^{T} \beta_{tp}^{ue} (ue_{tp} - \gamma (uen_{p}) \bigg) \Bigg)
 	\end{align*} }
 		

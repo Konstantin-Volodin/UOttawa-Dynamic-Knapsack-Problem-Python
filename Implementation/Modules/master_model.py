@@ -140,17 +140,14 @@ def generate_master_model(input_data, state_action_data):
         cost = 0
 
         # Cost of Waiting
-        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-
-            # sum_t sc part
-            psc = 0 
-            for t in indices['t']:
-                psc += action.sc_tmdc[(t, mdc[0], mdc[1], mdc[2])]
-            
+        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
             # if m = 0, uses unscheduled patients who just arrived
             # if m > 0, uses patients waiting for m
-            if mdc[0] == 0: cost += model_param.cw**mdc[0] * ( state.pe_dc[(mdc[1],mdc[2])] - psc )
-            else: cost += model_param.cw**mdc[0] * ( state.pw_mdc[mdc] - psc )
+            if mdc[0] == 0: cost += model_param.cw**mdc[0] * ( state.pe_dc[(mdc[1],mdc[2])] )
+            else: cost += model_param.cw**mdc[0] * ( state.pw_mdc[mdc] )
+
+        for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+            cost += model_param.cw**indices['m'][-1] * ( state.ps_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
 
         # Cost of Cancelling
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
@@ -187,7 +184,22 @@ def generate_master_model(input_data, state_action_data):
 
         # Creates Data
         for tp in itertools.product(indices['t'], indices['p']):
-            lhs[tp] = state.ue_tp[tp] - gamma*(ppe_data[tp[1]].expected_units)
+            if tp[0] == 1:
+                previous_numbers = state.ue_tp[tp] - state.uu_tp[tp]
+                change_due_to_schedule = 0
+                for dc in itertools.product(indices['d'], indices['c']):
+                    for m in itertools.product(indices['m']):
+                        change_due_to_schedule += usage[(tp[1], dc[0], dc[1])] * action.sc_tmdc[(tp[0],m[0], dc[0], dc[1])]
+                    for tpm in itertools.product(indices['t'], indices['m']):
+                        if tpm[1] == 0: continue
+                        change_due_to_schedule += usage[(tp[1], dc[0], dc[1])] * action.rsc_ttpmdc[(tp[0],tpm[0], tpm[1], dc[0], dc[1])]
+                    for tm in itertools.product(indices['t'], indices['m']):
+                        if tm[1] == 0: continue
+                        change_due_to_schedule += usage[(tp[1], dc[0], dc[1])] * action.rsc_ttpmdc[(tm[0],tp[0], tm[1], dc[0], dc[1])]
+                lhs[tp] = state.ue_tp[tp] - gamma*(ppe_data[tp[1]].expected_units + previous_numbers - change_due_to_schedule)
+            elif tp[0] >= 2:
+                lhs[tp] = state.ue_tp[tp] - gamma*(ppe_data[tp[1]].expected_units)
+
             rhs[tp] = input_data.expected_state_values['ue'][tp]
             sign[tp] = ">="
             name[tp] = f"b_ue_{tp[0]}_{tp[1].replace(' ', '-')}"
