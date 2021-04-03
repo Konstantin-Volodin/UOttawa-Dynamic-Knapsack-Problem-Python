@@ -5,6 +5,7 @@ from typing import Dict, Tuple, List, Callable
 
 @dataclass(frozen=True)
 class ppe_data_class:
+    ppe_type: str
     expected_units: int
     deviation: List[int]
 @dataclass(frozen=True)
@@ -63,9 +64,12 @@ def read_data(data_file_path):
     ppe_data_sheet = book.get_sheet_by_name('PPE Data')
 
     ppe_data = {}
-    for ppe_row in ppe_data_sheet.iter_rows(min_row=2, min_col=1, max_col=3, values_only=True):
+    for ppe_row in ppe_data_sheet.iter_rows(min_row=2, min_col=1, max_col=4, values_only=True):
         if ppe_row[0] == None: break
-        ppe_data[ppe_row[0]] = ppe_data_class(ppe_row[1], [int(i) for i in ppe_row[2].split(',')])
+        ppe_type = ""
+        if ppe_row[1] == True: ppe_type = "carry-over"
+        else: ppe_type = "non-carry-over"
+        ppe_data[ppe_row[0]] = ppe_data_class(ppe_type, ppe_row[2], [int(i) for i in ppe_row[3].split(',')])
 
 
     # PPE Usage

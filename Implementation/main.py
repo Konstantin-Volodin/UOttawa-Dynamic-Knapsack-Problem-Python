@@ -10,17 +10,36 @@ my_path = os.path.dirname(__file__)
 read_data = timer(read_data)
 input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
 
-# %% Generate Master Model (Phase 1)
+# %% Generate Initial Feasible Set
 init_state, init_action = generate_initial_state_action(input_data)
 state_action_list = [(init_state, init_action)]
-p1_mast_model, p1_variables, p1_constraints = generate_phase1_master_model(input_data, state_action_list)
-p1_mast_model.write('mast_p1.lp')
 
-p1_mast_model.optimize()
-betas = generate_beta_values(input_data, p1_constraints)
+count = 0
+while True:
+    # Adjusted Master Model
+    p1_mast_model, p1_mast_var, p1_mast_const = generate_phase1_master_model(input_data, state_action_list)
+    p1_mast_model.Params.LogToConsole = 0
+    p1_mast_model.optimize()
+    print(f'iteration {count}, {p1_mast_model.getObjective().getValue()}')
+    count += 1
+    betas = generate_beta_values(input_data, p1_mast_const)
+    if p1_mast_model.getObjective().getValue() <= 0:
+        break
+    # Adjusted Subproblem
+    p1_sub_model, p1_sub_var = generate_sub_model(input_data, betas, True)
+    p1_sub_model.Params.LogToConsole = 0
+    p1_sub_model.optimize()
+    state_action = generate_state_action(p1_sub_var)
+    # Adjusts state action set
+    state_action_list.append(state_action)
+
 # %% Generate Sub Model (Phase 2)
-sub_model = generate_sub_model(input_data, betas)
-sub_model.write('sub_prob.lp')
+sub_model, sub_variables = generate_sub_model(input_data, betas)
+sub_model.write('sub_prob_p2.lp')
+
+# %% Generate Master Model (Phase 2)
+mast_model, variables, constraints = generate_master_model(input_data, state_action_list)
+mast_model.write('mast_p2.lp')
 
 
 # %% Solve the problem (Phase 2?)

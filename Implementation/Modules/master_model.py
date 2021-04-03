@@ -117,9 +117,10 @@ def generate_phase1_master_model(input_data,state_action_data):
         mast_model.chgCoeff(constraints['pw'][mdc], gv_pw[mdc], 1)
     
     # Beta ps
-    # for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-    #     gv_ps[tmdc] = mast_model.addVar(name=f'gv_b_ps_{tmdc}', obj=1)
-    #     mast_model.chgCoeff(constraints['pw'][mdc], gv_pw[mdc], 1)
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        if tmdc[1] == 0: continue
+        gv_ps[tmdc] = mast_model.addVar(name=f'gv_b_ps_{tmdc}', obj=1)
+        mast_model.chgCoeff(constraints['ps'][tmdc], gv_ps[tmdc], 1)
 
     return mast_model, variables, constraints
 
@@ -162,7 +163,6 @@ def generate_master_model(input_data, state_action_data):
             cost += state.uv_tp[tp] * M
 
         return(cost)
-
     # Generates beta 0 constraint data 
     def b_0_constraint(state: state, action: action) -> constraint_parameter:
 
@@ -173,7 +173,6 @@ def generate_master_model(input_data, state_action_data):
             {"b_0": 'b_0'},
         )
         return constr_data
-
     # Generates beta ue constraint data
     def b_ue_constraint(state: state, action: action) -> constraint_parameter:
         # Initializes Data
@@ -207,7 +206,6 @@ def generate_master_model(input_data, state_action_data):
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
         return constr_data
-
     # Generates beta uu constraint data
     def b_uu_constraint(state: state, action: action) -> constraint_parameter:
         # Initializes Data
@@ -259,7 +257,6 @@ def generate_master_model(input_data, state_action_data):
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
         return constr_data
-
     # Generates beta uv constraint data
     def b_uv_constraint(state: state, action: action) -> constraint_parameter:
         # Initializes Data
@@ -278,7 +275,6 @@ def generate_master_model(input_data, state_action_data):
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
         return constr_data
-
     # Generates beta pe constraint data
     def b_pe_constraint(state: state, action: action) -> constraint_parameter:
         # Initializes Data
@@ -297,7 +293,6 @@ def generate_master_model(input_data, state_action_data):
         # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
         return constr_data
-
     # Generates beta pw constraint data
     def b_pw_constraint(state: state, action: action) -> constraint_parameter:
         # Initializes Data
@@ -310,7 +305,6 @@ def generate_master_model(input_data, state_action_data):
         for mc in itertools.product(indices['m'], indices['c']):
             for d in range(len(indices['d'])):
                 mdc = (mc[0], indices['d'][d], mc[1])
-
                 if mc[0] == 0: continue
                 
                 # When m = 1
@@ -332,12 +326,12 @@ def generate_master_model(input_data, state_action_data):
                         not_scheduled += gamma * state.pw_mdc[(mm, indices['d'][d], mc[1])]
                         for t in indices['t']:
                             not_scheduled -= gamma * action.sc_tmdc[(t, mm, indices['d'][d], mc[1])]
-                    transitioned_out = gamma * state.pw_mdc[(mm,indices['d'][d],mc[1])] * transition[(mm,indices['d'][d],mc[1])]
-                    if d == 0: 
-                        transitioned_in = 0
-                    else:
-                        transitioned_in = gamma * state.pw_mdc[(mm,indices['d'][d-1],mc[1])] * transition[(mm,indices['d'][d-1],mc[1])]
-                        
+                        transitioned_out = gamma * state.pw_mdc[(mm,indices['d'][d],mc[1])] * transition[(mm,indices['d'][d],mc[1])]
+                        if d == 0: 
+                            transitioned_in = 0
+                        else:
+                            transitioned_in = gamma * state.pw_mdc[(mm,indices['d'][d-1],mc[1])] * transition[(mm,indices['d'][d-1],mc[1])]
+                            
                     lhs[mdc] = curr_state - not_scheduled + transitioned_out - transitioned_in
 
                 # All others
@@ -357,13 +351,74 @@ def generate_master_model(input_data, state_action_data):
                 sign[mdc] = ">="
                 name[mdc] = f"b_pw_{mdc[0]}_{mdc[1].replace(' ', '-')}_{mdc[2].replace(' ', '-')}"
             
-            # Returns Data
+        # Returns Data
         constr_data = constraint_parameter(lhs,rhs,sign,name)
         return constr_data
-
     # Generates beta ps constraint data
     def b_ps_constraint(state: state, action: action) -> constraint_parameter:
-        pass
+        # Initializes Data
+        lhs = {}
+        rhs = {}
+        sign = {}
+        name = {}
+        
+        for tmc in itertools.product(indices['t'], indices['m'], indices['c']):
+            for d in range(len(indices['d'])):
+                tmdc = (tmc[0], tmc[1], indices['d'][d], tmc[2])
+                if tmc[1] == 0: continue
+
+                # When t is T
+                if tmdc[0] == indices['t'][-1]:
+                    lhs[tmdc] = state.ps_tmdc[tmdc]
+
+                # All other times
+                else:
+                    lhs[tmdc] = 0
+
+                    # When m is M
+                    if tmdc[1] == indices['m'][-1]:
+                        # Baseline
+                        lhs[tmdc] += state.ps_tmdc[tmdc]
+                        # Transition in difficulties
+                        for mm in indices['m'][-2:]:
+                            lhs[tmdc] -= gamma * (1 - transition[( mm, tmdc[2], tmdc[3] )]) * state.ps_tmdc[( tmdc[0]+1, mm, tmdc[2], tmdc[3] )] 
+                            if d != 0: 
+                                lhs[tmdc] -= gamma * (transition[( mm, indices['d'][d-1], tmdc[3] )]) * state.ps_tmdc[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )] 
+                            
+                            # Scheduling / Rescheduling
+                            lhs[tmdc] += gamma * action.sc_tmdc[ (tmdc[0]+1, mm, tmdc[2], tmdc[3] ) ]
+                            for t in indices['t']:
+                                lhs[tmdc] += gamma * action.rsc_ttpmdc[ (tmdc[0]+1, t, mm, tmdc[2], tmdc[3]) ]
+                                lhs[tmdc] -= gamma * action.rsc_ttpmdc[ (t, tmdc[0]+1, mm, tmdc[2], tmdc[3]) ]
+                                
+                    # When m is 0
+                    elif tmdc[1] == 0: continue
+
+                    # All other Ms
+                    else:
+                        # Baseline
+                        lhs[tmdc] += state.ps_tmdc[tmdc]
+                        # Transition in difficulties
+                        if tmdc[1] >= 2:
+                            lhs[tmdc] -= gamma * (1 - transition[( tmdc[1]-1, tmdc[2], tmdc[3] )]) * state.ps_tmdc[( tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3] )] 
+                            if d != 0: 
+                                lhs[tmdc] -= gamma * (transition[( tmdc[1]-1, indices['d'][d-1], tmdc[3] )]) * state.ps_tmdc[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )] 
+                        
+                        # Scheduling / Rescheduling
+                        lhs[tmdc] += gamma * action.sc_tmdc[ (tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3]) ]
+                        if tmdc[1] >= 2:
+                            for t in indices['t']:
+                                lhs[tmdc] += gamma * action.rsc_ttpmdc[ (tmdc[0]+1, t, tmdc[1]-1, tmdc[2], tmdc[3]) ]
+                                lhs[tmdc] -= gamma * action.rsc_ttpmdc[ (t, tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3]) ]
+
+                    
+                rhs[tmdc] = input_data.expected_state_values['ps'][tmdc]
+                sign[tmdc] = ">="
+                name[tmdc] = f"b_ps_{tmdc}"
+
+        # Returns Data
+        constr_data = constraint_parameter(lhs,rhs,sign,name)
+        return constr_data
 
     # generates constraints for a model
     def generate_constraint( 
@@ -413,14 +468,15 @@ def generate_master_model(input_data, state_action_data):
     uv_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_uv_constraint)
     pe_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_pe_constraint)
     pw_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_pw_constraint)
-    # ps_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_ps_constraint)
+    ps_constr = generate_constraint(mast_model, w_sa_var, state_action_data, b_ps_constraint)
     constraints = {
         'b0': b0_constr,
         'ue': ue_constr,
         'uu': uu_constr,
         'uv': uv_constr,
         'pe': pe_constr,
-        'pw': pw_constr
+        'pw': pw_constr,
+        'ps': ps_constr
     }
 
     # Generates Objective Function
@@ -469,8 +525,9 @@ def generate_beta_values(input_data, constraints):
         b_pw_dual[mdc] = constraints['pw'][mdc].Pi
 
     # Beta ps
-    # for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-    #     b_ps_dual[tmdc] = constraints['ps'][tmdc].Pi
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        if tmdc[1] == 0: continue
+        b_ps_dual[tmdc] = constraints['ps'][tmdc].Pi
 
     # Combines beta values
     betas = {

@@ -10,3 +10,8 @@ maybe we should focus the model on spine specifically
 we have a simulation resources that simulates distribution between CPUs
 TL is 6 weeks
 	
+- the goal is to put it into a spine journal
+- add more resources in addition to PPE
+	- OR time 
+- Need differentiation by surgery type
+	- Change CPU to surgery type (since we are only focusing on spine)
