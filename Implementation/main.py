@@ -1,5 +1,6 @@
 # %% Packages
 from Modules.data_import import *
+from Modules.data_export import *
 from Modules.master_model import *
 from Modules.sub_problem import *
 from Modules.decorators import timer
@@ -15,7 +16,7 @@ init_state, init_action = generate_initial_state_action(input_data)
 state_action_list = [(init_state, init_action)]
 
 count = 0
-while True:
+for i in range(100):
     # Adjusted Master Model
     p1_mast_model, p1_mast_var, p1_mast_const = generate_phase1_master_model(input_data, state_action_list)
     p1_mast_model.Params.LogToConsole = 0
@@ -32,6 +33,11 @@ while True:
     state_action = generate_state_action(p1_sub_var)
     # Adjusts state action set
     state_action_list.append(state_action)
+
+# %% Saves Feasible State-Action pairs
+my_path = os.path.dirname(__file__)
+export_all_state_action(state_action_list, os.path.join(my_path, 'Data', 'SA-Pairs.xlsx'))
+
 
 # %% Generate Sub Model (Phase 2)
 sub_model, sub_variables = generate_sub_model(input_data, betas)

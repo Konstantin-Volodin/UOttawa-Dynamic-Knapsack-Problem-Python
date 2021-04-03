@@ -371,7 +371,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
     value_expr = gp.LinExpr(b0_expr + b_ue_expr + b_uu_expr + b_uv_expr + b_pe_expr + b_pw_expr + b_ps_expr)
 
     if phase1:
-        sub_model.setObjective(value_expr, GRB.MAXIMIZE)
+        sub_model.setObjective(-value_expr, GRB.MINIMIZE)
     else:
         sub_model.setObjective(cost_expr - value_expr, GRB.MINIMIZE)
 
