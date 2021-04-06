@@ -16,7 +16,7 @@ init_state, init_action = generate_initial_state_action(input_data)
 state_action_list = [(init_state, init_action)]
 
 count = 0
-for i in range(100):
+for i in range(4):
     # Adjusted Master Model
     p1_mast_model, p1_mast_var, p1_mast_const = generate_phase1_master_model(input_data, state_action_list)
     p1_mast_model.Params.LogToConsole = 0

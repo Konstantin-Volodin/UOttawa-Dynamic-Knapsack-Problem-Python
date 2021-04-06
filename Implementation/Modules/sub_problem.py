@@ -67,6 +67,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
         if mdc[0] == 0: continue
         var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=4*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        if tmdc[1] == 0: continue
         var_ps[tmdc] = sub_model.addVar(name=f's_ps_{tmdc}', ub=4*arrival[(tmdc[2],tmdc[3])], vtype=GRB.INTEGER)
     # Actions
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):

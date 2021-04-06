@@ -141,14 +141,19 @@ def generate_master_model(input_data, state_action_data):
         cost = 0
 
         # Cost of Waiting
+        cost_waiting_unsc = 0
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
             # if m = 0, uses unscheduled patients who just arrived
             # if m > 0, uses patients waiting for m
             if mdc[0] == 0: cost += model_param.cw**mdc[0] * ( state.pe_dc[(mdc[1],mdc[2])] )
             else: cost += model_param.cw**mdc[0] * ( state.pw_mdc[mdc] )
+        cost_waiting_unsc = cost
 
+        # Cost of Waiting - Last Period
+        cost_waiting_last = 0
         for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
             cost += model_param.cw**indices['m'][-1] * ( state.ps_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+        cost_waiting_last = cost - cost_waiting_unsc
 
         # Cost of Cancelling
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
@@ -196,6 +201,8 @@ def generate_master_model(input_data, state_action_data):
                         if tm[1] == 0: continue
                         change_due_to_schedule += usage[(tp[1], dc[0], dc[1])] * action.rsc_ttpmdc[(tm[0],tp[0], tm[1], dc[0], dc[1])]
                 lhs[tp] = state.ue_tp[tp] - gamma*(ppe_data[tp[1]].expected_units + previous_numbers - change_due_to_schedule)
+                print(state.ue_tp[tp] - gamma * (ppe_data[tp[1]].expected_units + previous_numbers))
+                print(gamma * change_due_to_schedule)
             elif tp[0] >= 2:
                 lhs[tp] = state.ue_tp[tp] - gamma*(ppe_data[tp[1]].expected_units)
 
