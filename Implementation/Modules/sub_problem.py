@@ -79,20 +79,30 @@ def generate_sub_model(input_data, betas, phase1 = False):
     sub_vars = variables( var_ue, var_uu, var_uv, var_pe, var_pw, var_ps, var_sc, var_rsc)
 
     # Constraints
-    # 1) PPE Capacity
+    # 1) PPE Usage Constraint
     for tp in itertools.product(indices['t'], indices['p']):
         expr = gp.LinExpr()
+        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+            if mdc[0] == 0: continue
+            expr.addTerms(-usage[(tp[1],mdc[1],mdc[2])], var_ps[(tp[0], mdc[0],mdc[1],mdc[2])])
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
             expr.addTerms(-usage[(tp[1],mdc[1],mdc[2])], var_sc[(tp[0], mdc[0],mdc[1],mdc[2])])
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
             if tmdc[1] == 0: continue
             expr.addTerms(-usage[(tp[1],tmdc[2],tmdc[3])], var_rsc[(tmdc[0], tp[0], tmdc[1],tmdc[2],tmdc[3])])
-        expr.addTerms(1, var_ue[tp])
-        expr.addTerms(-1, var_uu[tp])
-        expr.addTerms(1, var_uv[tp])
-        sub_model.addConstr(expr >= 0, name=f'ppe_capacity_{tp}')
+        expr.addTerms(1, var_uu[tp])
+        sub_model.addConstr(expr == 0, name=f'tracks_usage{tp}')
 
-    # 2) Bounds on Reschedules
+
+    # 2) PPE Capacity
+    for tp in itertools.product(indices['t'], indices['p']):
+        expr = gp.LinExpr()
+        expr.addTerms(-1, var_ue[tp])
+        expr.addTerms(1, var_uu[tp])
+        expr.addTerms(-1, var_uv[tp])
+        sub_model.addConstr(expr <= 0, name=f'ppe_capacity_constraint_{tp}')
+
+    # 3) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[2] == 0: continue
         if ttpmdc[0] == ttpmdc[1]:
@@ -102,9 +112,9 @@ def generate_sub_model(input_data, betas, phase1 = False):
         elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
             sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
-    # 3) Cap on max schedule/reschedule wait time
+    # 4) Cap on max schedule/reschedule wait time
 
-    # 4) Number of people schedules/reschedules must be consistent
+    # 5) Number of people schedules/reschedules must be consistent
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         if tmdc[1] == 0: continue
         expr = gp.LinExpr()
@@ -212,11 +222,11 @@ def generate_sub_model(input_data, betas, phase1 = False):
                 # Change due to transition in complexity
                 for mc in itertools.product(indices['m'], indices['c']):
                     for d in range(len(indices['d'])):
-                        # if mc[0] == 0: continue
+                        if mc[0] == 0: continue
                         if d == (len(indices['d']) - 1): continue
                         change_in_usage = usage[( tp[1], indices['d'][d+1], mc[1] )] - usage[( tp[1], indices['d'][d], mc[1] )]
                         expr.addTerms( 
-                            -betas['uu'][tp] * gamma * transition[mdc] * (change_in_usage), 
+                            -betas['uu'][tp] * gamma * transition[(mc[0], indices['d'][d], mc[1])] * (change_in_usage), 
                             var.s_ps[(tp[0], mc[0], indices['d'][d], mc[1])]
                         )
                 

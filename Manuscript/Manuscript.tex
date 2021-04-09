@@ -98,14 +98,21 @@ State space is defined by current units available for various PPEs for future pe
     \item $\vec{pe} = pe_{dc}$ - Number of patients of complexity $d$, CPU $c$ expected to arrive this period
     \item $\vec{ps} = ps_{tmdc}$ - Number of patients of complexity $d$, CPU $c$, scheduled to period $t$, who have been on the waitlist for $m$ periods ($m$ of 0 stands for people who have just arrived)
 \end{itemize}
-\subsubsection{Bounds on States}
+\subsubsection{States Constraints}
 \begin{itemize}
-	\item $ue_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
-	\item $uu_{tp} \le 2(uen_{p} + max(ued_p)) \quad \forall tp$
-	\item $uv_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
-	\item $pe_{dc} \le pea_{dc} * 4 \quad \forall dc$
-	\item $pw_{mdc} \le pea_{dc} * 4 \quad \forall mdc$
-	\item $ps_{tmdc} \le pea_{dc} * 4 \quad \forall tmdc$
+	\item PPE Usage Constraint
+	\begin{equation}
+		uu_{tp} = ue_{tp}+uv_{tp} \quad \forall tp
+	\end{equation}
+	\item Bounds on states
+	\begin{itemize}
+		\item $ue_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
+		\item $uu_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
+		\item $uv_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
+		\item $pe_{dc} \le pea_{dc} * 4 \quad \forall dc$
+		\item $pw_{mdc} \le pea_{dc} * 4 \quad \forall mdc$
+		\item $ps_{tmdc} \le pea_{dc} * 4 \quad \forall tmdc$
+	\end{itemize}
 \end{itemize}
 
 \subsection{Action Sets}
@@ -120,12 +127,12 @@ At the beginning of each period, decision maker must reschedule appointments as 
 \subsubsection{Action Constraints}
 \label{action constraints}
 \begin{itemize}
-    \item Total number of PPE units cannot be exceeded  
+    \item Tracks PPE Usage  
     \begin{itemize}
     		\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
     \end{itemize}
         \begin{equation} 
-			( \sum_{mdc}sc_{tmdc} + \sum_{tmdc} rsc_{tt'mdc} )U_{pdc} <= (ue_{tp} - uu_{tp}) + uv_{tp}\ \quad \forall tp
+			(\sum_{mdc}ps_{tmdc} \sum_{mdc}sc_{tmdc} + \sum_{tmdc} rsc_{tt'mdc} )U_{pdc} = uu_{tp}\ \quad \forall tp
 		\end{equation}
 	
 	\item Bounds on when reschedules are allowed
