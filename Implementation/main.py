@@ -11,6 +11,7 @@ import os.path
 # generate_phase1_master_model = timer(generate_phase1_master_model)
 # generate_sub_model = timer(generate_sub_model)
 # update_master_model = timer(update_master_model)
+# gp.Model.optimize = timer(gp.Model.optimize)
 
 my_path = os.path.dirname(__file__)
 input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
@@ -29,9 +30,6 @@ while True:
     p1_mast_model.Params.LogToConsole = 0
     p1_mast_model.optimize()
     betas = generate_beta_values(input_data, p1_mast_const)
-
-    p1_mast_model.write('mast_p1.lp')
-    mast_model.write('mast_p2.lp')
         
     # Debugging
     print(f'Phase 1 - iteration {count+1}, Mast Objective {p1_mast_model.getObjective().getValue()}')
@@ -45,6 +43,8 @@ while True:
     # Generates and solves Subproblem 
     p1_sub_model, p1_sub_var = generate_sub_model(input_data, betas, True)
     p1_sub_model.Params.LogToConsole = 0
+    # p1_sub_model.setParam('Presolve', 0)
+    p1_sub_model.setParam('MIPGap', 0)
     p1_sub_model.optimize()
     
     # Update State-Actions
@@ -56,7 +56,6 @@ while True:
     if state_action_list[-1] == state_action_list[-2]:
         print('Unable to find feasible set')
         break
-
 
 # %% Solve the problem (Phase 2)
 count = 0
@@ -79,9 +78,9 @@ while True:
     count += 1
 
     # Stops if necessary
-    if sub_model.ObjVal >= 0:
-        print('Found Optimal Solution')
-        break
+    # if sub_model.ObjVal >= 0:
+    #     print('Found Optimal Solution')
+    #     break
 
     # Update State-Actions
     state_action = generate_state_action(sub_var)

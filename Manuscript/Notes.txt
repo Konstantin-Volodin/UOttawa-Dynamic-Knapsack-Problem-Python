@@ -1,0 +1,14 @@
+a) OR Time - assume fixed for now - keep fixed
+b) Staffing - suggests we use 1 type for now - assume it is fixed - keep 1 fixed
+c) ppe - good to have for political reasons (these 4) - start with 1 - start with 1
+d) instrumentation - issue if it is not available - is it really a constraint?  - maybe not?
+	- is it really necessary?
+e) Same as ^ for bone grafts - maybe not necessary
+f) Same as staff - should be available - same as PPE
+g) ignore medication - ignore
+h) ignore
+
+keep 3 surgeries 
+	- up to 2 hours
+	- 3-4 hours
+	- over 4 hours

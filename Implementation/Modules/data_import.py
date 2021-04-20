@@ -35,11 +35,15 @@ def read_data(data_file_path):
     indices_sheet = book.get_sheet_by_name('Indices Data')
 
     # Generates T
-    time_horizon = indices_sheet.cell(row=2, column=1).value
-    t = [i+1 for i in range(time_horizon)]
+    t = []
+    for t_row in indices_sheet.iter_rows(min_row=2, min_col=1, max_col=1, values_only=True):
+        if t_row[0] == None: break
+        t.append(t_row[0])
     # Generates M
-    tracked_wait = indices_sheet.cell(row=2, column=2).value
-    m = [i for i in range(tracked_wait + 1)]
+    m = [0]
+    for m_row in indices_sheet.iter_rows(min_row=2, min_col=2, max_col=2, values_only=True):
+        if m_row[0] == None: break
+        m.append(m_row[0])
     # Generates P
     p = []
     for ppe_row in indices_sheet.iter_rows(min_row=2, min_col=3, max_col=3, values_only=True):
