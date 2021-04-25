@@ -89,13 +89,12 @@ Decisions are made at the beginning of each time period (will be weeks)
 \subsection{State Space}
 \subsubsection{Description}
 State space is defined by current units available for various PPEs for future periods, amount of units already used for various PPEs, current patient waitlist, expected period demand, and number of patients already scheduled
-\[  \vec{S}  = (\vec{ue}, \vec{uu}, \vec{uv}, \vec{pw}, \vec{pe}, \vec{ps}) \]
+\[  \vec{S}  = (\vec{ue}, \vec{uu}, \vec{uv}, \vec{pw}, \vec{ps}) \]
 \begin{itemize}
     \item $\vec{ue} = ue_{tp}$ - Expected unist for period $t$, and PPE $p$
     \item $\vec{uu} = uu_{tp}$ - Used units for period $t$, and PPE $p$
     \item $\vec{uv} = uv_{tp}$ - goal variable, violation on number of resources used for period $t$, of PPE $p$
-    \item $\vec{pw} = pw_{mdc}$ - Number of patients of complexity $d$, CPU $c$, on a wait list for $m$ periods
-    \item $\vec{pe} = pe_{dc}$ - Number of patients of complexity $d$, CPU $c$ expected to arrive this period
+    \item $\vec{pw} = pw_{mdc}$ - Number of patients of complexity $d$, CPU $c$, on a wait list for $m$ periods ($m$ of 0, stands for people who just arrived)
     \item $\vec{ps} = ps_{tmdc}$ - Number of patients of complexity $d$, CPU $c$, scheduled to period $t$, who have been on the waitlist for $m$ periods ($m$ of 0 stands for people who have just arrived)
 \end{itemize}
 \subsubsection{States Constraints}
@@ -109,7 +108,6 @@ State space is defined by current units available for various PPEs for future pe
 		\item $ue_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
 		\item $uu_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
 		\item $uv_{tp} \le uen_{p} + max(ued_p) \quad \forall tp$
-		\item $pe_{dc} \le pea_{dc} * 4 \quad \forall dc$
 		\item $pw_{mdc} \le pea_{dc} * 4 \quad \forall mdc$
 		\item $ps_{tmdc} \le pea_{dc} * 4 \quad \forall tmdc$
 	\end{itemize}
@@ -132,7 +130,7 @@ At the beginning of each period, decision maker must reschedule appointments as 
     		\item ($U_{pdc}$ - usage of PPE $p$ per patient difficulty $d$, CPU $c$)
     \end{itemize}
         \begin{equation} 
-			(\sum_{mdc}ps_{tmdc} \sum_{mdc}sc_{tmdc} + \sum_{tmdc} rsc_{tt'mdc} )U_{pdc} = uu_{tp}\ \quad \forall tp
+			(\sum_{mdc}ps_{tmdc} + \sum_{mdc}sc_{tmdc} + \sum_{tmdc} rsc_{tt'mdc} )U_{pdc} = uu_{tp}\ \quad \forall tp
 		\end{equation}
 	
 	\item Bounds on when reschedules are allowed
@@ -159,10 +157,7 @@ At the beginning of each period, decision maker must reschedule appointments as 
 			\sum_{t'} rsc_{tt'mdc} \le ps_{tmdc} \quad \forall tmdc 
 		\end{equation} 
 		\begin{equation}  
-			\sum_{t} sc_{t0dc} \le pe_{dc} \quad \forall dc 
-		\end{equation} 
-		\begin{equation}  
-			\sum_{t} sc_{tmdc} \le pw_{mdc} \quad \forall m \in \{1...M \}, dc 
+			\sum_{t} sc_{tmdc} \le pw_{mdc} \quad \forall mdc 
 		\end{equation} 
 \end{itemize}
 
@@ -230,17 +225,12 @@ At the beginning of each period, decision maker must reschedule appointments as 
 		uv'_{tp} = \max \{0, uu'_{tp} - ue'_{tp} \} \quad \forall tp
 	\end{equation}
 
-	\item Transition from $\vec{pe}$ to $\vec{pe'}$ - Expected number of patients for this month
-		\begin{equation} 
-			\ pe_{dc} = pea_{dc} \quad \forall dc 
-		\end{equation} 
-
 	\item Transition from $\vec{pw}$ to $\vec{pw'}$ - Flow of patients between difficulties/scheduling/cancelling for waitlist
 		\begin{equation}  
-			pw'_{1dc} = pe_{dc} - \sum_{t} sc_{t0dc} \quad \forall dc 
+			pw'_{0dc} = pea_{dc} \quad \forall dc 
 		\end{equation} 
 		\begin{equation}  
-			pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + pwt_{m,d-1,c} - pwt_{mdc} \quad \forall m \in \{1...M-2 \}, dc 
+			pw'_{m+1, dc} = pw_{mdc} - \sum_{t} sc_{tmdc} + pwt_{m,d-1,c} - pwt_{mdc} \quad \forall m \in \{0...M-2 \}, dc 
 		\end{equation} 
 		\begin{equation}  
 			pw'_{Mdc} = \sum_{M-1}^M pw_{mdc} - \sum_{t,M-1}^{M} sc_{tmdc} + \sum_{M-1}^{M} pwt_{m,d-1,c} - 
@@ -248,6 +238,9 @@ At the beginning of each period, decision maker must reschedule appointments as 
 		\end{equation} 
 
 	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patiensts between difficulties/scheduling/cancelling for scheduled appointments
+		\begin{equation}
+			ps'_{t0dc} = 0 \quad \forall tdc
+		\end{equation}
 		\begin{align}  \begin{split}
 			ps'_{t-1,m+1,dc} = & ps_{tmdc} +  \sum_{t} sc_{tmdc} - \sum_{t'} rsc_{tt'mdc} + \sum_{t} rsc_{tt'mdc} +\\ 
 										& + pst_{tm,d-1,c} - pst_{tmdc} \quad \forall t \in \{2 ... T\},  m \in \{0... M-2 \}, dc 
@@ -303,7 +296,6 @@ Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximati
 		\sum_{tp} \beta_{tp}^{uu} uu_{tp} + 
 		\sum_{tp} \beta_{tp}^{uv} uv_{tp} + \\
 		& + \sum_{mdc} \beta_{mdc}^{pw} pw_{mdc}  + 
-		\sum_{dc} \beta_{dc}^{pe} pe_{dc} + 
 		\sum_{tmdc} \beta_{tmdc}^{ps} ps_{tmdc}
 \end{split} \end{align}
 
@@ -325,9 +317,8 @@ Subject to:
 				\sum_{t'mdc} (rsc_{t+1,t'mdc} U_{pdc}) + \sum_{tmdc} (rsc_{tt'+1,mdc} U_{pdc})  + \\ 
 				& \quad \quad \quad \quad \quad \sum_{mdc} pst_{tmdc} (U_{pd+1c} - U_{pdc}) \Big) \bigg) +  \\
 		& \bigg( \sum_{tp} uv'_{tp} \bigg) + \\ 
-		& \bigg( \sum_{dc} \beta_{dc}^{pe} pea_{dc} \bigg) + 
-			\bigg( \sum_{dc} \beta_{1dc}^{pw} (pe_{dc} - \sum_{t} sc_{t0dc}) \bigg) + \\
-		&  \bigg( \sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} 
+			& \bigg( \sum_{dc} \beta_{0dc}^{pw} (pea_{dc}) \bigg) + \\
+		&  \bigg( \sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} 
 			(pw_{m-1,dc} - \sum_{t} sc_{t,m-1,dc} + pwt_{m-1,d-1,c} - pwt_{m-1,dc}) \bigg) + \\
 		& \bigg( \sum_{dc} \beta_{Mdc}^{pw} 
 			(\sum_{M-1}^{M} pw_{mdc} - \sum_{M-1,t}^{M} sc_{tmdc} + 
@@ -395,20 +386,14 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 		\sum_{tp} \beta_{tp}^{uv} (uv_{tp} - \gamma (E[uv_{tp}])) = 
 		\color{red} \sum_{tp} \beta_{tp}^{uv} uv_{tp} 
 	\end{equation*}
-
-	\item $\beta_{dc}^{pe}$
-	\begin{equation*}
-		\sum_{dc} \beta_{dc}^{pe} pe_{dc} - \gamma \sum_{dc} \beta_{dc}^{pe} E[pea_{dc}] = 
-		\color{red} \sum_{dc} \beta_{dc}^{pe} (pe_{dc} - \gamma E[pea_{dc}])
-	\end{equation*}	
 	
 	\item $\beta_{mdc}^{pw}$ - Let's assume $pwp_{mdc}$ - is the probability of a patient transitioning to a higher complexity
 	\begin{equation*}
 		E[pwt_{mdc}] = pw_{mdc} pwp_{mdc}		
 	\end{equation*}
 	{ \color{red} \begin{align*}
-		\Bigg( \sum _{dc} \beta_{1dc}^{pw}& ( pw_{1dc} - \gamma (pe_{dc} - \sum_{t} sc_{t0dc})) + \\
-		\sum_{m=2,dc}^{M-1} \beta_{mdc}^{pw} & ( pw_{mdc} - \gamma 
+		\Bigg( \sum_{dc} \beta_{0dc}^{pw} & (pw_{0dc} - \gamma E[pea_{dc}]) + \\
+		\sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} & ( pw_{mdc} - \gamma 
 			\big( pw_{m-1dc} (1 - pwp) + pw_{m-1d-1c} pwp - \sum_{t} sc_{tm-1dc} \big) + \\
 		\sum_{dc} \beta_{Mdc}^{pw} & ( pw_{Mdc} - \gamma \sum_{M-1}^{M}
 			\big( pw_{mdc} (1 - pwp) + pw_{md-1c} pwp - \sum_{t} sc_{tmdc} \big) \Bigg)
@@ -419,9 +404,10 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 		E[pst_{tmdc}] = ps_{tmdc} pwp_{mdc}		
 	\end{equation*}
 	{ \color{red} \begin{align*}
-		\Bigg( \sum _{t=1 m=1 dc}^{T-1 M-1} \beta_{tmdc}^{ps} & 
-			\bigg( ps_{tmdc} - 
-				\gamma \Big( ps_{t+1m-1dc}(1-pwp) + ps_{t+1m-1d-1c} pwp - \sum_{t} sc_{t+1m-1dc} \\ 
+		\Bigg( \sum_{tdc} \beta_{t0dc}^{ps} & * ps_{Tmdc} + \\
+			\sum _{t=1 m=1 dc}^{T-1 M-1} \beta_{tmdc}^{ps} & 
+				\bigg( ps_{tmdc} - 
+					\gamma \Big( ps_{t+1m-1dc}(1-pwp) + ps_{t+1m-1d-1c} pwp - \sum_{t} sc_{t+1m-1dc} \\ 
 				&  - \sum_{t'} rsc_{t+1t'm-1dc} + \sum_{t} rsc_{tt'+1m-1dc} \Big) \bigg) + \\
 		\sum _{t=1dc}^{T-1} \beta_{tMdc}^{ps} & 
 			\bigg( ps_{tMdc} - 
@@ -436,7 +422,7 @@ Steps for converting the mega constraint $v(\vec{S'})$ into expectation and merg
 Let's say $E[V]$ is the addition of all the red parts above. In that case the ADP model converted to expectation would look as follows:
 \begin{equation}
 	\max_{\vec{\beta}} \sum \beta^{0} + \sum \beta^{ue} E[ue] + \sum \beta^{uu} E[uu] + \sum \beta^{uv} E[uv] 
-		\sum \beta^{pe} E[pe] + \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps]
+		+ \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps]
 \end{equation}
 Subject to:
 \begin{equation}
@@ -482,21 +468,16 @@ Subject To:
 
 	\item $\beta^{uv} constraints$
 	\begin{equation}
-		\sum_{\vec{S}\vec{A}} \vec{w} (uv_{tp}) \ge 0 \quad \forall tp
-	\end{equation}
-	
-	\item $\beta^{pe}$ constraints
-	\begin{equation}
-		\sum_{\vec{S}\vec{A}} \vec{w} (pe_{dc} - \gamma E[pea_{dc}])  \ge E[pe_{dc}] \quad \forall dc
+		\sum_{\vec{S}\vec{A}} \vec{w} (uv_{tp}) \ge E[uv_{tp}] \quad \forall tp
 	\end{equation}
 	
 	\item $\beta^{pw}$ constraints
 	\begin{equation}
-		  \sum_{\vec{S}\vec{A}}w  ( pw_{1dc} - \gamma (pe_{dc} - \sum_{t} sc_{t0dc})) \ge E[pw_{1dc}] \quad \forall dc
+		  \sum_{\vec{S}\vec{A}}w  ( pw_{0dc} - \gamma E[pea_{dc}]) \ge E[pw_{0dc}] \quad \forall dc
 	\end{equation}
 	\begin{multline}
 		\sum_{\vec{S}\vec{A}}w  \Big( pw_{mdc} - \gamma \big( pw_{m-1dc} (1 - pwp) + pw_{m-1d-1c} pwp - \sum_{t} sc_{tm-1dc} \big) \Big) \\ 
-		\ge E[pw_{mdc}]  \quad \forall m \in \{2 ... M-1 \}dc
+		\ge E[pw_{mdc}]  \quad \forall m \in \{1 ... M-1 \}dc
 	\end{multline}
 	\begin{equation}
 		\sum_{\vec{S}\vec{A}}w  \Big( pw_{Mdc} - \gamma \sum_{M-1}^{M}
@@ -504,6 +485,9 @@ Subject To:
 	\end{equation}
 	
 	\item $\beta^{ps}$ constraints
+	\begin{equation}
+		 \sum_{\vec{S}\vec{A}}w (ps_{t0dc}) \ge E[ps_{t0dc}] \quad \forall tdc 
+	\end{equation}
 	\begin{multline}
 		\sum_{\vec{S}\vec{A}}w \bigg( ps_{tmdc} - 
 				\gamma \Big( ps_{t+1m-1dc}(1-pwp) + ps_{t+1m-1d-1c} pwp - sc_{t+1m-1dc} \\ 

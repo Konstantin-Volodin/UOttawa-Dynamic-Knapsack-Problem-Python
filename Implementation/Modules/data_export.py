@@ -1,22 +1,9 @@
 # Imports packages
 import openpyxl
 from dataclasses import dataclass
+from Modules.data_classes import state, action
 from typing import Dict, Tuple, List, Callable
 
-# Data Classes
-@dataclass(frozen=True)
-class state:
-    ue_tp: Dict[ Tuple[str],float ] # units expected on time t, ppe p
-    uu_tp: Dict[ Tuple[str],float ] # units used on time t, ppe p
-    uv_tp: Dict[ Tuple[str],float ] # units violated on time t, ppe p
-    pe_dc: Dict[ Tuple[str],float ] # new patient arrivals of complexity d, cpu c
-    pw_mdc: Dict[ Tuple[str],float ] # patients waiting for m periods, of complexity d, cpu c
-    ps_tmdc: Dict[ Tuple[str],float ] # patients scheduled into time t, who have waited for m periods, of complexity d, cpu c
-@dataclass(frozen=True)
-class action:
-    sc_tmdc: Dict[ Tuple[str],float ] # patients of complexity d, cpu c, waiting for m periods to schedule into t (m of 0 corresponds to pe)
-    rsc_ttpmdc: Dict[ Tuple[str],float ] # patients of complexity d, cpu c, waiting for m periods, to reschedule from t to tp 
-   
 # Exports all state-action pairs to a workbook
 def export_all_state_action(state_action_set, data_file_path):
     # Creates
@@ -63,7 +50,6 @@ def export_state_action_pair(state_action, ws):
     column = export_single_set(st.ue_tp, column, 'State - Units Expected')
     column = export_single_set(st.uu_tp, column, 'State - Units Used')
     column = export_single_set(st.uv_tp, column, 'State - Units Violated')
-    column = export_single_set(st.pe_dc, column, 'State - Patients Arrived')
     column = export_single_set(st.pw_mdc, column, 'State - Patients Waiting')
     column = export_single_set(st.ps_tmdc, column, 'State - Patients Scheduled Already')
     column = export_single_set(ac.sc_tmdc, column, 'Action - Patients Scheduled')

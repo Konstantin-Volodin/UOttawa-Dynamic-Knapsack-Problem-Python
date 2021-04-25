@@ -44,7 +44,7 @@ while True:
     p1_sub_model, p1_sub_var = generate_sub_model(input_data, betas, True)
     p1_sub_model.Params.LogToConsole = 0
     # p1_sub_model.setParam('Presolve', 0)
-    p1_sub_model.setParam('MIPGap', 0)
+    # p1_sub_model.setParam('MIPGap', 0)
     p1_sub_model.optimize()
     
     # Update State-Actions
@@ -78,9 +78,9 @@ while True:
     count += 1
 
     # Stops if necessary
-    # if sub_model.ObjVal >= 0:
-    #     print('Found Optimal Solution')
-    #     break
+    if sub_model.ObjVal >= 0:
+        print('Found Optimal Solution')
+        break
 
     # Update State-Actions
     state_action = generate_state_action(sub_var)

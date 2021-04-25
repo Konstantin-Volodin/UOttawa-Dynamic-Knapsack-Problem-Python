@@ -1,28 +1,8 @@
 # Imports packages
 import openpyxl
 from dataclasses import dataclass
+from Modules.data_classes import ppe_data_class, model_param_class, input_data_class
 from typing import Dict, Tuple, List, Callable
-
-@dataclass(frozen=True)
-class ppe_data_class:
-    ppe_type: str
-    expected_units: int
-    deviation: List[int]
-@dataclass(frozen=True)
-class model_param_class:
-    cw: float
-    cc: float
-    M: float
-    gamma: float
-@dataclass(frozen=True)
-class input_data_class:
-    indices: Dict[ str, List[int] ]
-    ppe_data: Dict[ str,ppe_data_class ]
-    usage: Dict[ Tuple[str], List[int] ]
-    arrival: Dict[ Tuple[str], List[int] ]
-    transition: Dict[ Tuple[str], List[int] ]
-    model_param: model_param_class
-    expected_state_values: Dict[ str, Dict[Tuple[str], float] ]
 
 # Reads All data
 def read_data(data_file_path):
@@ -40,7 +20,7 @@ def read_data(data_file_path):
         if t_row[0] == None: break
         t.append(t_row[0])
     # Generates M
-    m = [0]
+    m = []
     for m_row in indices_sheet.iter_rows(min_row=2, min_col=2, max_col=2, values_only=True):
         if m_row[0] == None: break
         m.append(m_row[0])
@@ -142,23 +122,16 @@ def read_data(data_file_path):
         key = (row[1], row[0])
         value = float(row[2])
         expected_state_values['uv'][key] = value
-    # pe
-    expected_state_values['pe'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=10,max_col=12, values_only=True):
-        if row[0] == None: break
-        key = (row[0], row[1])
-        value = float(row[2])
-        expected_state_values['pe'][key] = value
     # pw
     expected_state_values['pw'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=13,max_col=16, values_only=True):
+    for row in expected_state_sheet.iter_rows(min_row=3, min_col=10,max_col=13, values_only=True):
         if row[0] == None: break
         key = (row[0], row[1], row[2])
         value = float(row[3])
         expected_state_values['pw'][key] = value
     # ps
     expected_state_values['ps'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=17,max_col=21, values_only=True):
+    for row in expected_state_sheet.iter_rows(min_row=3, min_col=14,max_col=18, values_only=True):
         if row[0] == None: break
         key = (row[0], row[1], row[2], row[3])
         value = float(row[4])
