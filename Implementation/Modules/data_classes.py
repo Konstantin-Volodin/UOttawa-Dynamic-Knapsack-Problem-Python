@@ -8,6 +8,7 @@ class ppe_data_class:
     ppe_type: str
     expected_units: int
     deviation: List[int]
+
 @dataclass(frozen=True)
 class model_param_class:
     cw: float

@@ -1,14 +1,89 @@
-a) OR Time - assume fixed for now - keep fixed
-b) Staffing - suggests we use 1 type for now - assume it is fixed - keep 1 fixed
-c) ppe - good to have for political reasons (these 4) - start with 1 - start with 1
-d) instrumentation - issue if it is not available - is it really a constraint?  - maybe not?
-	- is it really necessary?
-e) Same as ^ for bone grafts - maybe not necessary
-f) Same as staff - should be available - same as PPE
-g) ignore medication - ignore
-h) ignore
+meeting with stephen
+	- not sure how relevant complexities are
+	- there is not a lot of that happening
+		- the time horizon might be a longer horizon
+	- he has a comment for the literature, have to make sure it doesn't have any factors someone might disagree with 
+		(not used to looking at theoretical works)
+		- and the main issue could be the transition rates - it is much lower than actually assumed
+	- can introduce prioritazation of patients
+
+
+	Next Steps:
+		1) Implement/Solve fully
+		2) Develop a case for a model
+		3) Write the model to journal
+
+	Questions:
+		- PPE is shared but some resources might not be shared between CPUs
+		- Maybe longer period of time - maybe month instead of week
+		- Deterioration is about 3-6 month
+		- Do we need to introduce priorities
+			- Quality based procedures?
+			- To make the model more realistic - it would be better to add priorities
+
+	Comments:
+		- Maybe initial case would be just for a single doctor - Stephen
+
+Meeting with Wojtek/Antoine	
+	1) Need to consider prioritization
+		- easy - just one index
+	2) Differentiating between CPUs
+		- Add OR time - usually very rigid
+		- don't need to differentiate between CPU specific resources, because we are only looking at 1 CPU
+	3) Case Study
+		- Stephen's practice
+
+	maybe we should focus the model on spine specifically
+	we have a simulation resources that simulates distribution between CPUs
+	TL is 6 weeks
+	
+	- the goal is to put it into a spine journal
+	- add more resources in addition to PPE
+		- OR time 
+	- Need differentiation by surgery type
+		- Change CPU to surgery type (since we are only focusing on spine)
+
+
+Meetning with Antoine - Wojtek
+	a) OR Time - assume fixed for now - keep fixed
+	b) Staffing - suggests we use 1 type for now - assume it is fixed - keep 1 fixed
+	c) ppe - good to have for political reasons (these 4) - start with 1 - start with 1
+	d) instrumentation - issue if it is not available - is it really a constraint?  - maybe not?
+		- is it really necessary?
+	e) Same as ^ for bone grafts - maybe not necessary
+	f) Same as staff - should be available - same as PPE
+	g) ignore medication - ignore
+	h) ignore
 
 keep 3 surgeries 
 	- up to 2 hours
 	- 3-4 hours
 	- over 4 hours
+
+
+Meeting with Antoine - Wojtek about Steve's ideas
+	1) Complexity discussion
+		- A surgery can become more complex, by requiring more time
+		- Some evolve, some don't
+		- It only affects time really
+	2) Items to include (resources)
+		- Steve is saying we should consider everything - but it is not possible
+		- For proof of concept - include a couple of items from big categories
+			- PPE
+				- Mask and Gloves
+			- Instrumentation
+				- Convert everything into money
+			- OR Time
+			- Bed Days?
+				- patients will need to stay for a number of days
+				- this will be the resource that changes the most with complexity
+	3) Group surgeties into 3 categories
+		- 
+
+	4 Distinct Resources
+	3 Surgery types
+		- a/b
+		- f/h
+		- d/e
+	
+	
