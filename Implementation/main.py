@@ -48,11 +48,11 @@ def non_zero_action(action: action):
 curr_state = initial_state(input_data)
 for i in range(10):
     print()
-    print(f'Replication {i} - Initial State')
+    print(f'Day {i} - Initial State')
     non_zero_state(curr_state)
 
-    print('Myopic Action')
-    new_action = myopic_policy(input_data, curr_state)
+    print('FAS Action')
+    new_action = fas_policy(input_data, curr_state)
     non_zero_action(new_action)
 
     print(f'Post Action State')

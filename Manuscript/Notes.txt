@@ -85,5 +85,13 @@ Meeting with Antoine - Wojtek about Steve's ideas
 		- a/b
 		- f/h
 		- d/e
+
+Meeting with Antoine - 2021/04/30
+	move uv to action
+	equation (1) - change to less equal sign
+	add resource carry over to simulation
+	- Equation (10) - we assume if we used too much resource it comes out of next period
+		- that is you can use tomorrow's resources for high cost 
+	- add post decision auxiliary variable
 	
 	
