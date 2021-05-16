@@ -1,12 +1,13 @@
 # Imports packages
 import openpyxl
-from dataclasses import dataclass
-from Modules.data_classes import ppe_data_class, model_param_class, input_data_class
 from typing import Dict, Tuple, List, Callable
+from dataclasses import dataclass
 
-# Reads All data
+from Modules.data_classes import ppe_data_class, model_param_class, input_data_class
+
+# Reads All input data from excel
 def read_data(data_file_path):
-    
+
     #Opens the excel book
     book = openpyxl.load_workbook(data_file_path, data_only=True)
 
@@ -98,45 +99,61 @@ def read_data(data_file_path):
         model_param_sheet.cell(row=2, column=4).value
     )
 
-    # Expected State Values
-    expected_state_sheet = book.get_sheet_by_name('Expected State Values')
-    expected_state_values = {}
-    # ue 
-    expected_state_values['ue'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=1,max_col=3, values_only=True):
+    # Expected Data
+    expected_vals_sheet = book.get_sheet_by_name('Expected State Values')
+    expected_vals = {}
+    expected_vals['ue'] = {}
+    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=1, max_col=3, values_only=True):
         if row[0] == None: break
-        key = (row[1], row[0])
-        value = float(row[2])
-        expected_state_values['ue'][key] = value
-    # uu
-    expected_state_values['uu'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=4,max_col=6, values_only=True):
+        expected_vals['ue'][(row[1], row[0])] = row[2]
+    expected_vals['uu'] = {}
+    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=4, max_col=6, values_only=True):
         if row[0] == None: break
-        key = (row[1], row[0])
-        value = float(row[2])
-        expected_state_values['uu'][key] = value
-    # uv
-    expected_state_values['uv'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=7,max_col=9, values_only=True):
+        expected_vals['uu'][(row[1], row[0])] = row[2]
+    expected_vals['pw'] = {}
+    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=7, max_col=10, values_only=True):
         if row[0] == None: break
-        key = (row[1], row[0])
-        value = float(row[2])
-        expected_state_values['uv'][key] = value
-    # pw
-    expected_state_values['pw'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=10,max_col=13, values_only=True):
+        expected_vals['pw'][(row[0], row[1], row[2])] = row[3]
+    expected_vals['ps'] = {}
+    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=11, max_col=15, values_only=True):
         if row[0] == None: break
-        key = (row[0], row[1], row[2])
-        value = float(row[3])
-        expected_state_values['pw'][key] = value
-    # ps
-    expected_state_values['ps'] = {}
-    for row in expected_state_sheet.iter_rows(min_row=3, min_col=14,max_col=18, values_only=True):
-        if row[0] == None: break
-        key = (row[0], row[1], row[2], row[3])
-        value = float(row[4])
-        expected_state_values['ps'][key] = value
+        expected_vals['ps'][(row[0], row[1], row[2], row[3])] = row[4]
+
 
     # Returns data
-    input_data = input_data_class(indices, ppe_data, usage, arrival, transition, model_param, expected_state_values)
+    input_data = input_data_class(indices, ppe_data, usage, arrival, transition, model_param, expected_vals)
     return input_data
+# Read betas from json
+def read_betas(data_file_path):
+    
+    #Opens the excel book
+    book = openpyxl.load_workbook(data_file_path, data_only=True)
+
+    # Read Bets
+    betas_sheet = book.get_sheet_by_name('Betas')
+    betas = {}
+
+    betas['b0'] = {}
+    betas['b0']['b_0'] = betas_sheet.cell(row=2, column=2).value
+
+    betas['ue'] = {}
+    for row in betas_sheet.iter_rows(min_row=2, min_col=3, max_col=5, values_only=True):
+        if row[0] == None: break
+        betas['ue'][(row[0], row[1])] = row[2]
+
+    betas['uu'] = {}
+    for row in betas_sheet.iter_rows(min_row=2, min_col=6, max_col=8, values_only=True):
+        if row[0] == None: break
+        betas['uu'][(row[0], row[1])] = row[2]
+
+    betas['pw'] = {}
+    for row in betas_sheet.iter_rows(min_row=2, min_col=9, max_col=12, values_only=True):
+        if row[0] == None: break
+        betas['pw'][(row[0], row[1], row[2])] = row[3]
+
+    betas['ps'] = {}
+    for row in betas_sheet.iter_rows(min_row=2, min_col=13, max_col=17, values_only=True):
+        if row[0] == None: break
+        betas['ps'][(row[0], row[1], row[2], row[3])] = row[4]
+
+    return(betas)

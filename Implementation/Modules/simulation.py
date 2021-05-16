@@ -27,68 +27,62 @@ def initial_state(input_data) -> state:
     # Unit States
     ue = {}
     uu = {}
-    uv = {}
     for tp in itertools.product(indices['t'], indices['p']):
         ue[tp] = ppe_data[tp[1]].expected_units
-        uv[tp] = 0
         uu[tp] = 0
 
-    init_state = state(ue, uu, uv, pw, ps)
+    init_state = state(ue, uu, pw, ps)
 
     return init_state
 # Initializes Action ( Everything Empty )
 def initial_action(input_data) -> action:
     indices = input_data.indices
 
+    # Action
     sc = {}
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         sc[tmdc] = 0
     rsc = {}
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         rsc[ttpmdc] = 0
+    
+    # Violation
+    uv = {}
+    for tp in itertools.product(indices['t'], indices['p']):
+        uv[tp] = 0
+    
+    # Auxiliary variables
+    uu_p = {}
+    for tp in itertools.product(indices['t'], indices['p']):
+        uu_p[tp] = 0
+    pw_p = {}
+    for mdc in itertools.product(indices['m'],indices['d'], indices['c']):
+        pw_p[mdc] = 0
+    ps_p = {}
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        ps_p[tmdc] = 0
 
     # Returns
-    init_action = action(sc, rsc)
+    init_action = action(sc, rsc, uv, uu_p, pw_p, ps_p)
     return(init_action)
 
 # Executes Action
 def execute_action(input_data, state, action) -> state:
     
+    indices = input_data.indices
     new_state = deepcopy(state)
 
-    # Handles Reschedules
-    for t in input_data.indices['t']:
-        for tp in input_data.indices['t']:
-            for mdc in itertools.product(input_data.indices['m'], input_data.indices['d'], input_data.indices['c']):
-
-                # Change
-                rescheduled_number = action.rsc_ttpmdc[(t, tp, mdc[0], mdc[1], mdc[2])]
-
-                # Reschedules Out
-                new_state.ps_tmdc[(t, mdc[0], mdc[1], mdc[2])] -= rescheduled_number
-                # Schedules into
-                new_state.ps_tmdc[(tp, mdc[0], mdc[1], mdc[2])] += rescheduled_number
+    # Patients Scheduled
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        new_state.ps_tmdc[tmdc]= action.ps_p_tmdc[tmdc]
                 
-    # Handles Schedules
-    for m in input_data.indices['m']:
-        for d in input_data.indices['d']:
-            for c in input_data.indices['c']:
-
-                # Adjusts PS
-                total_sched = 0
-                for t in input_data.indices['t']:
-                    new_state.ps_tmdc[(t,m,d,c)] += action.sc_tmdc[(t, m, d, c)]
-                    total_sched += action.sc_tmdc[(t, m, d, c)]
-
-                # Adjusts PW
-                new_state.pw_mdc[(m,d,c)] -= total_sched
-
-                # Adjusts Resource Usage
-                for t in input_data.indices['t']:
-                    for p in input_data.indices['p']:
-                        new_state.uu_tp[t, p] += input_data.usage[(p, d, c)] * action.sc_tmdc[(t, m, d, c)]
+    # Patients Waiting
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        new_state.pw_mdc[mdc]= action.pw_p_mdc[mdc]
     
-
+    # Units Used
+    for tp in itertools.product(indices['t'], indices['p']):
+        new_state.uu_tp[tp]= action.uu_p_tp[tp]
 
     return(new_state)
 # Generates cost of state-action
@@ -116,7 +110,7 @@ def state_action_cost(input_data, state, action) -> float:
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):
-        cost += state.uv_tp[tp] * M
+        cost += action.uv_tp[tp] * M
 
     return(cost)
 # Executes Transition to next state
@@ -202,10 +196,6 @@ def execute_transition(input_data, state) -> state:
                 for p in indices['p']:
                     ppe_change = input_data.usage[(p, indices['d'][d+1], tmc[2])] - input_data.usage[(p, indices['d'][d], tmc[2])]
                     new_state.uu_tp[(tmc[0], p)] += ppe_change*patients_transitioned
-
-    # UV
-    for tp in itertools.product(indices['t'], indices['p']):
-        new_state.uv_tp[tp] = np.max([0, new_state.uu_tp[tp] - new_state.ue_tp[tp]])
 
     return(new_state)
 
@@ -293,57 +283,92 @@ def fas_policy(input_data, state) -> action:
                     break
 
     # Schedules into day 1 if it can
-    #               
+    #          
+
+    # Calculates Post Decision States
+
+
+    # Unit Violation calculation      
     return(init_action)
 def myopic_policy(input_data, state) -> action:
     # Input Data
     indices = input_data.indices
-    arrival = input_data.arrival
     ppe_data = input_data.ppe_data
     model_param = input_data.model_param
-    transition = input_data.transition
     usage = input_data.usage
-
-    M = model_param.M
-    gamma = model_param.gamma
+    M = input_data.model_param.M
 
     # State Data
     ue = state.ue_tp
     uu = state.uu_tp
-    uv = state.uv_tp
     pw = state.pw_mdc
     ps = state.ps_tmdc
 
     # Initializes model
     myopic = gp.Model('Myopic Policy')
-    # myopic.Params.LogToConsole = 0
+    myopic.Params.LogToConsole = 0
 
     # Decision Variables
     var_sc = {}
     var_rsc = {}
+    var_uv = {}
+    var_uu_p = {}
+    var_pw_p = {}
+    var_ps_p = {}
 
-    # Actions
     # SC
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         var_sc[tmdc] = myopic.addVar(name=f'a_sc_{tmdc}', vtype=GRB.INTEGER)
     # RSC
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         var_rsc[ttpmdc] = myopic.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
+    # UV
+    for tp in itertools.product(indices['t'], indices['p']):
+        ppe_upper_bounds = ppe_data[tp[1]].expected_units + ppe_data[tp[1]].deviation[1]
+        var_uv[tp] = myopic.addVar(name=f'a_uv_{tp}', ub=ppe_upper_bounds, vtype=GRB.CONTINUOUS)
+    # UU Hat
+    for tp in itertools.product(indices['t'], indices['p']):
+        var_uu_p[tp] = myopic.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
+    # PW Hat
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        var_pw_p[mdc] = myopic.addVar(name=f'a_pw_p_{mdc}', vtype=GRB.INTEGER)
+    # PS Hat
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        var_ps_p[tmdc] = myopic.addVar(name=f'a_ps_p_{tmdc}', vtype=GRB.INTEGER)
 
-    # Constraints
-    # 1) PPE Usage Constraint
+    # Auxiliary Variable Definition
+        # UU Hat
     for tp in itertools.product(indices['t'], indices['p']):
         expr = gp.LinExpr()
-        # Patients scheduled - action
+        expr.addTerms(1, var_uu_p[tp])
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-            expr.addTerms(usage[(tp[1],mdc[1],mdc[2])], var_sc[(tp[0], mdc[0],mdc[1],mdc[2])])
-        # Patients rescheduled into
-        for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(usage[(tp[1],tmdc[2],tmdc[3])], var_rsc[(tmdc[0], tp[0], tmdc[1],tmdc[2],tmdc[3])])
-        # Patients rescheduled out
-        myopic.addConstr(expr <=  ue[tp] - uu[tp] + uv[tp], name=f'tracks_usage{tp}')
+            expr.addTerms(-usage[(tp[1], mdc[1], mdc[2])], var_ps_p[(tp[0], mdc[0], mdc[1], mdc[2])])
+        myopic.addConstr(expr == 0, name=f'uu_hat_{tp}')
+        # PW Hat
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        expr = gp.LinExpr()
+        expr.addTerms(1, var_pw_p[mdc])
+        expr.addConstant(-state.pw_mdc[mdc])
+        for t in indices['t']:
+            expr.addTerms(1, var_sc[(t, mdc[0], mdc[1], mdc[2])])
+        myopic.addConstr(expr == 0, name=f'pw_hat_{mdc}')
+        # PS Hat
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        expr = gp.LinExpr()
+        expr.addTerms(1, var_ps_p[tmdc])
+        expr.addConstant(-state.ps_tmdc[tmdc])
+        expr.addTerms(-1, var_sc[tmdc])
+        for tp in indices['t']:
+            expr.addTerms(-1, var_rsc[(tp, tmdc[0], tmdc[1], tmdc[2], tmdc[3])])
+            expr.addTerms(1, var_rsc[(tmdc[0], tp, tmdc[1], tmdc[2], tmdc[3])])
+        myopic.addConstr(expr == 0, name=f'ps_hat_{tmdc}')
 
-    # 3) Bounds on Reschedules
+    # Constraints
+    # 1) Resource Usage Constraint
+    for tp in itertools.product(indices['t'], indices['p']):
+        myopic.addConstr(var_uu_p[tp] <= state.ue_tp[tp] + var_uv[tp], name=f'resource_constraint_{tp}')
+
+    # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] == ttpmdc[1]:
             myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
@@ -352,20 +377,20 @@ def myopic_policy(input_data, state) -> action:
         elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
             myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
-    # 4) Number of people schedules/reschedules must be consistent
+    # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         for tp in itertools.product(indices['t']):
             expr.addTerms(-1, var_rsc[(tmdc[0], tp[0], tmdc[1], tmdc[2], tmdc[3])])
-        expr.addConstant(1 * ps[tmdc])
+        expr.addConstant(state.ps_tmdc[tmdc])
         myopic.addConstr(expr >= 0, f'consistent_resc_{(tmdc)}')
         # Scheduled
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         for t in itertools.product(indices['t']):
             expr.addTerms(-1, var_sc[(t[0], mdc[0], mdc[1], mdc[2])])
-        expr.addConstant(1 * pw[mdc])
+        expr.addConstant(state.pw_mdc[mdc])
         myopic.addConstr(expr >= 0, f'consistent_sch_{(mdc)}')
 
     # Objective Function
@@ -373,17 +398,17 @@ def myopic_policy(input_data, state) -> action:
     def wait_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
     
-        # PW Cost
-        for mdc in itertools.product(indices['m'], indices['d'], indices['c']): 
-            expr.addConstant((model_param.cw**mdc[0]) * pw[mdc])
-            for t in indices['t']:
-                expr.addTerms(-(model_param.cw**mdc[0]), var_sc[(t, mdc[0], mdc[1], mdc[2])])
-        # PS Cost
-        for tdc in itertools.product(indices['t'], indices['d'], indices['c']): 
-            expr.addConstant((model_param.cw**indices['m'][-1]) * ps[(tdc[0], indices['m'][-1], tdc[1], tdc[2])])
+        # Cost of Waiting
+        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
+            expr.addTerms(model_param.cw**mdc[0], var_pw_p[mdc])                    
+        
+        # Cost of Waiting - Last Period
+        for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+            expr.addTerms(model_param.cw**indices['m'][-1], var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return(expr)
     def reschedule_cost() -> gp.LinExpr:
+
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
@@ -397,7 +422,7 @@ def myopic_policy(input_data, state) -> action:
         expr = gp.LinExpr()
 
         for tp in itertools.product(indices['t'], indices['p']):
-            expr.addConstant(M * uv[tp])
+            expr.addTerms(M, var_uv[tp])
 
         return(expr)
     
@@ -419,325 +444,366 @@ def myopic_policy(input_data, state) -> action:
     rsc = {}
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         rsc[ttpmdc] = var_rsc[ttpmdc].X
-    new_action = action(sc, rsc)
-    
-    return(new_action)
+    uv = {}
+    for tp in itertools.product(indices['t'], indices['p']):
+        uv[tp] = var_uv[tp].X
+    uu_p = {}
+    for tp in itertools.product(indices['t'], indices['p']):
+        uu_p[tp] = var_uu_p[tp].X
+    pw_p = {}
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        pw_p[mdc] = var_pw_p[mdc].X
+    ps_p = {}
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        ps_p[tmdc] = var_ps_p[tmdc].X
 
+    new_action = action(sc, rsc, uv, uu_p, pw_p, ps_p)
+    return(new_action)
 def mdp_policy(input_data, state, betas) -> action:
+
+    # Input Data
     indices = input_data.indices
-    arrival = input_data.arrival
     ppe_data = input_data.ppe_data
     model_param = input_data.model_param
-    transition = input_data.transition
     usage = input_data.usage
-
-    M = model_param.M
+    M = input_data.model_param.M
     gamma = model_param.gamma
+    transition = input_data.transition
+    arrival = input_data.arrival
+
+    # State Data
+    ue = state.ue_tp
+    uu = state.uu_tp
+    pw = state.pw_mdc
+    ps = state.ps_tmdc
 
     # Initializes model
-    sub_model = gp.Model('MDD Policy')
+    myopic = gp.Model('Myopic Policy')
+    myopic.Params.LogToConsole = 0
 
     # Decision Variables
     var_sc = {}
     var_rsc = {}
+    var_uv = {}
+    var_uu_p = {}
+    var_pw_p = {}
+    var_ps_p = {}
 
-    # Actions
     # SC
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        var_sc[tmdc] = sub_model.addVar(name=f'a_sc_{tmdc}', vtype=GRB.INTEGER)
+        var_sc[tmdc] = myopic.addVar(name=f'a_sc_{tmdc}', vtype=GRB.INTEGER)
     # RSC
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        var_rsc[ttpmdc] = sub_model.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
+        var_rsc[ttpmdc] = myopic.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
+    # UV
+    for tp in itertools.product(indices['t'], indices['p']):
+        ppe_upper_bounds = ppe_data[tp[1]].expected_units + ppe_data[tp[1]].deviation[1]
+        var_uv[tp] = myopic.addVar(name=f'a_uv_{tp}', ub=ppe_upper_bounds, vtype=GRB.CONTINUOUS)
+    # UU Hat
+    for tp in itertools.product(indices['t'], indices['p']):
+        var_uu_p[tp] = myopic.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
+    # PW Hat
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        var_pw_p[mdc] = myopic.addVar(name=f'a_pw_p_{mdc}', vtype=GRB.INTEGER)
+    # PS Hat
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        var_ps_p[tmdc] = myopic.addVar(name=f'a_ps_p_{tmdc}', vtype=GRB.INTEGER)
 
-    sub_vars = variables( var_ue, var_uu, var_uv, var_pw, var_ps, var_sc, var_rsc)
+    # Auxiliary Variable Definition
+        # UU Hat
+    for tp in itertools.product(indices['t'], indices['p']):
+        expr = gp.LinExpr()
+        expr.addTerms(1, var_uu_p[tp])
+        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+            expr.addTerms(-usage[(tp[1], mdc[1], mdc[2])], var_ps_p[(tp[0], mdc[0], mdc[1], mdc[2])])
+        myopic.addConstr(expr == 0, name=f'uu_hat_{tp}')
+        # PW Hat
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        expr = gp.LinExpr()
+        expr.addTerms(1, var_pw_p[mdc])
+        expr.addConstant(-state.pw_mdc[mdc])
+        for t in indices['t']:
+            expr.addTerms(1, var_sc[(t, mdc[0], mdc[1], mdc[2])])
+        myopic.addConstr(expr == 0, name=f'pw_hat_{mdc}')
+        # PS Hat
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        expr = gp.LinExpr()
+        expr.addTerms(1, var_ps_p[tmdc])
+        expr.addConstant(-state.ps_tmdc[tmdc])
+        expr.addTerms(-1, var_sc[tmdc])
+        for tp in indices['t']:
+            expr.addTerms(-1, var_rsc[(tp, tmdc[0], tmdc[1], tmdc[2], tmdc[3])])
+            expr.addTerms(1, var_rsc[(tmdc[0], tp, tmdc[1], tmdc[2], tmdc[3])])
+        myopic.addConstr(expr == 0, name=f'ps_hat_{tmdc}')
 
     # Constraints
-    # 1) PPE Usage Constraint
+    # 1) Resource Usage Constraint
     for tp in itertools.product(indices['t'], indices['p']):
-        expr = gp.LinExpr()
-        # Patients scheduled - state
-        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-            expr.addTerms(-usage[(tp[1],mdc[1],mdc[2])], var_ps[(tp[0], mdc[0],mdc[1],mdc[2])])
-        # Patients scheduled - action
-        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-            expr.addTerms(-usage[(tp[1],mdc[1],mdc[2])], var_sc[(tp[0], mdc[0],mdc[1],mdc[2])])
-        # Patients rescheduled
-        for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(-usage[(tp[1],tmdc[2],tmdc[3])], var_rsc[(tmdc[0], tp[0], tmdc[1],tmdc[2],tmdc[3])])
-        expr.addTerms(1, var_uu[tp])
-        sub_model.addConstr(expr == 0, name=f'tracks_usage{tp}')
+        myopic.addConstr(var_uu_p[tp] <= state.ue_tp[tp] + var_uv[tp], name=f'resource_constraint_{tp}')
 
-
-    # 2) PPE Capacity
-    for tp in itertools.product(indices['t'], indices['p']):
-        expr = gp.LinExpr()
-        expr.addTerms(-1, var_ue[tp])
-        expr.addTerms(1, var_uu[tp])
-        expr.addTerms(-1, var_uv[tp])
-        sub_model.addConstr(expr <= 0, name=f'ppe_capacity_constraint_{tp}')
-
-    # 3) Bounds on Reschedules
+    # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] == ttpmdc[1]:
-            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
-    # 4) Cap on max schedule/reschedule wait time
-
-    # 5) Number of people schedules/reschedules must be consistent
+    # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         for tp in itertools.product(indices['t']):
             expr.addTerms(-1, var_rsc[(tmdc[0], tp[0], tmdc[1], tmdc[2], tmdc[3])])
-        expr.addTerms(1, var_ps[tmdc])
-        sub_model.addConstr(expr >= 0, f'consistent_resc_{(tmdc)}')
+        expr.addConstant(state.ps_tmdc[tmdc])
+        myopic.addConstr(expr >= 0, f'consistent_resc_{(tmdc)}')
         # Scheduled
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         for t in itertools.product(indices['t']):
             expr.addTerms(-1, var_sc[(t[0], mdc[0], mdc[1], mdc[2])])
-        expr.addTerms(1, var_pw[mdc])
-        sub_model.addConstr(expr >= 0, f'consistent_sch_{(mdc)}')
+        expr.addConstant(state.pw_mdc[mdc])
+        myopic.addConstr(expr >= 0, f'consistent_sch_{(mdc)}')
 
     # Objective Function
     # Cost Function
-    def wait_cost(var: variables, betas) -> gp.LinExpr:
+    def wait_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
     
-        # PW Cost
-        for mdc in itertools.product(indices['m'], indices['d'], indices['c']): 
-            expr.addTerms(model_param.cw**mdc[0], var.s_pw[mdc])
-        # PS Cost
-        for tdc in itertools.product(indices['t'], indices['d'], indices['c']): 
-            expr.addTerms(model_param.cw**indices['m'][-1], var.s_ps[(tdc[0], indices['m'][-1], tdc[1], tdc[2])])
+        # Cost of Waiting
+        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
+            expr.addTerms(model_param.cw**mdc[0], var_pw_p[mdc])                    
+        
+        # Cost of Waiting - Last Period
+        for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+            expr.addTerms(model_param.cw**indices['m'][-1], var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return(expr)
-    def reschedule_cost(var: variables, betas) -> gp.LinExpr:
+    def reschedule_cost() -> gp.LinExpr:
+
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(model_param.cc, var.a_rsc[ttpmdc])
+                expr.addTerms(model_param.cc, var_rsc[ttpmdc])
             elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-model_param.cc, var.a_rsc[ttpmdc])
+                expr.addTerms(-model_param.cc, var_rsc[ttpmdc])
 
         return(expr)
-    def goal_violation_cost(var: variables, betas) -> gp.LinExpr:
+    def goal_violation_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for tp in itertools.product(indices['t'], indices['p']):
-            expr.addTerms(M, var.s_uv[tp])
+            expr.addTerms(M, var_uv[tp])
 
         return(expr)
-    
+
+        
     # E[V] Function
-    def b0_cost(var: variables, betas) -> gp.LinExpr:
+    def b0_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
-        expr.addConstant(betas['b0']['b_0'])
+        expr.addConstant((1-gamma) * betas['b0']['b_0'])
         return(expr)
-    def b_ue_cost(var: variables, betas) -> gp.LinExpr:
+    def b_ue_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
         
         for tp in itertools.product(indices['t'], indices['p']):
-        
-            # When t is 1
+            # When t is 0
             if tp[0] == 1:
-                
-                # Default
-                expr.addTerms(betas['ue'][tp], var.s_ue[tp])
-                expr.addConstant(-betas['ue'][tp] * gamma * ppe_data[tp[1]].expected_units)
-                
-                # Previous Leftover
-                expr.addTerms(-betas['ue'][tp] * gamma, var.s_ue[tp])
-                expr.addTerms(betas['ue'][tp] * gamma, var.s_uu[tp])
-                
-                # New Usage
-                for dc in itertools.product(indices['d'], indices['c']):
-                    for m in itertools.product(indices['m']):
-                        expr.addTerms( usage[(tp[1], dc[0], dc[1])],  var.a_sc[(tp[0],m[0], dc[0], dc[1])])
-                    for tpm in itertools.product(indices['t'], indices['m']):
-                        expr.addTerms( usage[(tp[1], dc[0], dc[1])], var.a_rsc[(tp[0],tpm[0], tpm[1], dc[0], dc[1])] )
-                    for tm in itertools.product(indices['t'], indices['m']):
-                        expr.addTerms( -usage[(tp[1], dc[0], dc[1])], var.a_rsc[(tm[0],tp[0], tm[1], dc[0], dc[1])] )
-            
-            # When t > 1
-            elif tp[0] >= 2:
-                expr.addTerms(betas['ue'][tp], var.s_ue[tp])
-                expr.addConstant(-betas['ue'][tp] * gamma * ppe_data[tp[1]].expected_units)
-        
+                expr.addConstant(betas['ue'][tp] * state.ue_tp[tp])
+                expr.addConstant(-gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
+                expr.addConstant(-gamma * betas['ue'][tp] * state.ue_tp[tp])
+                expr.addTerms(gamma * betas['ue'][tp], var_uu_p[tp])
+
+            # All other
+            else:
+                expr.addConstant(betas['ue'][tp] * state.ue_tp[tp])
+                expr.addConstant(-gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
+                    
         return(expr)
-    def b_uu_costs(var: variables, betas) -> gp.LinExpr:
+    def b_uu_costs() -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for tp in itertools.product(indices['t'], indices['p']):
-
-            # when T
+            # When t is T
             if tp[0] == indices['t'][-1]:
-                expr.addTerms( betas['uu'][tp], var.s_uu[tp] )
+                expr.addConstant( betas['uu'][tp] * state.uu_tp[tp] )
             
             # All others
             else:
-                expr.addTerms( betas['uu'][tp], var.s_uu[tp] )
-                expr.addTerms( -betas['uu'][tp] * gamma, var.s_uu[(tp[0]+1, tp[1])] )
+                expr.addConstant( betas['uu'][tp] * state.uu_tp[tp] )
+                expr.addTerms( -betas['uu'][tp] * gamma, var_uu_p[(tp[0]+1, tp[1])] )
                 
                 # Change due to transition in complexity
                 for mc in itertools.product(indices['m'], indices['c']):
                     for d in range(len(indices['d'])):
-                        # if mc[0] == 0: continue
-                        if d == (len(indices['d']) - 1): continue
-                        change_in_usage = usage[( tp[1], indices['d'][d+1], mc[1] )] - usage[( tp[1], indices['d'][d], mc[1] )]
-                        expr.addTerms( 
-                            -betas['uu'][tp] * gamma * transition[(mc[0], indices['d'][d], mc[1])] * (change_in_usage), 
-                            var.s_ps[(tp[0], mc[0], indices['d'][d], mc[1])]
-                        )
-                
-                # Change due to scheduling
-                for mdc in itertools.product(indices['m'],indices['d'],indices['c']):
-                    expr.addTerms( 
-                        -betas['uu'][tp] * gamma * usage[(tp[1], mdc[1], mdc[2])] , 
-                        var.a_sc[(tp[0]+1, mdc[0], mdc[1], mdc[2])] 
-                    )
-                for tmdc in itertools.product(indices['t'], indices['m'],indices['d'],indices['c']):
-                    if not (tmdc[0]+1 in indices['t']): continue
-                    # if tmdc[1] == 0: continue
-                    expr.addTerms( 
-                        betas['uu'][tp] * gamma * usage[(tp[1], mdc[1], mdc[2])] , 
-                        var.a_rsc[(tmdc[0]+1, tp[0], tmdc[1], tmdc[2], tmdc[3])] 
-                    )
-                for tpmdc in itertools.product(indices['t'], indices['m'],indices['d'],indices['c']):
-                    if not (tpmdc[0]+1 in indices['t']): continue
-                    # if tpmdc[1] == 0: continue
-                    expr.addTerms( 
-                        -betas['uu'][tp] * gamma * usage[(tp[1], mdc[1], mdc[2])] , 
-                        var.a_rsc[(tp[0], tpmdc[0]+1, tpmdc[1], tpmdc[2], tpmdc[3])] 
-                    )
+
+                        # When d is D
+                        if d == len(indices['d'])-1: 
+                            pass
+
+                        # Otherwise
+                        else:
+                            transition_prob = transition[(mc[0], d, mc[1])]
+                            usage_change = usage[(tp[1], indices['d'][d+1], mc[1])] - usage[(tp[1], indices['d'][d], mc[1])]
+                            coeff = betas['uu'][tp] * gamma * transition_prob * usage_change
+                            expr.addTerms( -coeff, var_ps_p[ (tp[0]+1, mc[0], indices['d'][d], mc[1]) ] )
 
         return(expr)
-    def b_uv_costs(var: variables, betas) -> gp.LinExpr:
-        expr = gp.LinExpr()
-
-        for tp in itertools.product(indices['t'], indices['p']):
-            expr.addTerms(betas['uv'][tp], var.s_uv[tp])
-
-        return (expr)
-    def b_pw_costs(var: variables, betas) -> gp.LinExpr:
+    def b_pw_costs() -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for mc in itertools.product(indices['m'], indices['c']):
             for d in range(len(indices['d'])):
                 mdc = (mc[0], indices['d'][d], mc[1])
 
-                # When m = 0
+                # When m is 0
                 if mc[0] == 0: 
-                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
+                    expr.addConstant(betas['pw'][mdc] * state.pw_mdc[mdc])
                     expr.addConstant(-betas['pw'][mdc] * gamma * arrival[mdc[1], mdc[2]])
 
-                # When m = M
+                # When m is M
                 elif mc[0] == indices['m'][-1]:
-                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
-                    # Transition out
-                    expr.addTerms(-betas['pw'][mdc] * gamma * (1-transition[(mdc[0]-1, mdc[1], mdc[2])]), var.s_pw[(mdc[0]-1, mdc[1], mdc[2])] )
-                    expr.addTerms(-betas['pw'][mdc] * gamma * (1-transition[mdc]), var.s_pw[mdc] )
-                    # Transitioned in
-                    if d != 0:
-                        expr.addTerms(-betas['pw'][mdc] * gamma * transition[(mdc[0]-1, indices['d'][d-1], mdc[2])], var.s_pw[(mdc[0]-1, indices['d'][d-1], mdc[2])] )
-                        expr.addTerms(-betas['pw'][mdc] * gamma * transition[(mdc[0], indices['d'][d-1], mdc[2])], var.s_pw[(mdc[0], indices['d'][d-1], mdc[2])] )
-                    # Scheduled
-                    for t in indices['t']:
-                        expr.addTerms(betas['pw'][mdc] * gamma, var.a_sc[t, mdc[0]-1, mdc[1], mdc[2]])
-                        expr.addTerms(betas['pw'][mdc] * gamma, var.a_sc[t, mdc[0], mdc[1], mdc[2]])
+                    expr.addConstant(betas['pw'][mdc] * state.pw_mdc[mdc])
+
+                    for mm in input_data.indices['m'][-2:]:
+                        expr.addTerms(-betas['pw'][mdc] * gamma, var_pw_p[(mm, mdc[1], mdc[2])])
+           
+                        # Transitioned In
+                        if d != 0:
+                            expr.addTerms(
+                                -betas['pw'][mdc] * gamma * transition[( mm, indices['d'][d-1], mdc[2] )],
+                                var_pw_p[( mm, indices['d'][d-1], mdc[2] )]
+                            )
+                        # Transitioned Out
+                        if d != indices['d'][-1]:
+                            expr.addTerms(
+                                betas['pw'][mdc] * gamma * transition[( mm, mdc[1], mdc[2] )],
+                                var_pw_p[( mm, mdc[1], mdc[2] )]
+                            )
 
                 # All others
                 else:                   
-                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
-                    # Transition out
-                    expr.addTerms(-betas['pw'][mdc] * gamma * (1-transition[(mdc[0]-1, mdc[1], mdc[2])]), var.s_pw[(mdc[0]-1, mdc[1], mdc[2])] )
-                    # Transitioned in
+                    expr.addConstant(betas['pw'][mdc] * state.pw_mdc[mdc])
+                    expr.addTerms(-betas['pw'][mdc] * gamma, var_pw_p[(mdc[0]-1, mdc[1], mdc[2])])
+           
+                    # Transitioned In
                     if d != 0:
-                        expr.addTerms(-betas['pw'][mdc] * gamma * transition[(mdc[0]-1, indices['d'][d-1], mdc[2])], var.s_pw[(mdc[0]-1, indices['d'][d-1], mdc[2])] )
-                    # Scheduled
-                    for t in indices['t']:
-                        expr.addTerms(betas['pw'][mdc] * gamma, var.a_sc[t, mdc[0]-1, mdc[1], mdc[2]])
-                        
+                        expr.addTerms(
+                            -betas['pw'][mdc] * gamma * transition[( mdc[0]-1, indices['d'][d-1], mdc[2] )],
+                            var_pw_p[( mdc[0]-1, indices['d'][d-1], mdc[2] )]
+                        )
+                    # Transitioned Out
+                    if d != indices['d'][-1]:
+                        expr.addTerms(
+                            betas['pw'][mdc] * gamma * transition[( mdc[0]-1, mdc[1], mdc[2] )],
+                            var_pw_p[( mdc[0]-1, mdc[1], mdc[2] )]
+                        )
+
         return(expr)
-    def b_ps_costs(var: variables, betas) -> gp.LinExpr:
+    def b_ps_costs() -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for tmc in itertools.product(indices['t'], indices['m'], indices['c']):
             for d in range(len(indices['d'])):
                 tmdc = (tmc[0], tmc[1], indices['d'][d], tmc[2])
 
-                # When t is T or m is 0
-                if (tmdc[0] == indices['t'][-1]) or (tmdc[1] == 0):
-                    expr.addTerms( betas['ps'][tmdc], var.s_ps[tmdc] )
+                # When m is 0
+                if tmdc[1] == 0: 
+                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
 
-                # When m is M
+                # When t is T
+                elif tmdc[0] == indices['t'][-1]:
+                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
+
+                # when m is M
                 elif tmdc[1] == indices['m'][-1]:
-                    # Baseline
-                    expr.addTerms( betas['ps'][tmdc], var.s_ps[tmdc] )
-                    # Transition in difficulties
-                    for mm in indices['m'][-2:]:
-                        expr.addTerms( -betas['ps'][tmdc]*gamma * (1 - transition[( mm, tmdc[2], tmdc[3] )]), var.s_ps[ ( tmdc[0]+1, mm, tmdc[2], tmdc[3] ) ] )
-                        if d != 0: 
-                            expr.addTerms( -betas['ps'][tmdc] * gamma * transition[( mm, indices['d'][d-1], tmdc[3] )], var.s_ps[ (tmdc[0]+1, mm, indices['d'][d-1], tmdc[3]) ] )
-                        
-                        # Scheduling / Rescheduling
-                        expr.addTerms( betas['ps'][tmdc] * gamma, var.a_sc[ (tmdc[0]+1, mm, tmdc[2], tmdc[3]) ] )
-                        for t in indices['t']:
-                            expr.addTerms( betas['ps'][tmdc] * gamma, var.a_rsc[ (tmdc[0]+1, t, mm, tmdc[2], tmdc[3]) ] )
-                            expr.addTerms( -betas['ps'][tmdc] * gamma, var.a_rsc[ (t, tmdc[0]+1, mm, tmdc[2], tmdc[3]) ] )
+                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
 
-                # All others
-                else: 
-                    # Baseline
-                    expr.addTerms( betas['ps'][tmdc], var.s_ps[tmdc] )
-                    # Transition in difficulties
-                    if tmdc[1] >= 1:
-                        expr.addTerms( -betas['ps'][tmdc]*gamma * (1 - transition[( tmdc[1]-1, tmdc[2], tmdc[3] )]), var.s_ps[ ( tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3] ) ] )
-                        if d != 0: 
-                            expr.addTerms( -betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, indices['d'][d-1], tmdc[3] )], var.s_ps[ (tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3]) ] )
-                    
-                    # Scheduling / Rescheduling
-                    expr.addTerms( betas['ps'][tmdc] * gamma, var.a_sc[ (tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3]) ] )
-                    if tmdc[1] >= 1:
-                        for t in indices['t']:
-                            expr.addTerms( betas['ps'][tmdc] * gamma, var.a_rsc[ (tmdc[0]+1, t, tmdc[1]-1, tmdc[2], tmdc[3]) ] )
-                            expr.addTerms( -betas['ps'][tmdc] * gamma, var.a_rsc[ (t, tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3]) ] )
-
+                    for mm in input_data.indices['m'][-2:]:
+                        expr.addTerms(-betas['ps'][tmdc] * gamma, var_ps_p[(tmdc[0]+1, mm, tmdc[2], tmdc[3])])
+           
+                        # Transitioned In
+                        if d != 0:
+                            expr.addTerms(
+                                -betas['ps'][tmdc] * gamma * transition[( mm, indices['d'][d-1], tmdc[3] )],
+                                var_ps_p[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )]
+                            )
+                        # Transitioned Out
+                        if d != indices['d'][-1]:
+                            expr.addTerms(
+                                betas['ps'][tmdc] * gamma * transition[( mm, tmdc[2], tmdc[3] )],
+                                var_ps_p[( tmdc[0]+ 1, mm, tmdc[2], tmdc[3] )]
+                            )
+                
+                # Everything Else
+                else:
+                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
+                    expr.addTerms(-betas['ps'][tmdc] * gamma, var_ps_p[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
+           
+                    # Transitioned In
+                    if d != 0:
+                        expr.addTerms(
+                            -betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, indices['d'][d-1], tmdc[3] )],
+                            var_ps_p[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )]
+                        )
+                    # Transitioned Out
+                    if d != indices['d'][-1]:
+                        expr.addTerms(
+                            betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, tmdc[2], tmdc[3] )],
+                            var_ps_p[( tmdc[0]+ 1, tmdc[1]-1, tmdc[2], tmdc[3] )]
+                        )
 
         return(expr)
     
+
     # Generates Objective Function
         # Cost
-    wait_cost_expr = wait_cost(sub_vars, betas)
-    rescheduling_cost_expr = reschedule_cost(sub_vars, betas)
-    goal_vio_cost_expr = goal_violation_cost(sub_vars, betas)
+    wait_cost_expr = wait_cost()
+    rescheduling_cost_expr = reschedule_cost()
+    goal_vio_cost_expr = goal_violation_cost()
     cost_expr = gp.LinExpr(wait_cost_expr + rescheduling_cost_expr + goal_vio_cost_expr)
-    
+
         # Value
-    b0_expr = b0_cost(sub_vars, betas)
-    b_ue_expr = b_ue_cost(sub_vars, betas)
-    b_uu_expr = b_uu_costs(sub_vars, betas)
-    b_uv_expr = b_uv_costs(sub_vars, betas)
-    b_pw_expr = b_pw_costs(sub_vars, betas)
-    b_ps_expr = b_ps_costs(sub_vars, betas)
-    value_expr = gp.LinExpr(b0_expr + b_ue_expr + b_uu_expr + b_uv_expr + b_pw_expr + b_ps_expr)
+    b0_expr = b0_cost()
+    b_ue_expr = b_ue_cost()
+    b_uu_expr = b_uu_costs()
+    b_pw_expr = b_pw_costs()
+    b_ps_expr = b_ps_costs()
+    value_expr = gp.LinExpr(b0_expr + b_ue_expr + b_uu_expr + b_pw_expr + b_ps_expr)
+    
+    
+    myopic.setObjective(cost_expr + value_expr, GRB.MINIMIZE)
+    myopic.optimize()
+    myopic.write('mdp.lp')
 
-    if phase1:
-        sub_model.setObjective(-value_expr, GRB.MINIMIZE)
-    else:
-        sub_model.setObjective(cost_expr - value_expr, GRB.MINIMIZE)
+    # Saves Action
+    sc = {}
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        sc[tmdc] = var_sc[tmdc].X
+    rsc = {}
+    for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
+        rsc[ttpmdc] = var_rsc[ttpmdc].X
+    uv = {}
+    for tp in itertools.product(indices['t'], indices['p']):
+        uv[tp] = var_uv[tp].X
+    uu_p = {}
+    for tp in itertools.product(indices['t'], indices['p']):
+        uu_p[tp] = var_uu_p[tp].X
+    pw_p = {}
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        pw_p[mdc] = var_pw_p[mdc].X
+    ps_p = {}
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        ps_p[tmdc] = var_ps_p[tmdc].X
 
-    return sub_model, sub_vars
+    new_action = action(sc, rsc, uv, uu_p, pw_p, ps_p)
+    return(new_action)
 
+def simulation(input_data, replication, days, warm_up, decision_policy, save_data, **kwargs): 
 
-
-
-def simulation(input_data, replication, days, warm_up, decision_policy, save_data = False): 
+    np.random.seed(1487)
 
     full_data = []
     cost_data = []
@@ -757,7 +823,11 @@ def simulation(input_data, replication, days, warm_up, decision_policy, save_dat
                     repl_data.append(deepcopy(curr_state))
 
             # Generate Action & Executes an Action
-            new_action = decision_policy(input_data, curr_state)
+            new_action = None
+            if 'betas' in kwargs:
+                new_action = decision_policy(input_data, curr_state, kwargs['betas'])
+            else:
+                new_action = decision_policy(input_data, curr_state)
             curr_state = execute_action(input_data, curr_state, new_action)
 
             # Calculates cost
