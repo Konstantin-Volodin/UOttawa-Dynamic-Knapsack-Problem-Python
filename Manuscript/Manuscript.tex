@@ -352,7 +352,7 @@ Subject to:
 	& 	\bigg( \sum_{p} \beta_{1p}^{ue} 
 			(ue_{2p} + ued_{p} + ue_{1p} - \hat{uu}_{1p}) \bigg)+
 		\bigg( \sum_{t=2,p}^{T-1} \beta_{tp}^{ue} ue_{t+1,p} \bigg)+ 
-		\bigg( \sum_{p} \beta_{Tp}^{ue} uen_{d} \bigg) + \\
+		\bigg( \sum_{p} \beta_{Tp}^{ue} uen_{p} \bigg) + \\
 	& 	\bigg( \sum_{tp}^{T-1} \beta_{tp}^{uu} 
 			( \hat{uu}_{t+1,p} + \sum_{mdc} pst_{tmdc} (U_{pd+1c} - U_{pdc})) \bigg) +
 		\bigg( \sum_{p} \beta_{Tp}^{uu} * 0 \bigg) + \\
@@ -512,24 +512,28 @@ Once $\vec{\beta}$ values have been approximated, you may use the model below to
 \begin{equation*}
 	\min_{\vec{A}} c(\vec{S}, \vec{A}) - \gamma v(S')
 \end{equation*}	
-\begin{align*}
-	v(S') = \bigg(  & \beta^0 + \sum_{t=2p}^{T} \beta_{tp}^{ue} uen_{p} + \\ 
-	& \sum_{p} \beta_{1p}^{ue} \Big( uen_{p} + ue_{1p} - uu_{1p} - 
-		\sum_{dc} U_{pdc} (\sum_{m} sc_{1mdc} + \sum_{t'm} rsc_{1t'mdc} - \sum_{tm} rsc_{t1mdc}) \Big) + \\
-	& \sum_{tp}^{T-1} \beta_{tp}^{uu} \Big( uu_{t+1p} + 
-		\sum_{mdc} ps_{tmdc}pwp_{} (U_{pd+1c} - U_{pdc}) + 
-		U_{pdc} \big( \sum_{mdc} sc_{t+1}  - \sum_{t'mdc} rsc_{t+1t'} + 
-		\sum_{tmdc} rsc_{tt'+1} \big) \Big) + \\
-	& \sum_{dc} \beta_{0dc}^{pw} E[pea_{dc}]) + \\
-	& \sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} \Big( pw_{m-1dc} (1 - pwp) + pw_{m-1d-1c} pwp - \sum_{t} sc_{tm-1dc} \Big) + \\
-	& \sum_{dc} \beta_{Mdc}^{pw} \sum_{M-1}^{M} \Big( pw_{mdc} (1 - pwp) + pw_{md-1c} pwp - \sum_{t} sc_{tmdc} \Big) + \\
-	& \sum _{t=1 m=1 dc}^{T-1 M-1} \beta_{tmdc}^{ps} 
-		\Big( ps_{t+1m-1dc}(1-pwp) + ps_{t+1m-1d-1c} pwp - \sum_{t} sc_{t+1m-1dc} - \\
-		& - \sum_{t'} rsc_{t+1t'm-1dc} + \sum_{t} rsc_{tt'+1m-1dc} \Big) + \\
-	& \sum _{t=1dc}^{T-1} \beta_{tMdc}^{ps} \sum_{M-1}^{M} \Big( ps_{t+1mdc}(1-pwp) + ps_{t+1md-1c} pwp - \sum_{t} sc_{t+1mdc} \\ 
-	&  - \sum_{t'} rsc_{t+1t'mdc} + \sum_{t} rsc_{tt'+1mdc} \Big) \bigg)
-	& \bigg)
-\end{align*}
+
+\begin{equation}\begin{alignedat}{10}
+	&	v(S') = \Bigg( 
+		&& 	\beta^0 + 
+			\bigg( \sum_{p} \beta_{1p}^{ue} 
+				(uen_{d} + ue_{1p} - \hat{uu}_{1p}) \bigg)+
+			\bigg( \sum_{t=2,p}^{T} \beta_{tp}^{ue} uen_{d} \bigg)+ \\
+	&	&& 	\bigg( \sum_{tp}^{T-1} \beta_{tp}^{uu} 
+				( \hat{uu}_{t+1,p} + \sum_{mdc} E[pst_{tmdc}] (U_{pd+1c} - U_{pdc})) \bigg) + \\
+	&	&&	\bigg( \sum_{dc} \beta_{0dc}^{pw} pea_{dc} \bigg) +
+			\bigg( \sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} 
+				(\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \bigg) + \\
+	&	&&	\qquad \qquad \bigg( \sum_{dc} \beta_{Mdc}^{pw} 
+				(\sum_{M-1}^{M} \hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}])\bigg) + \\
+	& 	&&	\bigg( \sum_{t=1m=1dc}^{T-1M-1} \beta_{tmdc}^{ps} 
+				(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{t+1m-1dc}]) \bigg) + \\	
+	&	&&	\qquad \qquad \bigg( \sum_{t=1Mdc}^{T-1} \beta_{tmdc}^{ps} 
+				(\sum_{M-1}^{M} (\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{t+1mdc}])) \bigg)
+			\Bigg)
+\end{alignedat}
+\end{equation}
+
 Subject to:
 constraints in section "\nameref{state-action constraints}"
 

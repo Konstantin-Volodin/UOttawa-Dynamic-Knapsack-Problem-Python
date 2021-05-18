@@ -122,11 +122,13 @@ def execute_transition(input_data, state) -> state:
     # UE
     for tp in itertools.product(indices['t'], indices['p']):
         if tp[0] == 1:
+            left_over = state.ue_tp[tp] - state.uu_tp[tp]
             deviation = np.random.uniform(
                 input_data.ppe_data[tp[1]].deviation[0],
                 input_data.ppe_data[tp[1]].deviation[1]
             )
-            new_state.ue_tp[tp] = state.ue_tp[(tp[0]+1, tp[1])] + deviation
+
+            new_state.ue_tp[tp] = state.ue_tp[(tp[0]+1, tp[1])] + deviation + left_over
         elif tp[0] == indices['t'][-1]:
             new_state.ue_tp[tp] = input_data.ppe_data[tp[1]].expected_units
         else:
@@ -306,7 +308,7 @@ def myopic_policy(input_data, state) -> action:
 
     # Initializes model
     myopic = gp.Model('Myopic Policy')
-    myopic.Params.LogToConsole = 0
+    # myopic.Params.LogToConsole = 0
 
     # Decision Variables
     var_sc = {}
@@ -479,7 +481,7 @@ def mdp_policy(input_data, state, betas) -> action:
 
     # Initializes model
     myopic = gp.Model('Myopic Policy')
-    myopic.Params.LogToConsole = 0
+    # myopic.Params.LogToConsole = 0
 
     # Decision Variables
     var_sc = {}
@@ -603,7 +605,7 @@ def mdp_policy(input_data, state, betas) -> action:
     # E[V] Function
     def b0_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
-        expr.addConstant((1-gamma) * betas['b0']['b_0'])
+        expr.addConstant(betas['b0']['b_0'])
         return(expr)
     def b_ue_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
@@ -611,15 +613,13 @@ def mdp_policy(input_data, state, betas) -> action:
         for tp in itertools.product(indices['t'], indices['p']):
             # When t is 0
             if tp[0] == 1:
-                expr.addConstant(betas['ue'][tp] * state.ue_tp[tp])
-                expr.addConstant(-gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
-                expr.addConstant(-gamma * betas['ue'][tp] * state.ue_tp[tp])
-                expr.addTerms(gamma * betas['ue'][tp], var_uu_p[tp])
+                expr.addConstant(gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
+                expr.addConstant(gamma * betas['ue'][tp] * state.ue_tp[tp])
+                expr.addTerms(-gamma * betas['ue'][tp], var_uu_p[tp])
 
             # All other
             else:
-                expr.addConstant(betas['ue'][tp] * state.ue_tp[tp])
-                expr.addConstant(-gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
+                expr.addConstant(gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
                     
         return(expr)
     def b_uu_costs() -> gp.LinExpr:
@@ -628,12 +628,11 @@ def mdp_policy(input_data, state, betas) -> action:
         for tp in itertools.product(indices['t'], indices['p']):
             # When t is T
             if tp[0] == indices['t'][-1]:
-                expr.addConstant( betas['uu'][tp] * state.uu_tp[tp] )
+                pass
             
             # All others
             else:
-                expr.addConstant( betas['uu'][tp] * state.uu_tp[tp] )
-                expr.addTerms( -betas['uu'][tp] * gamma, var_uu_p[(tp[0]+1, tp[1])] )
+                expr.addTerms( betas['uu'][tp] * gamma, var_uu_p[(tp[0]+1, tp[1])] )
                 
                 # Change due to transition in complexity
                 for mc in itertools.product(indices['m'], indices['c']):
@@ -648,7 +647,7 @@ def mdp_policy(input_data, state, betas) -> action:
                             transition_prob = transition[(mc[0], d, mc[1])]
                             usage_change = usage[(tp[1], indices['d'][d+1], mc[1])] - usage[(tp[1], indices['d'][d], mc[1])]
                             coeff = betas['uu'][tp] * gamma * transition_prob * usage_change
-                            expr.addTerms( -coeff, var_ps_p[ (tp[0]+1, mc[0], indices['d'][d], mc[1]) ] )
+                            expr.addTerms( coeff, var_ps_p[ (tp[0]+1, mc[0], indices['d'][d], mc[1]) ] )
 
         return(expr)
     def b_pw_costs() -> gp.LinExpr:
@@ -660,44 +659,41 @@ def mdp_policy(input_data, state, betas) -> action:
 
                 # When m is 0
                 if mc[0] == 0: 
-                    expr.addConstant(betas['pw'][mdc] * state.pw_mdc[mdc])
-                    expr.addConstant(-betas['pw'][mdc] * gamma * arrival[mdc[1], mdc[2]])
+                    expr.addConstant(betas['pw'][mdc] * gamma * arrival[mdc[1], mdc[2]])
 
                 # When m is M
                 elif mc[0] == indices['m'][-1]:
-                    expr.addConstant(betas['pw'][mdc] * state.pw_mdc[mdc])
 
                     for mm in input_data.indices['m'][-2:]:
-                        expr.addTerms(-betas['pw'][mdc] * gamma, var_pw_p[(mm, mdc[1], mdc[2])])
+                        expr.addTerms(betas['pw'][mdc] * gamma, var_pw_p[(mm, mdc[1], mdc[2])])
            
                         # Transitioned In
                         if d != 0:
                             expr.addTerms(
-                                -betas['pw'][mdc] * gamma * transition[( mm, indices['d'][d-1], mdc[2] )],
+                                betas['pw'][mdc] * gamma * transition[( mm, indices['d'][d-1], mdc[2] )],
                                 var_pw_p[( mm, indices['d'][d-1], mdc[2] )]
                             )
                         # Transitioned Out
                         if d != indices['d'][-1]:
                             expr.addTerms(
-                                betas['pw'][mdc] * gamma * transition[( mm, mdc[1], mdc[2] )],
+                                -betas['pw'][mdc] * gamma * transition[( mm, mdc[1], mdc[2] )],
                                 var_pw_p[( mm, mdc[1], mdc[2] )]
                             )
 
                 # All others
                 else:                   
-                    expr.addConstant(betas['pw'][mdc] * state.pw_mdc[mdc])
-                    expr.addTerms(-betas['pw'][mdc] * gamma, var_pw_p[(mdc[0]-1, mdc[1], mdc[2])])
+                    expr.addTerms(betas['pw'][mdc] * gamma, var_pw_p[(mdc[0]-1, mdc[1], mdc[2])])
            
                     # Transitioned In
                     if d != 0:
                         expr.addTerms(
-                            -betas['pw'][mdc] * gamma * transition[( mdc[0]-1, indices['d'][d-1], mdc[2] )],
+                            betas['pw'][mdc] * gamma * transition[( mdc[0]-1, indices['d'][d-1], mdc[2] )],
                             var_pw_p[( mdc[0]-1, indices['d'][d-1], mdc[2] )]
                         )
                     # Transitioned Out
                     if d != indices['d'][-1]:
                         expr.addTerms(
-                            betas['pw'][mdc] * gamma * transition[( mdc[0]-1, mdc[1], mdc[2] )],
+                            -betas['pw'][mdc] * gamma * transition[( mdc[0]-1, mdc[1], mdc[2] )],
                             var_pw_p[( mdc[0]-1, mdc[1], mdc[2] )]
                         )
 
@@ -711,47 +707,45 @@ def mdp_policy(input_data, state, betas) -> action:
 
                 # When m is 0
                 if tmdc[1] == 0: 
-                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
+                    pass
 
                 # When t is T
                 elif tmdc[0] == indices['t'][-1]:
-                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
+                    pass
 
                 # when m is M
                 elif tmdc[1] == indices['m'][-1]:
-                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
 
                     for mm in input_data.indices['m'][-2:]:
-                        expr.addTerms(-betas['ps'][tmdc] * gamma, var_ps_p[(tmdc[0]+1, mm, tmdc[2], tmdc[3])])
+                        expr.addTerms(betas['ps'][tmdc] * gamma, var_ps_p[(tmdc[0]+1, mm, tmdc[2], tmdc[3])])
            
                         # Transitioned In
                         if d != 0:
                             expr.addTerms(
-                                -betas['ps'][tmdc] * gamma * transition[( mm, indices['d'][d-1], tmdc[3] )],
+                                betas['ps'][tmdc] * gamma * transition[( mm, indices['d'][d-1], tmdc[3] )],
                                 var_ps_p[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )]
                             )
                         # Transitioned Out
                         if d != indices['d'][-1]:
                             expr.addTerms(
-                                betas['ps'][tmdc] * gamma * transition[( mm, tmdc[2], tmdc[3] )],
+                                -betas['ps'][tmdc] * gamma * transition[( mm, tmdc[2], tmdc[3] )],
                                 var_ps_p[( tmdc[0]+ 1, mm, tmdc[2], tmdc[3] )]
                             )
                 
                 # Everything Else
                 else:
-                    expr.addConstant(betas['ps'][tmdc] * state.ps_tmdc[tmdc])
-                    expr.addTerms(-betas['ps'][tmdc] * gamma, var_ps_p[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
+                    expr.addTerms(betas['ps'][tmdc] * gamma, var_ps_p[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
            
                     # Transitioned In
                     if d != 0:
                         expr.addTerms(
-                            -betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, indices['d'][d-1], tmdc[3] )],
+                            betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, indices['d'][d-1], tmdc[3] )],
                             var_ps_p[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )]
                         )
                     # Transitioned Out
                     if d != indices['d'][-1]:
                         expr.addTerms(
-                            betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, tmdc[2], tmdc[3] )],
+                            -betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, tmdc[2], tmdc[3] )],
                             var_ps_p[( tmdc[0]+ 1, tmdc[1]-1, tmdc[2], tmdc[3] )]
                         )
 
@@ -774,7 +768,7 @@ def mdp_policy(input_data, state, betas) -> action:
     value_expr = gp.LinExpr(b0_expr + b_ue_expr + b_uu_expr + b_pw_expr + b_ps_expr)
     
     
-    myopic.setObjective(cost_expr + value_expr, GRB.MINIMIZE)
+    myopic.setObjective(cost_expr - (gamma * value_expr), GRB.MINIMIZE)
     myopic.optimize()
     myopic.write('mdp.lp')
 

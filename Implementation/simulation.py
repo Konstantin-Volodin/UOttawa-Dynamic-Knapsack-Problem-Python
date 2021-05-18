@@ -79,3 +79,4 @@ for i in range(5):
     # print(f'\t Cost: {state_action_cost(input_data, curr_state, new_action)}')
 
     curr_state = execute_transition(input_data, curr_state)
+# %%
