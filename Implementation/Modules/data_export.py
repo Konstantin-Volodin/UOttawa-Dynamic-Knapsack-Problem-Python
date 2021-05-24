@@ -91,3 +91,43 @@ def export_betas(betas, data_file_path):
 
     # Saves
     wb.save(data_file_path)
+def export_expected_vals(data_file_path, state):
+    wb = openpyxl.load_workbook(data_file_path, data_only=True)
+    ws = wb["Expected State Values"]
+
+    # UE
+    count = 3
+    for tp, v in state.ue_tp.items():
+        ws.cell(row=count, column=1).value = tp[1]
+        ws.cell(row=count, column=2).value = tp[0]
+        ws.cell(row=count, column=3).value = v
+        count += 1
+
+    # UU
+    count = 3
+    for tp, v in state.uu_tp.items():
+        ws.cell(row=count, column=4).value = tp[1]
+        ws.cell(row=count, column=5).value = tp[0]
+        ws.cell(row=count, column=6).value = v
+        count += 1
+
+    # PW
+    count = 3
+    for mdc, v in state.pw_mdc.items():
+        ws.cell(row=count, column=7).value = mdc[0]
+        ws.cell(row=count, column=8).value = mdc[1]
+        ws.cell(row=count, column=9).value = mdc[2]
+        ws.cell(row=count, column=10).value = v
+        count += 1
+
+    # UE
+    count = 3
+    for tmdc, v in state.ps_tmdc.items():
+        ws.cell(row=count, column=11).value = tmdc[0]
+        ws.cell(row=count, column=12).value = tmdc[1]
+        ws.cell(row=count, column=13).value = tmdc[2]
+        ws.cell(row=count, column=14).value = tmdc[3]
+        ws.cell(row=count, column=15).value = v
+        count += 1
+        
+    wb.save(data_file_path)

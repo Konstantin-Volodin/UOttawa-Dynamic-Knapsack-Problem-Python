@@ -19,7 +19,10 @@ def initial_state(input_data) -> state:
     # Patient States
     pw = {}
     for mdc in itertools.product(indices['m'],indices['d'], indices['c']):
-        pw[mdc] = 0
+        if mdc[0] == 0:
+            pw[mdc] = arrival[(mdc[1], mdc[2])] 
+        else:
+            pw[mdc] = 0
     ps = {}
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         ps[tmdc] = 0
@@ -95,18 +98,22 @@ def state_action_cost(input_data, state, action) -> float:
 
     # Cost of Waiting
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
-        cost += model_param.cw**mdc[0] * ( state.pw_mdc[mdc] )
+        cost += model_param.cw**mdc[0] * ( action.pw_p_mdc[mdc] )
 
     # Cost of Waiting - Last Period
     for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-        cost += model_param.cw**indices['m'][-1] * ( state.ps_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+        cost += model_param.cw**indices['m'][-1] * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+
+    # Cost of Later Schedulings
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        cost += (model_param.cw**tmdc[1] * tmdc[0] * 1/M) * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
 
     # Cost of Cancelling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] > ttpmdc[1]: #good schedule
-            cost -= model_param.cc * action.rsc_ttpmdc[ttpmdc]
+            cost -= (model_param.cc-model_param.cw) * action.rsc_ttpmdc[ttpmdc]
         elif ttpmdc[1] > ttpmdc[0]: #bad schedule
-            cost += model_param.cc * action.rsc_ttpmdc[ttpmdc]
+            cost += (model_param.cc+model_param.cw) * action.rsc_ttpmdc[ttpmdc]
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):
@@ -114,7 +121,7 @@ def state_action_cost(input_data, state, action) -> float:
 
     return(cost)
 # Executes Transition to next state
-def execute_transition(input_data, state) -> state:
+def execute_transition(input_data, state, action) -> state:
 
     indices = input_data.indices
     new_state = deepcopy(state)
@@ -122,7 +129,7 @@ def execute_transition(input_data, state) -> state:
     # UE
     for tp in itertools.product(indices['t'], indices['p']):
         if tp[0] == 1:
-            left_over = state.ue_tp[tp] - state.uu_tp[tp]
+            left_over = state.ue_tp[tp] - state.uu_tp[tp] + action.uv_tp[tp]
             deviation = np.random.uniform(
                 input_data.ppe_data[tp[1]].deviation[0],
                 input_data.ppe_data[tp[1]].deviation[1]
@@ -143,7 +150,6 @@ def execute_transition(input_data, state) -> state:
             new_state.uu_tp[tp] = state.uu_tp[(tp[0]+1, tp[1])]
 
     # PW
-
         # Generates New Arrivals, Shifts Everyone by 1 Month, Accumulates those who waited past limit
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         if mdc[0] == 0:
@@ -161,14 +167,13 @@ def execute_transition(input_data, state) -> state:
                 # Transitioned Patients
                 mdc = (mc[0], indices['d'][d], mc[1])
                 patients_transitioned = np.random.binomial(
-                    new_state.pw[mdc],
+                    new_state.pw_mdc[mdc],
                     input_data.transition[mdc]
                 )
                 new_state.pw_mdc[mdc] -= patients_transitioned
                 new_state.pw_mdc[(mc[0], indices['d'][d+1], mc[1])] += patients_transitioned
 
     # PS
-
         # Shifts Everyone by 1 Month, Accumulates those who waited past limit
     for tmdc in itertools.product(indices['t'], reversed(indices['m']), indices['d'], indices['c']):
         if tmdc[0] == indices['t'][-1]:
@@ -188,7 +193,7 @@ def execute_transition(input_data, state) -> state:
                 # Transitioned Patients
                 tmdc = (tmc[0], tmc[1], indices['d'][d], mc[1])
                 patients_transitioned = np.random.binomial(
-                    new_state.ps[tmdc],
+                    new_state.ps_tmdc[tmdc],
                     input_data.transition[(tmc[1], indices['d'][d], tmc[2])]
                 )
                 new_state.ps_tmdc[tmdc] -= patients_transitioned
@@ -202,96 +207,6 @@ def execute_transition(input_data, state) -> state:
     return(new_state)
 
 # Various Policies
-def fas_policy(input_data, state) -> action:
-    init_action = initial_action(input_data)
-
-    # Retrieves capacity
-    capacity = state.ue_tp.copy()
-    for tp in capacity.keys():
-        capacity[tp] = capacity[tp] - state.uu_tp[tp]
-
-    # Reschedules out of day 1 if necessary
-    for mdc in itertools.product(input_data.indices['m'], input_data.indices['d'],input_data.indices['c']):
-        t = 1
-
-        # Reschedules out of period 1 until there is no violation
-        need_to_reschedule = False
-
-        while True:
-
-            # Check if capacity is violated
-            need_to_reschedule = False
-            # print(capacity)
-            for p in input_data.indices['p']:
-                if capacity[(t, p)] <= 0:
-                    need_to_reschedule = True
-
-
-            if need_to_reschedule == False:
-                break
-
-            # Finds slot to reschedule to and adjusts capacity metrics
-            for tp in input_data.indices['t']:
-                enough_capacity = False
-                for p in input_data.indices['p']:
-                    if capacity[(tp, p)] >= input_data.usage[(p, mdc[1], mdc[2])]:
-                        enough_capacity = True
-
-                if enough_capacity:
-
-                    init_action.rsc_ttpmdc[(1, tp, mdc[0], mdc[1], mdc[2])] += 1
-                    for p in input_data.indices['p']:
-                        capacity[(t,p)] += input_data.usage[(p, mdc[1], mdc[2])]
-                        capacity[(tp,p)] -= input_data.usage[(p, mdc[1], mdc[2])]
-                    break
-        
-        if need_to_reschedule == False:
-            break
-
-    # Schedules patients starting from those who waited the longest
-    for m in reversed(input_data.indices['m']): 
-        for dc in itertools.product(reversed(input_data.indices['d']), input_data.indices['c']):
-            mdc = (m, dc[0], dc[1])
-
-            # Extracts number of people to schedule and usage of this patient type
-            patients_to_schedule = state.pw_mdc[mdc]
-            patients_scheduled = 0
-            usage = {}
-            for p in input_data.indices['p']:
-                usage[p] = input_data.usage[(p, dc[0], dc[1])]
-
-            # Scheduling Action
-            for patient in range(patients_to_schedule):
-
-                if patients_to_schedule == patients_scheduled: break
-
-                for t in input_data.indices['t']:
-
-                    # Checks Capacity
-                    available_capacity = True
-                    for p in input_data.indices['p']:
-                        if usage[p] > capacity[(t, p)]:
-                            available_capacity = False
-
-                    # Schedules if there is capacity
-                    if available_capacity == False: 
-                        continue 
-                    
-                    init_action.sc_tmdc[(t, m, dc[0], dc[1])] += 1
-                    for p in input_data.indices['p']:
-                        capacity[(t, p)] -= usage[p]
-                        patients_scheduled += 1
-                    
-                    break
-
-    # Schedules into day 1 if it can
-    #          
-
-    # Calculates Post Decision States
-
-
-    # Unit Violation calculation      
-    return(init_action)
 def myopic_policy(input_data, state) -> action:
     # Input Data
     indices = input_data.indices
@@ -308,7 +223,7 @@ def myopic_policy(input_data, state) -> action:
 
     # Initializes model
     myopic = gp.Model('Myopic Policy')
-    # myopic.Params.LogToConsole = 0
+    myopic.Params.LogToConsole = 0
 
     # Decision Variables
     var_sc = {}
@@ -327,7 +242,7 @@ def myopic_policy(input_data, state) -> action:
     # UV
     for tp in itertools.product(indices['t'], indices['p']):
         ppe_upper_bounds = ppe_data[tp[1]].expected_units + ppe_data[tp[1]].deviation[1]
-        var_uv[tp] = myopic.addVar(name=f'a_uv_{tp}', ub=ppe_upper_bounds, vtype=GRB.CONTINUOUS)
+        var_uv[tp] = myopic.addVar(name=f'a_uv_{tp}', vtype=GRB.CONTINUOUS)
     # UU Hat
     for tp in itertools.product(indices['t'], indices['p']):
         var_uu_p[tp] = myopic.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
@@ -350,7 +265,7 @@ def myopic_policy(input_data, state) -> action:
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         expr.addTerms(1, var_pw_p[mdc])
-        expr.addConstant(-state.pw_mdc[mdc])
+        expr.addConstant(round(-state.pw_mdc[mdc],0))
         for t in indices['t']:
             expr.addTerms(1, var_sc[(t, mdc[0], mdc[1], mdc[2])])
         myopic.addConstr(expr == 0, name=f'pw_hat_{mdc}')
@@ -358,7 +273,7 @@ def myopic_policy(input_data, state) -> action:
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         expr.addTerms(1, var_ps_p[tmdc])
-        expr.addConstant(-state.ps_tmdc[tmdc])
+        expr.addConstant(round(-state.ps_tmdc[tmdc],0))
         expr.addTerms(-1, var_sc[tmdc])
         for tp in indices['t']:
             expr.addTerms(-1, var_rsc[(tp, tmdc[0], tmdc[1], tmdc[2], tmdc[3])])
@@ -376,8 +291,8 @@ def myopic_policy(input_data, state) -> action:
             myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
             myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
+        #     myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -409,15 +324,25 @@ def myopic_policy(input_data, state) -> action:
             expr.addTerms(model_param.cw**indices['m'][-1], var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return(expr)
+    def pref_earlier_appointment() -> gp.LinExpr:
+        expr = gp.LinExpr()
+        
+        # Prefer Earlier Appointments
+        for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+            expr.addTerms(
+                model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M,
+                var_sc[tmdc]
+            )
+        return(expr)
     def reschedule_cost() -> gp.LinExpr:
 
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(model_param.cc, var_rsc[ttpmdc])
+                expr.addTerms(model_param.cc+model_param.cw, var_rsc[ttpmdc])
             elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-model_param.cc, var_rsc[ttpmdc])
+                expr.addTerms(-(model_param.cc-model_param.cw), var_rsc[ttpmdc])
 
         return(expr)
     def goal_violation_cost() -> gp.LinExpr:
@@ -431,13 +356,19 @@ def myopic_policy(input_data, state) -> action:
     # Generates Objective Function
         # Cost
     wait_cost_expr = wait_cost()
+    pref_early = pref_earlier_appointment()
     rescheduling_cost_expr = reschedule_cost()
     goal_vio_cost_expr = goal_violation_cost()
-    cost_expr = gp.LinExpr(wait_cost_expr + rescheduling_cost_expr + goal_vio_cost_expr)
+    cost_expr = gp.LinExpr(wait_cost_expr + pref_early + rescheduling_cost_expr + goal_vio_cost_expr)
     
     myopic.setObjective(cost_expr, GRB.MINIMIZE)
     myopic.optimize()
     myopic.write('myopic.lp')
+    if myopic.Status != 2:
+        print(state.ue_tp)
+        print(state.uu_tp)
+        print(state.pw_mdc)
+        print(state.ps_tmdc)
 
     # Saves Action
     sc = {}
@@ -480,8 +411,8 @@ def mdp_policy(input_data, state, betas) -> action:
     ps = state.ps_tmdc
 
     # Initializes model
-    myopic = gp.Model('Myopic Policy')
-    # myopic.Params.LogToConsole = 0
+    MDP = gp.Model('MDP Policy')
+    MDP.Params.LogToConsole = 0
 
     # Decision Variables
     var_sc = {}
@@ -493,23 +424,23 @@ def mdp_policy(input_data, state, betas) -> action:
 
     # SC
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        var_sc[tmdc] = myopic.addVar(name=f'a_sc_{tmdc}', vtype=GRB.INTEGER)
+        var_sc[tmdc] = MDP.addVar(name=f'a_sc_{tmdc}', vtype=GRB.INTEGER)
     # RSC
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        var_rsc[ttpmdc] = myopic.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
+        var_rsc[ttpmdc] = MDP.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
     # UV
     for tp in itertools.product(indices['t'], indices['p']):
         ppe_upper_bounds = ppe_data[tp[1]].expected_units + ppe_data[tp[1]].deviation[1]
-        var_uv[tp] = myopic.addVar(name=f'a_uv_{tp}', ub=ppe_upper_bounds, vtype=GRB.CONTINUOUS)
+        var_uv[tp] = MDP.addVar(name=f'a_uv_{tp}', vtype=GRB.CONTINUOUS)
     # UU Hat
     for tp in itertools.product(indices['t'], indices['p']):
-        var_uu_p[tp] = myopic.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
+        var_uu_p[tp] = MDP.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
     # PW Hat
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-        var_pw_p[mdc] = myopic.addVar(name=f'a_pw_p_{mdc}', vtype=GRB.INTEGER)
+        var_pw_p[mdc] = MDP.addVar(name=f'a_pw_p_{mdc}', vtype=GRB.INTEGER)
     # PS Hat
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        var_ps_p[tmdc] = myopic.addVar(name=f'a_ps_p_{tmdc}', vtype=GRB.INTEGER)
+        var_ps_p[tmdc] = MDP.addVar(name=f'a_ps_p_{tmdc}', vtype=GRB.INTEGER)
 
     # Auxiliary Variable Definition
         # UU Hat
@@ -518,39 +449,39 @@ def mdp_policy(input_data, state, betas) -> action:
         expr.addTerms(1, var_uu_p[tp])
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
             expr.addTerms(-usage[(tp[1], mdc[1], mdc[2])], var_ps_p[(tp[0], mdc[0], mdc[1], mdc[2])])
-        myopic.addConstr(expr == 0, name=f'uu_hat_{tp}')
+        MDP.addConstr(expr == 0, name=f'uu_hat_{tp}')
         # PW Hat
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         expr.addTerms(1, var_pw_p[mdc])
-        expr.addConstant(-state.pw_mdc[mdc])
+        expr.addConstant(round(-state.pw_mdc[mdc],0))
         for t in indices['t']:
             expr.addTerms(1, var_sc[(t, mdc[0], mdc[1], mdc[2])])
-        myopic.addConstr(expr == 0, name=f'pw_hat_{mdc}')
+        MDP.addConstr(expr == 0, name=f'pw_hat_{mdc}')
         # PS Hat
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         expr.addTerms(1, var_ps_p[tmdc])
-        expr.addConstant(-state.ps_tmdc[tmdc])
+        expr.addConstant(round(-state.ps_tmdc[tmdc],0))
         expr.addTerms(-1, var_sc[tmdc])
         for tp in indices['t']:
             expr.addTerms(-1, var_rsc[(tp, tmdc[0], tmdc[1], tmdc[2], tmdc[3])])
             expr.addTerms(1, var_rsc[(tmdc[0], tp, tmdc[1], tmdc[2], tmdc[3])])
-        myopic.addConstr(expr == 0, name=f'ps_hat_{tmdc}')
+        MDP.addConstr(expr == 0, name=f'ps_hat_{tmdc}')
 
     # Constraints
     # 1) Resource Usage Constraint
     for tp in itertools.product(indices['t'], indices['p']):
-        myopic.addConstr(var_uu_p[tp] <= state.ue_tp[tp] + var_uv[tp], name=f'resource_constraint_{tp}')
+        MDP.addConstr(var_uu_p[tp] <= state.ue_tp[tp] + var_uv[tp], name=f'resource_constraint_{tp}')
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] == ttpmdc[1]:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
+        #     MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -558,15 +489,15 @@ def mdp_policy(input_data, state, betas) -> action:
         expr = gp.LinExpr()
         for tp in itertools.product(indices['t']):
             expr.addTerms(-1, var_rsc[(tmdc[0], tp[0], tmdc[1], tmdc[2], tmdc[3])])
-        expr.addConstant(state.ps_tmdc[tmdc])
-        myopic.addConstr(expr >= 0, f'consistent_resc_{(tmdc)}')
+        expr.addConstant(round(state.ps_tmdc[tmdc],0))
+        MDP.addConstr(expr >= 0, f'consistent_resc_{(tmdc)}')
         # Scheduled
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         for t in itertools.product(indices['t']):
             expr.addTerms(-1, var_sc[(t[0], mdc[0], mdc[1], mdc[2])])
-        expr.addConstant(state.pw_mdc[mdc])
-        myopic.addConstr(expr >= 0, f'consistent_sch_{(mdc)}')
+        expr.addConstant(round(state.pw_mdc[mdc],0))
+        MDP.addConstr(expr >= 0, f'consistent_sch_{(mdc)}')
 
     # Objective Function
     # Cost Function
@@ -582,15 +513,25 @@ def mdp_policy(input_data, state, betas) -> action:
             expr.addTerms(model_param.cw**indices['m'][-1], var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return(expr)
+    def pref_earlier_appointment() -> gp.LinExpr:
+        expr = gp.LinExpr()
+        
+        # Prefer Earlier Appointments
+        for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+            expr.addTerms(
+                model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M,
+                var_sc[tmdc]
+            )
+        return(expr)
     def reschedule_cost() -> gp.LinExpr:
 
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(model_param.cc, var_rsc[ttpmdc])
+                expr.addTerms(model_param.cc+model_param.cw, var_rsc[ttpmdc])
             elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-model_param.cc, var_rsc[ttpmdc])
+                expr.addTerms(-(model_param.cc-model_param.cw), var_rsc[ttpmdc])
 
         return(expr)
     def goal_violation_cost() -> gp.LinExpr:
@@ -601,7 +542,6 @@ def mdp_policy(input_data, state, betas) -> action:
 
         return(expr)
 
-        
     # E[V] Function
     def b0_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
@@ -755,9 +695,10 @@ def mdp_policy(input_data, state, betas) -> action:
     # Generates Objective Function
         # Cost
     wait_cost_expr = wait_cost()
+    pref_early = pref_earlier_appointment()
     rescheduling_cost_expr = reschedule_cost()
     goal_vio_cost_expr = goal_violation_cost()
-    cost_expr = gp.LinExpr(wait_cost_expr + rescheduling_cost_expr + goal_vio_cost_expr)
+    cost_expr = gp.LinExpr(wait_cost_expr + pref_early + rescheduling_cost_expr + goal_vio_cost_expr)
 
         # Value
     b0_expr = b0_cost()
@@ -768,9 +709,15 @@ def mdp_policy(input_data, state, betas) -> action:
     value_expr = gp.LinExpr(b0_expr + b_ue_expr + b_uu_expr + b_pw_expr + b_ps_expr)
     
     
-    myopic.setObjective(cost_expr - (gamma * value_expr), GRB.MINIMIZE)
-    myopic.optimize()
-    myopic.write('mdp.lp')
+    MDP.setObjective(cost_expr - (gamma * value_expr), GRB.MINIMIZE)
+    MDP.optimize()
+    if MDP.Status != 2:
+        print(state.ue_tp)
+        print(state.uu_tp)
+        print(state.pw_mdc)
+        print(state.ps_tmdc)
+
+    MDP.write('mdp.lp')
 
     # Saves Action
     sc = {}
@@ -795,57 +742,84 @@ def mdp_policy(input_data, state, betas) -> action:
     new_action = action(sc, rsc, uv, uu_p, pw_p, ps_p)
     return(new_action)
 
-def simulation(input_data, replication, days, warm_up, decision_policy, save_data, **kwargs): 
+def non_zero_state(state: state):
+    for key,value in state.ue_tp.items():
+        if state.ue_tp[key] >= 0.1: print(f'\tUnits Expected - {key} - {state.ue_tp[key]}')
+        if state.uu_tp[key] >= 0.1: print(f'\tUnits Used - {key} - {state.uu_tp[key]}')
+    for key,value in state.pw_mdc.items(): 
+        if value >= 0.1: print(f'\tPatients Waiting- {key} - {value}')
+    for key,value in state.ps_tmdc.items(): 
+        if value >= 0.1: print(f'\tPatients Scheduled- {key} - {value}')
+def non_zero_action(action: action):
+    for key,value in action.sc_tmdc.items():
+        if value >= 0.1: print(f'\tPatients Schedule - {key} - {value}')
+    for key,value in action.rsc_ttpmdc.items(): 
+        if value >= 0.1: print(f'\tPatients Reschedule- {key} - {value}')
+    for key,value in action.uv_tp.items(): 
+        if value >= 0.1: print(f'\tUnits Violated- {key} - {value}')
+    for key,value in action.uu_p_tp.items(): 
+        if value >= 0.1: print(f'\tUnits Used - Post Decision - {key} - {value}')
+    for key,value in action.pw_p_mdc.items(): 
+        if value >= 0.1: print(f'\ttPatients Waiting - Post Decision - {key} - {value}')
+    for key,value in action.ps_p_tmdc.items(): 
+        if value >= 0.1: print(f'\tPatients Scheduled - Post Decision - {key} - {value}')
 
-    np.random.seed(1487)
+
+def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs): 
 
     full_data = []
     cost_data = []
-
-    for repl in trange(replication):
+    curr_state = initial_state(input_data)
+        
+    for repl in range(replication):
+        print(f'Replication {repl+1} / {replication}')
         repl_data = []
         cost_repl_data = []
 
         # Initializes State
-        curr_state = initial_state(input_data)
+        initial_state_val = deepcopy(curr_state)    
 
         for day in range(days):
+            print(f'Day - {day+1}')
 
             # Saves Initial State Data
-            if save_data:
-                if day >= warm_up:
-                    repl_data.append(deepcopy(curr_state))
+            if day >= warm_up:
+                repl_data.append(deepcopy(initial_state_val))
 
+            # print('Initial State')
+            # non_zero_state(initial_state_val)
             # Generate Action & Executes an Action
             new_action = None
-            if 'betas' in kwargs:
-                new_action = decision_policy(input_data, curr_state, kwargs['betas'])
+            if day < warm_up:
+                new_action = myopic_policy(input_data, initial_state_val)
             else:
-                new_action = decision_policy(input_data, curr_state)
-            curr_state = execute_action(input_data, curr_state, new_action)
+                if 'betas' in kwargs:
+                    new_action = decision_policy(input_data, initial_state_val, kwargs['betas'])
+                else:
+                    new_action = decision_policy(input_data, initial_state_val)
+            initial_state_val = execute_action(input_data, initial_state_val, new_action)
+            # print('Aciton')
+            # non_zero_action(new_action)
 
             # Calculates cost
-            cost = state_action_cost(input_data, curr_state, new_action)
+            cost = state_action_cost(input_data, initial_state_val, new_action)
             if day >= warm_up:
                 cost_repl_data.append(cost)
+            # print(f'Cost: {cost}')
 
             # Executes Transition
-            curr_state = execute_transition(input_data, curr_state)
+            initial_state_val = execute_transition(input_data, initial_state_val, new_action)
 
         # Save data
-        if save_data:
-            full_data.append(repl_data)
+        full_data.append(repl_data)
         cost_data.append(cost_repl_data)
     
-    if save_data:
-        return(full_data)
-    else:
-        return(cost_data)
-def generate_expected_values(input_data, repl, days):
-    sim_data = simulation(input_data, repl, days, 300, fas_policy, True)
+    return(cost_data, full_data)
+def generate_expected_values(input_data, repl, days, warmup):
+    cost_data, sim_data = simulation(input_data, repl, days, warmup, myopic_policy)
 
     state_averages = initial_state(input_data)
-    total_days = repl * (days-300)
+    total_days = repl * (days-warmup)
 
     # Adjusts UE
     for key,value in state_averages.ue_tp.items():
@@ -860,9 +834,6 @@ def generate_expected_values(input_data, repl, days):
             # UU Average
             for key,value in day_state.uu_tp.items():
                 state_averages.uu_tp[key] += value / total_days
-            # UV Average
-            for key,value in day_state.uv_tp.items():
-                state_averages.uv_tp[key] += value / total_days
             # PW Average
             for key,value in day_state.pw_mdc.items():
                 state_averages.pw_mdc[key] += value / total_days
@@ -877,9 +848,6 @@ def generate_expected_values(input_data, repl, days):
     # UU Average
     for key,value in state_averages.uu_tp.items():
         state_averages.uu_tp[key] = round(value, 3)
-    # UV Average
-    for key,value in state_averages.uv_tp.items():
-        state_averages.uv_tp[key] = round(value, 3)
     # PW Average
     for key,value in state_averages.pw_mdc.items():
         state_averages.pw_mdc[key] = round(value, 3)

@@ -73,12 +73,16 @@ def cost_function(input_data: input_data_class, state: state, action: action):
     for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
         cost += model_param.cw**indices['m'][-1] * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
 
-    # Cost of Cancelling
+    # Prefer Earlier Appointments
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        cost += model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
+
+    # Cost of Rescheduling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] > ttpmdc[1]: #good schedule
-            cost -= model_param.cc * action.rsc_ttpmdc[ttpmdc]
+            cost -= (model_param.cc-model_param.cw) * action.rsc_ttpmdc[ttpmdc]
         elif ttpmdc[1] > ttpmdc[0]: #bad schedule
-            cost += model_param.cc * action.rsc_ttpmdc[ttpmdc]
+            cost += (model_param.cc+model_param.cw) * action.rsc_ttpmdc[ttpmdc]
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):
@@ -111,7 +115,7 @@ def b_ue_constraint(input_data: input_data_class, state: state, action: action) 
     # Creates Data
     for tp in itertools.product(indices['t'], indices['p']):
         if tp[0] == 1:
-            lhs[tp] = state.ue_tp[tp] - gamma*( ppe_data[tp[1]].expected_units + state.ue_tp[tp] - action.uu_p_tp[tp])
+            lhs[tp] = state.ue_tp[tp] - gamma*( ppe_data[tp[1]].expected_units + state.ue_tp[tp] - action.uu_p_tp[tp] + action.uv_tp[tp])
        
         elif tp[0] >= 2:
             lhs[tp] = state.ue_tp[tp] - gamma*(ppe_data[tp[1]].expected_units)
@@ -157,11 +161,11 @@ def b_uu_constraint(input_data: input_data_class, state: state, action: action) 
                         
                     # Otherwise
                     else:
-                        transition_prob = transition[(tp[0]+1, indices['d'][d], mc[0])]
+                        transition_prob = transition[(mc[0], indices['d'][d], mc[1])]
                         patients_sched = action.ps_p_tmdc[(tp[0]+1, mc[0], indices['d'][d], mc[1])]
                         expected_transition = transition_prob * patients_sched
                     
-                        change_in_usage = usage(tp[1], indices['d'][d+1], mc[1]) - usage(tp[1], indices['d'][d], mc[1])
+                        change_in_usage = usage[(tp[1], indices['d'][d+1], mc[1])] - usage[(tp[1], indices['d'][d], mc[1])]
                         parameter_val -= gamma * (expected_transition * change_in_usage)
 
             lhs[tp] = parameter_val
@@ -193,7 +197,7 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
 
             # When m = 0
             if mc[0] == 0: 
-                lhs[mdc] = state.pw_mdc[mdc] - (gamma * arrival[(indices['d'][d], mc[1])] )
+                lhs[mdc] = state.pw_mdc[mdc] - (gamma * arrival[(mdc[1], mc[1])] )
 
             # When m = M
             elif mc[0] == indices['m'][-1]:

@@ -83,7 +83,7 @@
 	\end{itemize}
 	\item We allow some violation of PPE units, in rare cases (with high cost), in order to accomodate changes due to variability.
 	\begin{itemize}
-		\item If we have violation of PPE units - it reduces capacity in the future (Meaning violations are borrowed from future capacity)
+		\item If we have violation of PPE units - the extra capacity comes from external source
 	\end{itemize}
 \end{itemize}
 
@@ -169,7 +169,7 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 	\item Custom bounds on when reschedules are allowed
 	\begin{alignat}{10}
 		& rsc_{tt'mdc} && = 0 \quad && \forall t \in \{ 2...T \}, t' \in \{2...T\} mdc \\
-		& rsc_{tt'mdc} && = 0 \quad && \forall t \in \{ 1 \}, t'\in \{ 3...T \} mdc  \\
+		% & rsc_{tt'mdc} && = 0 \quad && \forall t \in \{ 1 \}, t'\in \{ 3...T \} mdc  \\
 		& rsc_{tt'mdc} && = 0 \quad && \forall tt'mdc, \text{where } t=t' 
 	\end{alignat}  
 	
@@ -223,7 +223,7 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 	\begin{alignat}{10}
 		& ue'_{1p} 
 			&& 	= \overbrace{ ue_{2p} + ued_{p} }^\text{deviation}
-				+ \overbrace{ ue_{1p} - \hat{uu}_{1p} }^\text{unused} \quad
+				+ \overbrace{ ue_{1p} - \hat{uu}_{1p} }^\text{unused} + uv_{1p} \quad
 			&& \forall p \in \{ \text{Carry Over Resources} \} \\
 		& ue'_{1p} 
 			&& 	= ue_{2p} + ued_{p} \quad
@@ -302,15 +302,19 @@ Cost will come from 3 sources:
 		&& 
 			\overbrace{ \sum_{mdc} cw^{m} (\hat{pw}_{mdc}) }^\text{
 				cost of waiting}  + 
-			\overbrace{ \sum_{tdc} cw^{M} (\hat{ps}_{tMdc})}^\text{
+			\overbrace{ \sum_{tmdc} cw^{M} (\hat{ps}_{tMdc})}^\text{
 				prevent infinite reschedules} + \\
+	&	&&	+
+				\overbrace{
+					\sum_{tmdc} cw^{m} * t * (1/M)  (sc_{tmdc})
+				}^\text{Prefer earlier appointments} \\ 
 	&	&&  +
 			\overbrace{
-				cc \sum_{
+				(1.5cc+cw^{m}) \sum_{
 				\substack{tt`mdc \\ t' > t}} 
 				rsc_{tt'mdc}}^\text{Bad Reschedule} - 
 			\overbrace{ 
-				cc \sum_{
+				(0.5cc) \sum_{
 				\substack{tt`mdc \\ t' < t}}
 				rsc_{tt'mdc}}^\text{Good Reschedule} + 
 			M \sum_{tp} uv_{tp}
@@ -350,7 +354,7 @@ Subject to:
 	& c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p \Bigg( 
 		\beta^0 + \\
 	& 	\bigg( \sum_{p} \beta_{1p}^{ue} 
-			(ue_{2p} + ued_{p} + ue_{1p} - \hat{uu}_{1p}) \bigg)+
+			(ue_{2p} + ued_{p} + ue_{1p} - \hat{uu}_{1p} + uv_{1p}) \bigg)+
 		\bigg( \sum_{t=2,p}^{T-1} \beta_{tp}^{ue} ue_{t+1,p} \bigg)+ 
 		\bigg( \sum_{p} \beta_{Tp}^{ue} uen_{p} \bigg) + \\
 	& 	\bigg( \sum_{tp}^{T-1} \beta_{tp}^{uu} 
@@ -389,7 +393,7 @@ Steps for rearranging and converting the constraint (\ref{full-adp-equation}) in
 \end{equation}
 \begin{equation}
 \beta^{ue}_{tp}: \qquad 
-	\sum_{p} \beta_{1p}^{ue} \Big( ue_{1p} - \gamma (uen_{p} + ue_{1p} - \hat{uu}_{1p}) \Big) + \sum_{t=2p}^{T} \beta_{tp}^{ue} \Big( ue_{tp} - \gamma (uen_{p}) \Big)
+	\sum_{p} \beta_{1p}^{ue} \Big( ue_{1p} - \gamma (uen_{p} + ue_{1p} - \hat{uu}_{1p} + uv_{tp}) \Big) + \sum_{t=2p}^{T} \beta_{tp}^{ue} \Big( ue_{tp} - \gamma (uen_{p}) \Big)
 \end{equation}
 \begin{equation}
 \beta^{uu}_{tp}: \qquad \sum_{tp}^{T-1} \beta_{tp}^{uu} 
@@ -422,7 +426,7 @@ Steps for rearranging and converting the constraint (\ref{full-adp-equation}) in
 
 Let's say $E[V]$ is the addition of all parts above. Then the ADP model converted to expectation would look as follows:
 \begin{equation}
-	\max_{\vec{\beta}} \Big( \sum \beta^{0} + \sum \beta^{ue} E[ue] + \sum \beta^{uu} E[uu] + \sum \beta^{uv} E[uv] 
+	\max_{\vec{\beta}} \Big( \sum \beta^{0} + \sum \beta^{ue} E[ue] + \sum \beta^{uu} E[uu]
 		+ \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps] \Big)
 \end{equation}
 Subject to:
@@ -444,7 +448,7 @@ Subject To:
 		&&	\sum_{\vec{S}\vec{A}}\vec{w} (1 - \gamma) = 1 \\
 	& \beta^{ue}: 
 		&& 	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ue_{1p} - 
-			\gamma (uen_{p} + ue_{1p} - \hat{uu}_{1p}) \Big) \ge E[ue_{tp}]
+			\gamma (uen_{p} + ue_{1p} - \hat{uu}_{1p} + uv_{1p}) \Big) \ge E[ue_{tp}]
 		&&	\forall p \\
 	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ue_{tp} - 
 			\gamma (uen_{p}) \Big) \ge E[ue_{tp}] 
@@ -517,7 +521,7 @@ Once $\vec{\beta}$ values have been approximated, you may use the model below to
 	&	v(S') = \Bigg( 
 		&& 	\beta^0 + 
 			\bigg( \sum_{p} \beta_{1p}^{ue} 
-				(uen_{d} + ue_{1p} - \hat{uu}_{1p}) \bigg)+
+				(uen_{d} + ue_{1p} - \hat{uu}_{1p} + uv_{1p}) \bigg)+
 			\bigg( \sum_{t=2,p}^{T} \beta_{tp}^{ue} uen_{d} \bigg)+ \\
 	&	&& 	\bigg( \sum_{tp}^{T-1} \beta_{tp}^{uu} 
 				( \hat{uu}_{t+1,p} + \sum_{mdc} E[pst_{tmdc}] (U_{pd+1c} - U_{pdc})) \bigg) + \\

@@ -39,8 +39,8 @@ def generate_sub_model(input_data, betas, phase1 = False):
     # UE, UU
     for tp in itertools.product(indices['t'], indices['p']):
         ppe_upper_bounds = ppe_data[tp[1]].expected_units + ppe_data[tp[1]].deviation[1]
-        var_ue[tp] = sub_model.addVar(name=f's_ue_{tp}', ub=ppe_upper_bounds, vtype=GRB.CONTINUOUS)
-        var_uu[tp] = sub_model.addVar(name=f's_uu_{tp}', ub=ppe_upper_bounds*2, vtype=GRB.CONTINUOUS)
+        var_ue[tp] = sub_model.addVar(name=f's_ue_{tp}', ub=4*ppe_upper_bounds, vtype=GRB.CONTINUOUS)
+        var_uu[tp] = sub_model.addVar(name=f's_uu_{tp}', ub=4*ppe_upper_bounds, vtype=GRB.CONTINUOUS)
     # PW
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=4*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
@@ -57,8 +57,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
         var_rsc[ttpmdc] = sub_model.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
     # UV
     for tp in itertools.product(indices['t'], indices['p']):
-        ppe_upper_bounds = ppe_data[tp[1]].expected_units + ppe_data[tp[1]].deviation[1]
-        var_uv[tp] = sub_model.addVar(name=f'a_uv_{tp}', ub=ppe_upper_bounds, vtype=GRB.CONTINUOUS)
+        var_uv[tp] = sub_model.addVar(name=f'a_uv_{tp}', vtype=GRB.CONTINUOUS)
     # UU Hat
     for tp in itertools.product(indices['t'], indices['p']):
         var_uu_p[tp] = sub_model.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
@@ -120,8 +119,8 @@ def generate_sub_model(input_data, betas, phase1 = False):
             sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
             sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
+        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 4) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -153,14 +152,24 @@ def generate_sub_model(input_data, betas, phase1 = False):
             expr.addTerms(model_param.cw**indices['m'][-1], var.a_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return(expr)
+    def pref_earlier_appointment(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+        
+        # Prefer Earlier Appointments
+        for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+            expr.addTerms(
+                model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M,
+                var.a_sc[tmdc]
+            )
+        return(expr)
     def reschedule_cost(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(model_param.cc, var.a_rsc[ttpmdc])
+                expr.addTerms(model_param.cc+model_param.cw, var.a_rsc[ttpmdc])
             elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-model_param.cc, var.a_rsc[ttpmdc])
+                expr.addTerms(-(model_param.cc-model_param.cw), var.a_rsc[ttpmdc])
 
         return(expr)
     def goal_violation_cost(var: variables, betas) -> gp.LinExpr:
@@ -180,12 +189,13 @@ def generate_sub_model(input_data, betas, phase1 = False):
         expr = gp.LinExpr()
         
         for tp in itertools.product(indices['t'], indices['p']):
-            # When t is 0
+            # When t is 1
             if tp[0] == 1:
                 expr.addTerms(betas['ue'][tp], var.s_ue[tp])
                 expr.addConstant(-gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
                 expr.addTerms(-gamma * betas['ue'][tp], var.s_ue[tp])
                 expr.addTerms(gamma * betas['ue'][tp], var.a_uu_p[tp])
+                expr.addTerms(-gamma * betas['ue'][tp], var.a_uv[tp])
 
             # All other
             else:
@@ -216,7 +226,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
 
                         # Otherwise
                         else:
-                            transition_prob = transition[(mc[0], d, mc[1])]
+                            transition_prob = transition[(mc[0], indices['d'][d], mc[1])]
                             usage_change = usage[(tp[1], indices['d'][d+1], mc[1])] - usage[(tp[1], indices['d'][d], mc[1])]
                             coeff = betas['uu'][tp] * gamma * transition_prob * usage_change
                             expr.addTerms( -coeff, var.a_ps_p[ (tp[0]+1, mc[0], indices['d'][d], mc[1]) ] )
@@ -331,9 +341,10 @@ def generate_sub_model(input_data, betas, phase1 = False):
     # Generates Objective Function
         # Cost
     wait_cost_expr = wait_cost(sub_vars, betas)
+    pref_early = pref_earlier_appointment(sub_vars, betas)
     rescheduling_cost_expr = reschedule_cost(sub_vars, betas)
     goal_vio_cost_expr = goal_violation_cost(sub_vars, betas)
-    cost_expr = gp.LinExpr(wait_cost_expr + rescheduling_cost_expr + goal_vio_cost_expr)
+    cost_expr = gp.LinExpr(wait_cost_expr + pref_early + rescheduling_cost_expr + goal_vio_cost_expr)
     
         # Value
     b0_expr = b0_cost(sub_vars, betas)
@@ -364,19 +375,19 @@ def generate_state_action(var: variables) -> Tuple[state, action]:
         
     s_pw = {}
     for key, value in var.s_pw.items():
-        s_pw[key] = value.x
+        s_pw[key] = int(value.x)
     
     s_ps = {}
     for key, value in var.s_ps.items():
-        s_ps[key] = value.x
+        s_ps[key] = int(value.x)
     
     a_sc = {}
     for key, value in var.a_sc.items():
-        a_sc[key] = value.x
+        a_sc[key] = int(value.x)
 
     a_rsc = {}
     for key, value in var.a_rsc.items():
-        a_rsc[key] = value.x
+        a_rsc[key] = int(value.x)
 
     a_uv = {}
     for key, value in var.a_uv.items():
@@ -388,11 +399,11 @@ def generate_state_action(var: variables) -> Tuple[state, action]:
 
     a_pw_p = {}
     for key, value in var.a_pw_p.items():
-        a_pw_p[key] = value.x
+        a_pw_p[key] = int(value.x)
 
     a_ps_p = {}
     for key, value in var.a_ps_p.items():
-        a_ps_p[key] = value.x
+        a_ps_p[key] = int(value.x)
 
     # Returns
     st = state(s_ue, s_uu, s_pw, s_ps)
