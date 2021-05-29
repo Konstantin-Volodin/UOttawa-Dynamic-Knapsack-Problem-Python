@@ -97,4 +97,9 @@ Meeting with Antoine - 2021/04/30
 Meeting with Wojtek and Antoine - 2021/05/07
 	transition state - instead of the post-transition state
 	non-carry over resource - rename it to perishable resource
+
+
+look into deviation - why did it make it work ?????
+	- why making a small change makes the model works??
+	- sensitivity analysis with low deviation
 	

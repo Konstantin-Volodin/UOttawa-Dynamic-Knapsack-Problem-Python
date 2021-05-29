@@ -75,14 +75,14 @@ def cost_function(input_data: input_data_class, state: state, action: action):
 
     # Prefer Earlier Appointments
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        cost += model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
+        cost += model_param.cs**tmdc[0] * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
 
     # Cost of Rescheduling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] > ttpmdc[1]: #good schedule
-            cost -= (model_param.cc-model_param.cw) * action.rsc_ttpmdc[ttpmdc]
+            cost -= (0.5*model_param.cc) * action.rsc_ttpmdc[ttpmdc]
         elif ttpmdc[1] > ttpmdc[0]: #bad schedule
-            cost += (model_param.cc+model_param.cw) * action.rsc_ttpmdc[ttpmdc]
+            cost += (1.5*model_param.cc) * action.rsc_ttpmdc[ttpmdc]
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):

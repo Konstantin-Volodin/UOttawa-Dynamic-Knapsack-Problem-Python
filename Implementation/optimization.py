@@ -2,17 +2,9 @@
 from Modules.data_import import *
 from Modules.data_export import *
 from Modules.master_model import *
-from Modules.sub_problem import *
-from Modules.decorators import timer
-import os.path
-import time
-
-my_path = os.path.dirname(__file__)
-input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
-    
+from Modules.sub_problem import *    
 
 # %% Generate Initial Feasible Set (Phase 1)
-@timer
 def generate_feasible_sa_list(input_data, init_state_actions):
     state_action_list = init_state_actions
     
@@ -55,13 +47,7 @@ def generate_feasible_sa_list(input_data, init_state_actions):
 
     return(state_action_list)
 
-init_state, init_action = generate_initial_state_action(input_data)
-state_action_list = [(init_state, init_action)]
-feasible_list = generate_feasible_sa_list(input_data, state_action_list)
-
-
 # %% Solve the problem (Phase 2)
-@timer
 def generate_optimal_sa_list(input_data, init_state_actions):
 
     # Initializes
@@ -125,12 +111,6 @@ def trim_sa_list(input_data, init_state_actions, variables):
     print(f'Trimmed SA List - removed {final_len - initial_len}')
 
     return(state_action_list, mast_model, mast_var, mast_const)
-optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list)
-mast_model, mast_var, mast_const = generate_master_model(input_data, optimal_list)
-
-export_betas(betas, os.path.join(my_path, 'Data', 'Optimal-Betas.xlsx'))
-
-
 
 
 # %% Misc Code

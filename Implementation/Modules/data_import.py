@@ -96,7 +96,8 @@ def read_data(data_file_path):
         model_param_sheet.cell(row=2, column=1).value,
         model_param_sheet.cell(row=2, column=2).value,
         model_param_sheet.cell(row=2, column=3).value,
-        model_param_sheet.cell(row=2, column=4).value
+        model_param_sheet.cell(row=2, column=4).value,
+        model_param_sheet.cell(row=2, column=5).value
     )
 
     # Expected Data

@@ -157,19 +157,16 @@ def generate_sub_model(input_data, betas, phase1 = False):
         
         # Prefer Earlier Appointments
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(
-                model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M,
-                var.a_sc[tmdc]
-            )
+            expr.addTerms(model_param.cs**tmdc[0], var.a_sc[tmdc])
         return(expr)
     def reschedule_cost(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(model_param.cc+model_param.cw, var.a_rsc[ttpmdc])
+                expr.addTerms(1.5*model_param.cc, var.a_rsc[ttpmdc])
             elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-(model_param.cc-model_param.cw), var.a_rsc[ttpmdc])
+                expr.addTerms(-(0.5*model_param.cc), var.a_rsc[ttpmdc])
 
         return(expr)
     def goal_violation_cost(var: variables, betas) -> gp.LinExpr:

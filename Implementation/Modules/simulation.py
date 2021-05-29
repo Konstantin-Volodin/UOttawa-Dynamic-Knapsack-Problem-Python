@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, Tuple, List, Callable
 from Modules.data_classes import state, action, variables
 
+from multiprocessing import Pool
 from tqdm import tqdm, trange
 from copy import deepcopy
 import itertools
@@ -764,23 +765,24 @@ def non_zero_action(action: action):
     for key,value in action.ps_p_tmdc.items(): 
         if value >= 0.1: print(f'\tPatients Scheduled - Post Decision - {key} - {value}')
 
-
 def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs): 
 
     full_data = []
     cost_data = []
+    discounted_total_cost = []
     curr_state = initial_state(input_data)
         
     for repl in range(replication):
         print(f'Replication {repl+1} / {replication}')
         repl_data = []
         cost_repl_data = []
+        discounted_total_cost.append(0)
 
         # Initializes State
         initial_state_val = deepcopy(curr_state)    
 
-        for day in range(days):
-            print(f'Day - {day+1}')
+        for day in trange(days):
+            # print(f'Day - {day+1}')
 
             # Saves Initial State Data
             if day >= warm_up:
@@ -789,6 +791,7 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
             # print('Initial State')
             # non_zero_state(initial_state_val)
             # Generate Action & Executes an Action
+            
             new_action = None
             if day < warm_up:
                 new_action = myopic_policy(input_data, initial_state_val)
@@ -805,6 +808,7 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
             cost = state_action_cost(input_data, initial_state_val, new_action)
             if day >= warm_up:
                 cost_repl_data.append(cost)
+                discounted_total_cost[repl] = discounted_total_cost[repl]*input_data.model_param.gamma + cost
             # print(f'Cost: {cost}')
 
             # Executes Transition
@@ -814,7 +818,7 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
         full_data.append(repl_data)
         cost_data.append(cost_repl_data)
     
-    return(cost_data, full_data)
+    return(cost_data, discounted_total_cost, full_data)
 def generate_expected_values(input_data, repl, days, warmup):
     cost_data, sim_data = simulation(input_data, repl, days, warmup, myopic_policy)
 

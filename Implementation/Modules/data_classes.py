@@ -9,10 +9,11 @@ class ppe_data_class:
     expected_units: int
     deviation: List[int]
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class model_param_class:
     cw: float
     cc: float
+    cs: float
     M: float
     gamma: float
 @dataclass()
