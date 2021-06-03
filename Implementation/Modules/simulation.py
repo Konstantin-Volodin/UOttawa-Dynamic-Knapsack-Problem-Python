@@ -773,7 +773,7 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
     curr_state = initial_state(input_data)
         
     for repl in range(replication):
-        print(f'Replication {repl+1} / {replication}')
+        # print(f'Replication {repl+1} / {replication}')
         repl_data = []
         cost_repl_data = []
         discounted_total_cost.append(0)
@@ -781,7 +781,7 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
         # Initializes State
         initial_state_val = deepcopy(curr_state)    
 
-        for day in trange(days):
+        for day in range(days):
             # print(f'Day - {day+1}')
 
             # Saves Initial State Data
