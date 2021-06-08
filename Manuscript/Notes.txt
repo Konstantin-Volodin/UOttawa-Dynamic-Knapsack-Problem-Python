@@ -102,4 +102,9 @@ Meeting with Wojtek and Antoine - 2021/05/07
 look into deviation - why did it make it work ?????
 	- why making a small change makes the model works??
 	- sensitivity analysis with low deviation
+
+- remove good scheduleds
+- make rescheduling cost prohibitively high
+	- see what happens
+
 	

@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 my_path = os.path.dirname(__file__)
 input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
 
-# # %% Optimization
+# %% Optimization
 # No need to do an expected state simulation, 
 # because setting values to extremes gives same results
 
@@ -21,48 +21,48 @@ input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
 #             input_data.model_param.cs = cs_p
 #             input_data.model_param.cc = cc_p
 
-#             # Phase 1
-#             init_state, init_action = generate_initial_state_action(input_data)
-#             state_action_list = [(init_state, init_action)]
-#             feasible_list = generate_feasible_sa_list(input_data, state_action_list)
+# Phase 1
+init_state, init_action = generate_initial_state_action(input_data)
+state_action_list = [(init_state, init_action)]
+feasible_list = generate_feasible_sa_list(input_data, state_action_list)
 
-#             # Phase 2
-#             optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list)
-#             export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-nv-cw{cw_p}-cs{cs_p}-cc{cc_p}.xlsx'))
+# Phase 2
+optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list)
+export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-nv.xlsx'))
             
 
 
 # %% Compare Policies
 # # Import betas
-fig, axes = plt.subplots(27, 1)
-fig.set_size_inches(10, 27*7)
-# fig.subplots_adjust(top = 1.5)
+# fig, axes = plt.subplots(1, 1)
+# # fig.set_size_inches()
+# # fig.subplots_adjust(top = 1.5)
 
-counter = 0
-for cw_p in [1, 1.25, 1.5]:
-    for cs_p in [1, 1.25, 1.5]:
-        for cc_p in [1, 50, 500]: 
+# # counter = 0
+# # for cw_p in [1, 1.25, 1.5]:
+# #     for cs_p in [1, 1.25, 1.5]:
+# #         for cc_p in [1, 50, 500]: 
             
-            input_data.model_param.cw = cw_p
-            input_data.model_param.cs = cs_p
-            input_data.model_param.cc = cc_p
+#             # input_data.model_param.cw = cw_p
+#             # input_data.model_param.cs = cs_p
+#             # input_data.model_param.cc = cc_p
 
-            betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-nv-cw{cw_p}-cs{cs_p}-cc{cc_p}.xlsx'))
+betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-nv.xlsx'))
 
-            # Compare Policies
-            print(f'COSTS: cw - {cw_p}, cs - {cs_p}, cc - {cc_p}')
-            compare_policies(input_data, betas, 5, 2000, 1000, axes[counter])
+#             # Compare Policies
+#             # print(f'COSTS: cw - {cw_p}, cs - {cs_p}, cc - {cc_p}')
+# compare_policies(input_data, betas, 5, 2000, 1000, axes)
 
-            # Plotting
-            axes[counter].set_title(f'COSTS: cw - {cw_p}, cs - {cs_p}, cc - {cc_p}')
-            counter += 1
-plt.savefig('sim_res.pdf')  
+#             # Plotting
+#             # axes.set_title(f'COSTS: cw - {cw_p}, cs - {cs_p}, cc - {cc_p}')
+#             # counter += 1
+# plt.savefig('sim_res_single.pdf')  
 
 
 
 # # %% Test out policies
 
-# test_out_policy(input_data, 10, mdp_policy, "MDP", betas)
+test_out_policy(input_data, 10, myopic_policy, "Myopic")
 # # for cw_p in [1, 1.25, 1.5]:
 # #     for cs_p in [1, 1.25, 1.5]:
 # #         for cc_p in [1, 25, 50]:
@@ -75,3 +75,5 @@ plt.savefig('sim_res.pdf')
 #             # fig.add_subplot()
 
 # # %%
+
+# %%
