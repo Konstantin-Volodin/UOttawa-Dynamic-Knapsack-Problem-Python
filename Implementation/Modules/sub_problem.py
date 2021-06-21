@@ -115,10 +115,10 @@ def generate_sub_model(input_data, betas, phase1 = False):
 
     # 3) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] == ttpmdc[1]:
-            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # if ttpmdc[0] == ttpmdc[1]:
+        sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+            # sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
         #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 

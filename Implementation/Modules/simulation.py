@@ -107,7 +107,7 @@ def state_action_cost(input_data, state, action) -> float:
 
     # Cost of Later Schedulings
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        cost += (model_param.cw**tmdc[1] * tmdc[0] * 1/M) * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
+        cost += (model_param.cs**tmdc[0]) * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
 
     # Cost of Cancelling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
@@ -120,7 +120,7 @@ def state_action_cost(input_data, state, action) -> float:
     for tp in itertools.product(indices['t'], indices['p']):
         cost += action.uv_tp[tp] * M
 
-    return(cost)
+    return cost
 # Executes Transition to next state
 def execute_transition(input_data, state, action) -> state:
 
@@ -288,10 +288,10 @@ def myopic_policy(input_data, state) -> action:
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] == ttpmdc[1]:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # if ttpmdc[0] == ttpmdc[1]:
+        myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+        #     myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
         #     myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
@@ -477,10 +477,10 @@ def mdp_policy(input_data, state, betas) -> action:
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] == ttpmdc[1]:
-            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # if ttpmdc[0] == ttpmdc[1]:
+        MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+            # MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
         #     MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
@@ -772,7 +772,7 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
     discounted_total_cost = []
     curr_state = initial_state(input_data)
         
-    for repl in range(replication):
+    for repl in trange(replication):
         # print(f'Replication {repl+1} / {replication}')
         repl_data = []
         cost_repl_data = []

@@ -40,6 +40,9 @@ def compare_policies(input_data, betas, repls, days, warm_up, axes):
     print(f"Myopic Discounted Cost - {np.average(myopic_disc_c)}")
     print(f"MDP Discounted Cost - {np.average(mdp_disc_c)}")
 
+    res = {'myopic': np.average(myopic_disc_c), 'mdp': np.average(mdp_disc_c)}
+    return res
+
 # %% Writing Out Things
 def non_zero_state(state: state):
     for key,value in state.ue_tp.items():
@@ -62,7 +65,7 @@ def non_zero_action(action: action):
         if value >= 0.1: print(f'\ttPatients Waiting - Post Decision - {key} - {value}')
     for key,value in action.ps_p_tmdc.items(): 
         if value >= 0.1: print(f'\tPatients Scheduled - Post Decision - {key} - {value}')
-def test_out_policy(input_data, duration, policy, policy_name, betas):
+def test_out_policy(input_data, duration, policy, policy_name, betas = False):
 
     curr_state = initial_state(input_data)
 

@@ -107,4 +107,22 @@ look into deviation - why did it make it work ?????
 - make rescheduling cost prohibitively high
 	- see what happens
 
-	
+
+Antoine's Comments on mathematical model:
+	- Assumption number 2 - first point there is a penalty
+	- Bad reschedules - from period 1 to any period
+	- expected units state
+		- is it a state or a parameter input
+		- 
+	- we can remove ue and uu
+		- and change uv to left over and violation
+		- and change it to left over in order to keep any left over information
+	- make uv only incur cost on day 1 
+		- if we do that, it would allow people to be scheduled however the model wants without considering the violation
+	- for custom bounds on reschedules change t=t' to t = t' = 1
+	- pw bound change last T to something higher
+	- units left over bound is twice - try that or maybe increase it higher later
+- TODO:
+	- implement the changes that we discussed
+	- try it out 
+	- and look for bugs
