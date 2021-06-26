@@ -1,0 +1,534 @@
+%%%~~~~~~~~~~~~~~~~~ Preamble ~~~~~~~~~~~~~~~~~~~~~~
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+
+\usepackage{xcolor, hyperref}
+\hypersetup{
+    colorlinks,
+    linkcolor={red!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\usepackage{geometry}
+\geometry{margin=0.65in}
+\setlength\parindent{0pt}
+
+\title{Dynamic Knapsack Problem}
+\author{AS, WM, KV}
+\date{\today}
+
+\allowdisplaybreaks
+
+%%%~~~~~~~~~~~~~~~~~ Document ~~~~~~~~~~~~~~~~~~~~~~
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+
+\section{Questions/Comments}
+
+\subsection{Questions}
+\begin{itemize}
+	\item Should $ul$ definition include units violated?? it seems a constraint might be violated otherwise
+\end{itemize}
+
+\subsection{Comments}
+\begin{itemize}
+	\item
+\end{itemize}
+
+
+\section{Assumptions} 
+\begin{itemize}
+	\item Assume all new patients are arriving at the beginning of the period 
+	\begin{itemize}
+		\item Assume arrivals follow poisson distribution
+	\end{itemize}		
+	
+	\item It is assumed that patients do not change complexities within some limit ($TL$). 
+	\begin{itemize}
+		\item Let's assume our limit is 10 periods, patients will never change complexities within the 10 periods.  
+		\item However, if a patient waits for 11 periods there is a possibility they increase complexity
+	\end{itemize}		
+	
+	\item We assume patient complexity transitions follow binary distribution - each period a patient can become more complex with a certain probability
+	\begin{itemize}
+		\item While patient is waiting less that $TL$, the transition probability is 0.
+		\item After $TL$, transition probability is some arbitrary value
+	\end{itemize}
+	
+	\item It is assumed if a patient is scheduled in period one, it means they are served "immediately", regardless if in practice the appointment is at the beginning or end of the period.
+	\item We distinguish between two types of reschedules: good and bad reschedules
+	\begin{itemize}
+		\item Good reschedules are reschedules where a patient is rescheduled to an earlier period
+		\item Bad reschedules are reschedules where a patient is rescheduled to a later period
+	\end{itemize}
+
+	\item We assume that only specific reschedules are allowed (to simplify the model, and remove  redundancies)
+	\begin{itemize}
+		\item Good reschedules are allowed from any period after 2 into period 1
+		\item Bad reschedules are only allowed from period 1 to any period after 2
+	\end{itemize}
+	
+	\item It is assumed that there is a certain default expected number of PPE units available for all periods
+	\begin{itemize}
+		\item However, in the period 1, there is some random deviation from the expected number of units
+		\item This random deviation follows some uniform distribution
+	\end{itemize}
+	\item We allow some violation of PPE units, in rare cases (with high cost), in order to accomodate changes due to variability.
+	\begin{itemize}
+		\item If we have violation of PPE units - the extra capacity comes from external source
+	\end{itemize}
+\end{itemize}
+
+
+\section{MDP Model}
+\subsection{Decision Epochs}
+Decisions are made at the beginning of each time period. There are 3 relevant time intervals to look at:
+\begin{itemize}
+	\item Pre-decision state ($S$)
+	\begin{itemize}
+		\item Pre-decision state defines the initial state on which a decision is required
+		\item This information drives decision making
+	\end{itemize}
+
+	\item Post-decision state ($\hat{S}$)
+	\begin{itemize}
+		\item Post-decision state is the time when the decision has been executed, but no new info came in
+		\item This state defines the immediate cost of an action
+	\end{itemize} 
+
+	\item Post-transition state ($S'$)
+	\begin{itemize}
+		\item This is the state when new information has come in (transition randomness). Defines next pre decision state
+		\item It is primarily used to generate expectation for the ADP
+	\end{itemize}
+\end{itemize}
+
+\subsection{State Space}
+\subsubsection{Description}
+State is defined by current available and used resources, patient waitlist/demand, and patients already scheduled
+\[  \vec{S}  = (\vec{ul}, \vec{pw}, \vec{ps}) \]
+\begin{itemize}
+	\item $\vec{ul} = ul_{p}$ - Units left over from previous period for resource $p$ plus deviation for that unit for period 1
+    \item $\vec{pw} = pw_{mdc}$ - Patients of complexity $d$, CPU $c$, on a wait list for $m$ periods ($m$ of 0 - just arrived)
+    \item $\vec{ps} = ps_{tmdc}$ - Patients of complexity $d$, CPU $c$, scheduled to period $t$, waiting for $m$ periods ($m$ of 0 - just arrived)
+\end{itemize}
+
+\subsection{Action Sets}
+\subsubsection{Description}
+Decision consists of rescheduling currently scheduled patients, and scheduling patients on waitlist. There are also some goal and auxiliary variables
+\[  \vec{A} = (\vec{sc}, \vec{rsc}, \vec{uv}, \text{auxiliary variables}) \] 
+\begin{itemize}
+    	\item $\vec{sc} = sc_{tmdc}$ - Patients of complexity $d$, CPU $c$, waiting for $m$ periods, to schedule in period $t$
+	\item $\vec{rsc} = rsc_{tt'mdc}$ -Patients of complexity $d$, CPU $c$, waiting for $m$ periods, to reschedule from period $t$ to period $t'$
+	\item $\vec{uv} = uv_{tp}$ - goal variable, violation on number of resources used for period $t$, of resource $p$
+\end{itemize}
+
+\subsubsection{Auxiliary Variables}
+\begin{itemize}
+	\item $uvb_{tp}$ - binary variable to enforce $uv$ variable without objective function
+	\item $\hat{ul}_{p}$ - post-decision unit leftover at period 1
+	\item $ulb_{p}$ - binary variable to enforce $ul$ variable without objective function
+	\item $\hat{uu}_{tp}$ - post-decision units used
+	\item $\hat{pw}_{mdc}$ - post-decision patients waiting
+	\item $\hat{ps}_{tmdc}$ - post-decision patients scheduled
+\end{itemize}
+\subsubsection{Auxiliary Variable Definition}
+\label{auxiliary constraints}
+\begin{alignat}{10}
+	& \hat{uu}_{tp} 
+		&& =  \sum_{mdc} U_{pdc} \hat{ps}_{tmdc} \quad
+		&& \forall tp \\ 
+	& \hat{pw}_{mdc} 
+		&& = pw_{mdc} - \sum_{t} sc_{tmdc} \quad 
+		&& \forall mdc \\ 
+	& \hat{ps}_{tmdc} 
+		&& = ps_{tmdc} + sc_{tmdc} + 
+			\sum_{t} rsc_{tt'mdc} - \sum_{t'} rsc_{tt'mdc} \quad 
+		&& \forall tmdc
+\end{alignat}
+
+\begin{itemize}
+
+	\item Define Resource Violation Variable
+	\begin{alignat}{10}
+			& \hat{uv}_{tp} 
+				&& \le  M(uvb_{tp}) \quad
+				&& \forall tp \\
+			& \hat{uv}_{1p} 
+				&& \le  (\hat{uu}_{1p} - uen_{1p} - ul_{p}) + M(1-uvb_{tp}) \quad
+				&& \forall p \\
+			& \hat{uv}_{tp} 
+				&& \le  (\hat{uu}_{tp} - uen_{tp}) + M(1-uvb_{tp}) \quad
+				&& \forall t \in \{ 2..T \} p \\
+	\end{alignat}
+	
+	\item Define Units Left Over Variable
+	\begin{alignat}{10}
+			& \hat{ul}_{p} 
+				&& \ge 0 \quad 
+				&& \forall p \\
+			& \hat{ul}_{p} 
+				&& \ge uen_{1p} + ul_{p} - \hat{uu}_{1p} \quad 
+				&& \forall p \\
+			& \hat{ul}_{p} 
+				&& \le M (ulb_{p}) \quad 
+				&& \forall p \\
+			& \hat{ul}_{p} 
+				&& \le (uen_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad 
+				&& \forall p
+	\end{alignat}
+\end{itemize}
+
+\subsubsection{State-Action Constraints}
+\label{state-action constraints}
+\begin{itemize}
+
+	\item Resource Usage Constraint
+	\begin{alignat}{10}
+			& \hat{uu}_{1p} 
+			&& \le uen_{1p} + ul_{p} + uv_{1p} \quad 
+			&& \forall p \\
+		& \hat{uu}_{tp} 
+			&& \le uen_{tp} + uv_{tp} \quad
+			&& \forall t \in \{ 2..T \}p 
+	\end{alignat}
+	
+	\item Custom bounds on when reschedules are allowed
+	\begin{alignat}{10}
+		& rsc_{tt'mdc} && = 0 \quad && \forall t \in \{ 2...T \}, t' \in \{2...T\} mdc \\
+		% & rsc_{tt'mdc} && = 0 \quad && \forall t \in \{ 1 \}, t'\in \{ 3...T \} mdc  \\
+		& rsc_{tt'mdc} && = 0 \quad && \forall tt'mdc, \text{where } t=t'=1 
+	\end{alignat}  
+	
+	\item Bounds on Schedules/Reschedules
+	\begin{alignat}{10}
+		& \sum_{t'} rsc_{tt'mdc} 	&& \le ps_{tmdc} \quad  && \forall tmdc  \\
+		& \sum_{t} sc_{tmdc} 		&& \le pw_{mdc} \quad 	&& \forall mdc 
+	\end{alignat}  
+	
+	\item Bounds on states
+	\begin{alignat}{10}
+		& ul_{p} 	&& \le uen_{p} * 3 \quad 	&& \forall p \\
+		& pw_{mdc} 	&& \le pea_{dc} * 20 \quad 			&& \forall mdc \\
+		& ps_{tmdc} && \le pea_{dc} * 4 \quad 			&& \forall tmdc
+	\end{alignat}
+\end{itemize}
+
+\subsection{Transition Probabilities}
+
+\subsubsection{Uncertainty Sources}
+\begin{enumerate}
+    	
+	\item Number of patients arriving this period - $pw_{0dc}$
+		\begin{itemize}
+			\item $pea_{dc}$ - represents the random number of patients arriving. Follows a poisson distribution.
+		\end{itemize}
+	
+	\item Transition between patient complexities within the wait list - $pw_{m>=1,dc}$
+		\begin{itemize}
+			\item $pwt_{mdc}$ represents the random number of patients of complexity $d$, CPU $c$, waiting for $m$ period, who became more complex. Follows binomial distribution.
+			\item $ptp_{mdc}$ represents transition probability to a higher complexity
+		\end{itemize}
+		
+	\item Transition between patient complexities within the scheduled list - $ps_{tmdc}$
+		\begin{itemize}
+			\item $pst_{tmdc}$ represents the random number of patients of complexity $d$, CPU $c$, waiting for $m$ period, scheduled into $t$ period, who became more complex. Follows binomial distribution.
+		\end{itemize}
+
+	\item Amout of expected units of PPE resource for the next time period - $ue_{1p}$
+		\begin{itemize}
+			\item $ued_{p}$ represents the random deviation of resource $p$ from the expectation. Follows uniform distribution.
+			\item $uen_{p}$ expected units of resource $p$ per period
+		\end{itemize}
+\end{enumerate}
+
+\subsubsection{Transition Constraints}
+
+\begin{enumerate}
+	\item Transition from $\vec{ue}$ to $\vec{ue'}$ - Resource Carry Over
+	\begin{alignat}{10}
+		& ul'_{p} 
+			&& = \hat{ul}_{p} + ued_{p} \quad 
+			&& \forall p
+	\end{alignat} 
+
+	
+	\item Transition from $\vec{pw}$ to $\vec{pw'}$ - Flow of patients on waitlist
+		\begin{alignat}{10}
+			& pw'_{0dc} 
+				&& = pea_{dc} \quad
+				&& \forall dc \\  
+			& pw'_{mdc} 
+				&& = \hat{pw}_{m-1,dc} + 
+				\overbrace{pwt_{m-1,d-1,c} - pwt_{m-1,dc}}^\text{
+					change in complexities} \quad
+				&& \forall m \in \{ 1...M-1 \} dc \\  
+			& pw'_{Mdc} 
+				&& = \sum_{M-1}^{M} \big( 
+					\hat{pw}_{mdc} + 
+					\overbrace{pwt_{md-1,c} - pwt_{mdc}}^\text{
+						change in complexities} \big) \quad
+				&& \forall dc
+		\end{alignat}
+
+
+	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patiensts scheduled
+		\begin{alignat}{10}
+			& ps'_{t0dc} 
+				&& = 0 \quad
+				&& \forall tdc \\  
+			& ps'_{Tmdc} 
+				&& = 0 \quad
+				&& \forall mdc \\  
+			& ps'_{tmdc} 
+				&& = \hat{ps}_{t+1,m-1,dc} + 
+				\overbrace{pst_{t+1,m-1,d-1,c} - pst_{t+1,m-1,dc}}^\text{
+					change in complexities} \quad
+				&& \forall t \in \{1...T-1\} m \in \{ 1...M-1 \} dc \\  
+			& ps'_{tMdc} 
+				&& = \sum_{M-1}^{M} \big( 
+				\hat{ps}_{t+1mdc} + 
+				\overbrace{pst_{t+1,md-1,c} - pst_{t+1,mdc}}^\text{
+					change in complexities} \big) \quad
+				&& \forall t \in \{1...T-1\} dc
+		\end{alignat}
+\end{enumerate}
+    
+\subsection{Costs}
+Cost will come from 4 sources:  
+\begin{itemize} 
+	\item waiting ($cw$)
+	\item rescheduling ($cc$)
+	\item scheduling ($cs$)
+	\item resource violation ($M$)
+\end{itemize}
+
+\begin{equation}\begin{alignedat}{10}
+	& C = c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) = 
+		&& 
+			\overbrace{ \sum_{mdc} cw^{m} (\hat{pw}_{mdc}) }^\text{
+				cost of waiting}  + 
+			\overbrace{ \sum_{tmdc} cw^{M} (\hat{ps}_{tMdc})}^\text{
+				prevent infinite reschedules} + \\
+	&	&&	+
+				\overbrace{
+					\sum_{tmdc} cs^{t} (sc_{tmdc})
+				}^\text{Prefer earlier appointments} \\ 
+	&	&&  +
+			\overbrace{
+				(1.5cc) \sum_{
+				\substack{tt`mdc \\ t' > t}} 
+				rsc_{tt'mdc}}^\text{Bad Reschedule} - 
+			\overbrace{ 
+				(0.5cc) \sum_{
+				\substack{tt`mdc \\ t' < t}}
+				rsc_{tt'mdc}}^\text{Good Reschedule} + 
+			M \sum_{tp} uv_{tp}
+\end{alignedat}\end{equation}
+
+\section{LP Model}
+
+\subsection{Full LP} 
+Given a full MDP model, the equivalent LP would look as follows:
+\begin{equation}
+	\max_{\vec{v}} \sum \alpha (\vec{S}) v(\vec{S}) 
+\end{equation}
+
+subject to
+\begin{equation}
+	c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) v( \vec{S'} | \vec{S}, \vec{A}, \vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) \ge v(\vec{S}) \quad \forall \vec{S} \vec{A}
+\end{equation}
+
+\section{Aproximate Dynamic Programming Model}
+\subsection{Full ADP Model}
+Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximation as follows:
+\begin{equation}\begin{alignedat}{10}
+	& v(\vec{ul}, \vec{pw}, \vec{ps}) 
+		&& =  \beta^0 + \sum_{p} \beta_{p}^{ul} ul_{p} +
+			\sum_{mdc} \beta_{mdc}^{pw} pw_{mdc}  + 
+			\sum_{tmdc} \beta_{tmdc}^{ps} ps_{tmdc}
+\end{alignedat} \end{equation}
+
+This gives the following LP
+\begin{equation}
+	\max_{\vec{\beta}} \sum \alpha (\vec{ul}, \vec{pw}, \vec{ps}) v(\vec{ul}, \vec{pw}, \vec{ps})
+\end{equation}
+Subject to:
+\begin{equation}\begin{alignedat}{10}
+\label{full-adp-equation}
+	& c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p \Bigg( 
+		\beta^0 +
+		\bigg( \beta^{ul}_{p} (\hat{ul}_{p} + uen_{d}) \bigg) + \\  
+	& 	\bigg( \sum_{dc} \beta_{0dc}^{pw} pea_{dc} \bigg) +
+		\bigg( \sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} 
+			(\hat{pw}_{m-1dc} + pwt_{m-1d-1c} - pwt_{m-1dc}) \bigg) + \\
+	&	\qquad \qquad \bigg( \sum_{dc} \beta_{Mdc}^{pw} 
+			(\sum_{M-1}^{M} \hat{pw}_{mdc} + pwt_{md-1c} - pwt_{mdc})\bigg) + \\
+	& 	\bigg( \sum_{tdc} \beta_{t0dc}^{ps} 0 \bigg) +
+		\bigg( \sum_{mdc} \beta_{Tmdc}^{ps} 0 \bigg) +
+		\bigg( \sum_{t=1m=1dc}^{T-1M-1} \beta_{tmdc}^{ps} 
+			(\hat{ps}_{t+1m-1dc} + pst_{t+1m-1d-1c} - pst_{t+1m-1dc}) \bigg) + \\	
+	&	\bigg( \sum_{t=1Mdc}^{T-1} \beta_{tmdc}^{ps} 
+			(\sum_{M-1}^{M} (\hat{ps}_{t+1mdc} + pst_{t+1md-1c} - pst_{t+1mdc})) \bigg)
+	\Bigg) \ge v(\vec{ul}, \vec{pw}, \vec{ps}) \quad \forall \vec{S} \vec{A}
+\end{alignedat} \end{equation}
+\begin{equation}
+	\vec{\beta} \ge 0 \quad \forall \beta
+\end{equation}
+And all auxiliary constraints in "\nameref{auxiliary constraints}"
+
+
+
+\subsection{Expectation ADP Model}
+Steps for rearranging and converting the constraint (\ref{full-adp-equation}) into expectation:
+\begin{itemize}
+	\item $E[ued_p] = 0$
+	\item $E[pwt_{mdc}] = ptp_{mdc} * \hat{pw}_{mdc}$ 
+	\item $E[pst_{tmdc}] = ptp_{mdc} * \hat{ps}_{tmdc}$ 
+\end{itemize}
+
+\begin{equation}
+	\beta^{0}: \qquad (1-\gamma) \beta^{0}
+\end{equation}
+\begin{equation}
+\beta^{ul}_{p}: \qquad 
+	\sum_{p} \beta_{p}^{ul} \Big( ul_{p} - \gamma ( \hat{ul}_{p}) \Big)
+\end{equation}
+\begin{equation}\begin{alignedat}{10}
+& \beta^{pw}_{mdc}: \qquad 
+	&& \sum_{dc} \beta_{0dc}^{pw} \Big( pw_{0dc} - \gamma (pea_{dc}) \Big) + 
+	\sum_{m=1dc}^{M-1} \beta_{mdc}^{pw} 
+	\Big( pw_{mdc} - \gamma 
+		(\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \Big) + \\
+&	&& \sum_{dc} \beta_{Mdc}^{pw} 
+	\Big( pw_{Mdc} - \gamma \sum_{M-1}^{M}
+		(\hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}]) \Big)
+\end{alignedat} \end{equation}
+\begin{equation}\begin{alignedat}{10}
+& \beta^{ps}_{tmdc}: \qquad 
+	&& \sum_{tdc} \beta_{t0dc}^{ps} \Big( ps_{t0dc}) \Big) + 
+	\sum_{mdc} \beta_{Tmdc}^{ps} \Big( ps_{Tmdc}) \Big) + \\
+&	&& 
+	\sum_{t=1m=1dc}^{T-1M-1} \beta_{tmdc}^{ps} 
+	\Big( ps_{tmdc} - \gamma 
+		(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{t+1m-1dc}]) \Big) + \\
+&	&& \sum_{t=1dc}^{T-1} \beta_{tMdc}^{ps} 
+	\Big( ps_{tMdc} - \gamma \sum_{M-1}^{M}
+		(\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{t+1mdc}]) \Big)
+\end{alignedat} \end{equation}
+
+Let's say $E[V]$ is the addition of all parts above. Then the ADP model converted to expectation would look as follows:
+\begin{equation}
+	\max_{\vec{\beta}} \Big( \sum \beta^{0} + \sum \beta^{ut} E[ut] + \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps] \Big)
+\end{equation}
+Subject to:
+\begin{equation}
+	E[V] \le c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) \quad \forall \vec{S} \vec{A} 
+\end{equation}
+
+
+\subsection{ADP Master Problem}
+\label{Dual of ADP LP}
+Converting to Dual
+\begin{equation}
+	\min_{w} \sum_{\vec{S} \vec{A}} w(\vec{S} \vec{A}) c(\vec{S} \vec{A})
+\end{equation}
+Subject To:
+
+\begin{alignat}{10}
+	& \beta^{0}: 
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} (1 - \gamma) = 1 \\
+	& \beta^{ul}: 
+		&& 	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ul_{p} - 
+			\gamma (\hat{ul}_{p}) \Big) \ge E[ul_{p}]
+		&&	\forall p \\
+	&	\beta^{pw}: 
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{0dc} - 
+		\gamma (pea_{dc}) \Big) \ge E[ps_{0dc}]
+		&&	\forall dc \\
+	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdc} - 
+		\gamma (\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \Big) \ge E[pw_{mdc}]
+		&&	\forall m \in \{1...M-1\} dc \\
+	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{Mdc} - \gamma 
+			\sum_{M-1}^{M} (\hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}]) \Big) \ge E[pw_{Mdc}]
+		&&	\forall dc \\ 
+	&	\beta^{ps}: 
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{t0dc} \Big) \ge E[ps_{t0dc}]
+		&&	\forall tdc \\
+	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{Tmdc} \Big) \ge E[ps_{Tmdc}]
+		&&	\forall mdc \\
+	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdc} - \gamma 
+			(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{d}]) \Big) \ge E[ps_{tmdc}] \;
+		&&	\forall \{1...T-1\} \{1...M-1\}dc \\
+	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tMdc} - \gamma \sum_{M-1}^{M}
+		(\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{d}]) \Big) \ge E[ps_{tMdc}] \;
+		&&	\forall \{1...T-1\} dc
+\end{alignat}
+
+\begin{equation}
+	\text{State Action Bounds:} \qquad w \ge 0 \qquad \forall w
+\end{equation}
+
+
+\subsection{ADP Pricing Problem}
+\label{Pricing Problem}
+\begin{equation}
+	\min_{(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \in S,  (\vec{sc}, \vec{rsc}) \in A } c(\vec{pw},\vec{sc},\vec{rsc},\vec{uv}) - E[V]
+\end{equation}
+Subject to:
+constraints in sections "\nameref{state-action constraints}" and "\nameref{auxiliary constraints}"
+
+\section{Solution Explanation}
+\subsection{Algorithm for solving}
+To get $\vec{\beta}$ values, which will be used to generate an action follow steps below:
+\begin{enumerate}
+	\item Perform a monte-carlo simulation (following some arbitrary policy) to get $E[ue], E[uu], E[pw] E[pw]$
+	\item Create an initial feasible set of state-action pairs - $\vec{w}$
+	\item Solve model in section "\nameref{Dual of ADP LP}" where each state-action pairs in $\vec{w}$ corresponds to a variable and parameters for all the constraints for a specific action.
+	\item Solve model in section "\nameref{Pricing Problem}", where duals from problem in step 3  correspond to $\vec{\beta}$ values. 
+		\begin{itemize}
+			\item If objective function is less than 0, add solution as a single state-action pair to $\vec{w}$ and go to step 3
+			\item If objective function is greater than 0, continue to next step
+		\end{itemize}
+	\item Duals from problem in step 3 correspond to final $\vec{\beta}$ values
+\end{enumerate}
+	
+\subsection{Generating an Action}
+Once $\vec{\beta}$ values have been approximated, you may use the model below to generate a recommended action for a specific state.
+\begin{equation*}
+	\min_{\vec{A}} c(\vec{S}, \vec{A}) - \gamma v(S')
+\end{equation*}	
+
+\begin{equation}\begin{alignedat}{10}
+	&	v(S') = \Bigg( 
+		&& 	\beta^0 + 
+			\bigg( \sum_{p} \beta_{1p}^{ue} 
+				(uen_{d} + ue_{1p} - \hat{uu}_{1p} + uv_{1p}) \bigg)+
+			\bigg( \sum_{t=2,p}^{T} \beta_{tp}^{ue} uen_{d} \bigg)+ \\
+	&	&& 	\bigg( \sum_{tp}^{T-1} \beta_{tp}^{uu} 
+				( \hat{uu}_{t+1,p} + \sum_{mdc} E[pst_{tmdc}] (U_{pd+1c} - U_{pdc})) \bigg) + \\
+	&	&&	\bigg( \sum_{dc} \beta_{0dc}^{pw} pea_{dc} \bigg) +
+			\bigg( \sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} 
+				(\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \bigg) + \\
+	&	&&	\qquad \qquad \bigg( \sum_{dc} \beta_{Mdc}^{pw} 
+				(\sum_{M-1}^{M} \hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}])\bigg) + \\
+	& 	&&	\bigg( \sum_{t=1m=1dc}^{T-1M-1} \beta_{tmdc}^{ps} 
+				(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{t+1m-1dc}]) \bigg) + \\	
+	&	&&	\qquad \qquad \bigg( \sum_{t=1Mdc}^{T-1} \beta_{tmdc}^{ps} 
+				(\sum_{M-1}^{M} (\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{t+1mdc}])) \bigg)
+			\Bigg)
+\end{alignedat}
+\end{equation}
+
+Subject to:
+constraints in section "\nameref{state-action constraints}"
+
+
+\end{document}
