@@ -1,78 +1,40 @@
 # %%
 from optimization import *
 from simulation import *
+import Modules.decorators
 import os.path
 import sys
 from matplotlib import pyplot as plt
 
 # Read Data
 my_path = os.path.dirname(__file__)
-input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
+input_data = read_data(os.path.join(my_path, 'Data', 'Data-full.xlsx'))
+generate_optimal_sa_list = Modules.decorators.timer(generate_optimal_sa_list)
 # %% Optimization
-# No need to do an expected state simulation, 
-# because setting values to extremes gives same results
-
-# for cw_p in [1, 1.25, 1.5]:
-#     for cs_p in [1, 1.25, 1.5]:
-#         for cc_p in [1, 25, 50]:
-
-            # if cw_p == 1.0 and cs_p == 1.0:
-            #     continue
-            # input_data.model_param.cw = cw_p
-            # input_data.model_param.cs = cs_p
-            # input_data.model_param.cc = cc_p
-
-# print(f"\t\tcw {cw_p}-cs {cs_p}-cc {cc_p}")
-# print(input_data.)
-
 # Phase 1
 init_state, init_action = generate_initial_state_action(input_data)
 state_action_list = [(init_state, init_action)]
 feasible_list = generate_feasible_sa_list(input_data, state_action_list)
 
 # Phase 2
-optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list)
-export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-ZeroVariation.xlsx'))
+stabilization_parameter = 0.3
+acceptable_error = 0
+optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list,stabilization_parameter, acceptable_error)
+export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-full.xlsx'))
             
 
 
-# %% Compare Policies
-# Import betas
-fig, axes = plt.subplots(1, 1)
-# fig.set_size_inches()
-# fig.subplots_adjust(top = 1.5)
+# # %% Compare Policies
+# # Import betas
+# fig, axes = plt.subplots(1, 1)
+# betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-full.xlsx'))
+# compare_policies(input_data, betas, 5, 3000, 1500, axes)
+# fig.show()
 
-# counter = 0
-# for cw_p in [1, 1.25, 1.5]:
-#     for cs_p in [1, 1.25, 1.5]:
-#         for cc_p in [1, 25, 50]: 
-betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-ZeroVariation.xlsx'))
-
-# input_data.model_param.cw = cw_p
-# input_data.model_param.cs = cs_p
-# input_data.model_param.cc = cc_p
-
-# print(f'COSTS: cw - {cw_p}, cs - {cs_p}, cc - {cc_p}')
-# betas = read_betas(os.path.join(my_path, 'Data', 'Optimal-Betas.xlsx'))
-
-# Compare Policies
-compare_policies(input_data, betas, 5, 3000, 1500, axes)
-# axes[counter].set_title(f'COSTS: cw - {cw_p}, cs - {cs_p}, cc - {cc_p}')
-# counter += 1
-fig.show()
-
-# %% Test out policies
-
-test_out_policy(input_data, 10, mdp_policy, "MDP", betas)
-# for cw_p in [1, 1.25, 1.5]:
-#     for cs_p in [1, 1.25, 1.5]:
-#         for cc_p in [1, 25, 50]:
-            # print()
-            # print()
-            # print(f'COSTS: {cw_p}-cs {cs_p}-cc {cc_p}')
-            
-            # betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-cw{cw_p}-cs{cs_p}-cc{cc_p}.xlsx'))
-            # test_out_policy(input_data, 1, mdp_policy, 'MDP ', betas)
-            # fig.add_subplot()
+# # %% Test out policies
+# betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-full.xlsx'))
+# # input_data.arrival[('Complexity 1', 'CPU 1')] = 30
+# test_out_policy(input_data, 10, mdp_policy, "MDP", betas)
+# test_out_policy(input_data, 100, myopic_policy, "Myopic")
 
 # %%

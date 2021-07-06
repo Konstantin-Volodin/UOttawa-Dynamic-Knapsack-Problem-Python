@@ -128,3 +128,28 @@ Antoine's Comments on mathematical model:
 	- and look for bugs
 
 
+
+- to discuss:
+	1) new model changes
+	2) difference between close to optimal and completely optimal
+		- and the method for generation the completely optimal
+		- including the bologna site: https://www.gerad.ca/colloques/ColumnGeneration2008/slides/EduardoU.pdf
+	- It appears that the model when it is  very close to optimality - E-17 but its not
+		- it gets stuck with the same value for a while
+		- however when a large number of columns gets removed (because they are not used in the master problem)
+		it is sometimes able to reach optimality of 0 reduced cost
+			- I will show the two excel files highlighting the differences
+	- And also the method linked above - it tries to speed up column generation by stabilizing it
+		- it has initial beta and then does the expoinential smoothing on it with new beta values
+		- I would like to discuss how the gap is calculated and if this method actually helps 
+		- I found it doesn't help much for speed - is it an error
+	3) Discuss how ps 0 is never present and patients scheduled 0 is also never included
+		- maybe that would mean some betas have to be negative??
+	4) Also it sometimes doesn't reach optimal answer at all - when expected value of ul is 0
+
+
+Notes - set the waiting cost to start at max scheduling cost
+
+- priority appears to be different from complexity 
+we will come up in english of what the model does
+

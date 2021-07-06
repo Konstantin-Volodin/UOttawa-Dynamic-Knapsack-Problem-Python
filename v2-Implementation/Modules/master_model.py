@@ -45,7 +45,7 @@ def generate_initial_state_action(input_data):
     ulb = {}
     for p in itertools.product(indices['p']):
         ul_p[p] = 0
-        ulb[p] = 1
+        ulb[p] = 0
     uvb = {}
     uu_p = {}
     for tp in itertools.product(indices['t'], indices['p']):
@@ -72,19 +72,19 @@ def cost_function(input_data: input_data_class, state: state, action: action):
     cost = 0
     # Cost of Waiting
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
-        cost += model_param.cw**mdc[0] * ( action.pw_p_mdc[mdc] )
+        cost += model_param.cw**(mdc[0]+1) * ( action.pw_p_mdc[mdc] )
     
     # Cost of Waiting - Last Period
     for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-        cost += model_param.cw**indices['m'][-1] * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+        cost += model_param.cw**(indices['m'][-1]+1) * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
 
     # Prefer Earlier Appointments
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        cost += model_param.cs**tmdc[0] * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
+        cost += model_param.cs**tmdc[0] * ( action.sc_tmdc[tmdc] )
 
     # Cost of Rescheduling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] > ttpmdc[1]: #good schedule
+        if ttpmdc[0] > ttpmdc[1]: # good schedule
             cost -= (0.5*model_param.cc) * action.rsc_ttpmdc[ttpmdc]
         elif ttpmdc[1] > ttpmdc[0]: #bad schedule
             cost += (1.5*model_param.cc) * action.rsc_ttpmdc[ttpmdc]
@@ -93,7 +93,7 @@ def cost_function(input_data: input_data_class, state: state, action: action):
     for tp in itertools.product(indices['t'], indices['p']):
         cost += action.uv_tp[tp] * model_param.M
 
-    return(cost)
+    return cost
 # Generates beta 0 constraint data 
 def b_0_constraint(input_data: input_data_class, state: state, action: action) -> constraint_parameter:
     gamma = input_data.model_param.gamma

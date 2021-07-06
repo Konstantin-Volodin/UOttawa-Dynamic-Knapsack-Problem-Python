@@ -43,10 +43,13 @@ def generate_sub_model(input_data, betas, phase1 = False):
     # States / Upper Bounds
     # UL
     for p in itertools.product(indices['p']):
-        var_ul[p] = sub_model.addVar(name=f's_ul_{p}', ub=3*ppe_data[p[0]].expected_units, vtype=GRB.CONTINUOUS)
+        var_ul[p] = sub_model.addVar(name=f's_ul_{p}', ub=5*ppe_data[p[0]].expected_units, vtype=GRB.CONTINUOUS)
     # PW
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-        var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=4*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
+        if mdc[0] == indices['m'][-1]:
+            var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=20*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
+        else:
+            var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=4*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
     # PS
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         var_ps[tmdc] = sub_model.addVar(name=f's_ps_{tmdc}', ub=4*arrival[(tmdc[2],tmdc[3])], vtype=GRB.INTEGER)
@@ -60,7 +63,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
         var_rsc[ttpmdc] = sub_model.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
     # UV
     for tp in itertools.product(indices['t'], indices['p']):
-        var_uv[tp] = sub_model.addVar(name=f'a_uv_{tp}', vtype=GRB.CONTINUOUS)
+        var_uv[tp] = sub_model.addVar(name=f'a_uv_{tp}', ub=10*ppe_data[p[0]].expected_units, vtype=GRB.CONTINUOUS)
 
     
     # UL Hat & UL B
@@ -90,6 +93,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
     for tp in itertools.product(indices['t'], indices['p']):
         expr = gp.LinExpr()
         expr.addTerms(1, var_uu_p[tp])
+        expr.addTerms
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
             expr.addTerms(-usage[(tp[1], mdc[1], mdc[2])], var_ps_p[(tp[0], mdc[0], mdc[1], mdc[2])])
         sub_model.addConstr(expr == 0, name=f'uu_hat_{tp}')
@@ -119,7 +123,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
         expr.addTerms(1, var_uu_p[tp])
         expr.addConstant(-input_data.ppe_data[tp[1]].expected_units)
         expr.addConstant(M)
-        expr.addTerms(-M, var_ulb[(tp[1],)])
+        expr.addTerms(-M, var_uvb[tp])
         if tp[0] == 1:
             expr.addTerms(-1, var_ul[(tp[1],)])
         sub_model.addConstr(var_uv[tp] <= expr)
@@ -128,15 +132,16 @@ def generate_sub_model(input_data, betas, phase1 = False):
         sub_model.addConstr(var_ul_p[p] >= 0)
         sub_model.addConstr(var_ul_p[p] >= input_data.ppe_data[p[0]].expected_units + var_ul[p] - var_uu_p[(1, p[0])])
         sub_model.addConstr(var_ul_p[p] <= M * var_ulb[p])
-        sub_model.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + var_ul[p] - var_uu_p[(1, p[0])] + (M * var_ulb[p]))
+        sub_model.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + var_ul[p] - var_uu_p[(1, p[0])] + (M * (1-var_ulb[p])))
 
     # Constraints
     # 1) Resource Usage Constraint
     for tp in itertools.product(indices['t'], indices['p']):
         if tp[0] == 1:
-            sub_model.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + var_uv[tp], name=f'resource_constraint_{tp}')
-        else:
+            # sub_model.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + var_uv[tp], name=f'resource_constraint_{tp}')
             sub_model.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + var_ul[(tp[1],)] + var_uv[tp], name=f'resource_constraint_{tp}')
+        else:
+            sub_model.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + var_uv[tp], name=f'resource_constraint_{tp}')
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
@@ -170,30 +175,31 @@ def generate_sub_model(input_data, betas, phase1 = False):
 
         # Cost of Waiting
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
-            expr.addTerms(model_param.cw**mdc[0], var.a_pw_p[mdc])                    
+            expr.addTerms(model_param.cw**(mdc[0]+1), var.a_pw_p[mdc])                    
         
         # Cost of Waiting - Last Period
         for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cw**indices['m'][-1], var.a_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
+            expr.addTerms(model_param.cw**(indices['m'][-1]+1), var.a_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
-        return(expr)
+        return expr
     def pref_earlier_appointment(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
         
         # Prefer Earlier Appointments
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
             expr.addTerms(model_param.cs**tmdc[0], var.a_sc[tmdc])
-        return(expr)
+
+        return expr
     def reschedule_cost(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-            if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(1.5*model_param.cc, var.a_rsc[ttpmdc])
-            elif ttpmdc[1] < ttpmdc[0]:
+            if ttpmdc[0] > ttpmdc[1]: # Good Reschedule
                 expr.addTerms(-(0.5*model_param.cc), var.a_rsc[ttpmdc])
+            elif ttpmdc[0] < ttpmdc[1]: # Bad Reschedule
+                expr.addTerms(1.5*model_param.cc, var.a_rsc[ttpmdc])
 
-        return(expr)
+        return expr
     def goal_violation_cost(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
 
@@ -225,7 +231,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
                 # When m is 0
                 if mc[0] == 0: 
                     expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
-                    expr.addConstant(-betas['pw'][mdc] * gamma * arrival[mdc[1], mdc[2]])
+                    expr.addConstant(-betas['pw'][mdc] * gamma * arrival[(mdc[1], mdc[2])])
 
                 # When m is M
                 elif mc[0] == indices['m'][-1]:

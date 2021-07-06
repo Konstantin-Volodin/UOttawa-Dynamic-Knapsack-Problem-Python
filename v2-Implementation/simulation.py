@@ -41,28 +41,7 @@ def compare_policies(input_data, betas, repls, days, warm_up, axes):
     print(f"MDP Discounted Cost - {np.average(mdp_disc_c)}")
 
 # %% Writing Out Things
-def non_zero_state(state: state):
-    for key,value in state.ue_tp.items():
-        if state.ue_tp[key] >= 0.1: print(f'\tUnits Expected - {key} - {state.ue_tp[key]}')
-        if state.uu_tp[key] >= 0.1: print(f'\tUnits Used - {key} - {state.uu_tp[key]}')
-    for key,value in state.pw_mdc.items(): 
-        if value >= 0.1: print(f'\tPatients Waiting- {key} - {value}')
-    for key,value in state.ps_tmdc.items(): 
-        if value >= 0.1: print(f'\tPatients Scheduled- {key} - {value}')
-def non_zero_action(action: action):
-    for key,value in action.sc_tmdc.items():
-        if value >= 0.1: print(f'\tPatients Schedule - {key} - {value}')
-    for key,value in action.rsc_ttpmdc.items(): 
-        if value >= 0.1: print(f'\tPatients Reschedule- {key} - {value}')
-    for key,value in action.uv_tp.items(): 
-        if value >= 0.1: print(f'\tUnits Violated- {key} - {value}')
-    for key,value in action.uu_p_tp.items(): 
-        if value >= 0.1: print(f'\tUnits Used - Post Decision - {key} - {value}')
-    for key,value in action.pw_p_mdc.items(): 
-        if value >= 0.1: print(f'\ttPatients Waiting - Post Decision - {key} - {value}')
-    for key,value in action.ps_p_tmdc.items(): 
-        if value >= 0.1: print(f'\tPatients Scheduled - Post Decision - {key} - {value}')
-def test_out_policy(input_data, duration, policy, policy_name, betas):
+def test_out_policy(input_data, duration, policy, policy_name, betas=False):
 
     curr_state = initial_state(input_data)
 

@@ -48,13 +48,18 @@ def generate_feasible_sa_list(input_data, init_state_actions):
     return(state_action_list)
 
 # %% Solve the problem (Phase 2)
-def generate_optimal_sa_list(input_data, init_state_actions):
+def generate_optimal_sa_list(input_data, init_state_actions, stabilization_parameter, error_parameter):
 
     # Initializes
     state_action_list = init_state_actions
     count = len(state_action_list)
-    count_without_removal = 0
+    count_same = 0
+    resets_counts = 0
     mast_model, mast_var, mast_const = generate_master_model(input_data, state_action_list)
+
+    # Initializes Stabilization Parameters
+    beta_avg = generate_beta_estimate(input_data)
+    non_neg_count = 0
 
     while True:
 
@@ -63,37 +68,41 @@ def generate_optimal_sa_list(input_data, init_state_actions):
         mast_model.optimize()
         betas = generate_beta_values(input_data, mast_const)
 
-        # Drops state action pairs as needed
-        if count_without_removal >= 50:
-            state_action_list, mast_model, mast_var, mast_const = trim_sa_list(input_data, state_action_list, mast_var)
-            count_without_removal = 0
+        # Update beta estimate 
+        beta_avg = update_beta_estimate(input_data, beta_avg, betas, stabilization_parameter)
 
         # Generates and solves Subproblem
-        sub_model, sub_var = generate_sub_model(input_data, betas)
+        sub_model, sub_var = generate_sub_model(input_data, beta_avg)
         sub_model.Params.LogToConsole = 0
         sub_model.optimize()
 
         # Debugging 
-        print(f'Phase 2 - iteration {count+1}, Sub Objective {sub_model.getObjective().getValue()}')
-
-
-        # Stops if necessary
-        if sub_model.ObjVal >= -0.00000000000000001:
-            print('Found Optimal Solution')
-            break
-
+        print(f'Phase 2 - iteration {count+1}, Sub Objective {sub_model.ObjVal:.5E}')
         # Update State-Actions
-        state_action = generate_state_action(sub_var)
-        state_action_list.append(state_action)
-        mast_model, mast_var, mast_const = update_master_model(input_data, mast_model, mast_var, mast_const, state_action, count)
+        if sub_model.ObjVal < 0:
+            state_action = generate_state_action(sub_var)
+            state_action_list.append(state_action)
+            mast_model, mast_var, mast_const = update_master_model(input_data, mast_model, mast_var, mast_const, state_action, count)
+        # Same state action
+        if state_action_list[-2] == state_action_list[-1]:
+            count_same += 1
 
-        # Stops if necessary
-        if state_action_list[-1] == state_action_list[-2]:
-            print('Unable to find feasible set')
+        # Stopping conditions
+        if sub_model.ObjVal >= 0:
+            non_neg_count += 1
+        if count_same >= 1000:
+            print(f'Stuck at {sub_model.ObjVal:.5E}')
+            break
+        
+        if non_neg_count >= 100:
+            print('Found Optimal Solution')
+            mast_model.optimize()
+            betas = generate_beta_values(input_data, mast_const)
+            beta_avg = update_beta_estimate(input_data, beta_avg, betas, stabilization_parameter)
             break
 
+        # Adjutst Counts
         count += 1
-        count_without_removal += 1
 
     return(state_action_list, betas)
 # Trim zero state-action pairs occasionally
@@ -111,12 +120,72 @@ def trim_sa_list(input_data, init_state_actions, variables):
     print(f'Trimmed SA List - removed {final_len - initial_len}')
 
     return(state_action_list, mast_model, mast_var, mast_const)
+# Initializes betas for stabilization algorithm
+def generate_beta_estimate(input_data):
+    indices = input_data.indices
 
+    # Beta Values
+    b_0_dual = {}
+    b_ul_dual = {}
+    b_pw_dual = {}
+    b_ps_dual = {}
 
-# %% Misc Code
-# Write the model
-# p1_mast_model.write('mast_p1.lp')
-# p1_sub_model.write('sub_prob_p1.lp')
+    # Beta 0
+    b_0_dual['b_0'] = 0
 
-# mast_model.write('mast_p2.lp')
-# sub_model.write('sub_prob_p2.lp')
+    for p in itertools.product(indices['p']):
+        # Beta ul
+        b_ul_dual[p] = 0
+
+    # Beta pw
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        b_pw_dual[mdc] = 0
+
+    # Beta ps
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        b_ps_dual[tmdc] = 0
+
+    # Combines beta values
+    betas = {
+        'b0': b_0_dual,
+        'ul': b_ul_dual,
+        'pw': b_pw_dual,
+        'ps': b_ps_dual
+    }
+
+    return betas
+# Adjusts betas for stabilization algorithm
+def update_beta_estimate(input_data, avg_beta, betas, alpha):
+    indices = input_data.indices
+
+    # Beta Values
+    b_0_dual = {}
+    b_ul_dual = {}
+    b_pw_dual = {}
+    b_ps_dual = {}
+
+    # Beta 0
+    b_0_dual['b_0'] = (alpha * avg_beta['b0']['b_0']) + ((1-alpha)*betas['b0']['b_0'])
+
+    for p in itertools.product(indices['p']):
+        # Beta ul
+        b_ul_dual[p] = (alpha * avg_beta['ul'][p]) + ((1-alpha)*betas['ul'][p])
+
+    # Beta pw
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        b_pw_dual[mdc] = (alpha * avg_beta['pw'][mdc]) + ((1-alpha)*betas['pw'][mdc])
+
+    # Beta ps
+    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+        b_ps_dual[tmdc] = (alpha * avg_beta['ps'][tmdc]) + ((1-alpha)*betas['ps'][tmdc])
+
+    # Combines beta values
+    betas = {
+        'b0': b_0_dual,
+        'ul': b_ul_dual,
+        'pw': b_pw_dual,
+        'ps': b_ps_dual
+    }
+
+    return betas
+# %%

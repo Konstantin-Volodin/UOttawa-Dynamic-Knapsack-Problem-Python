@@ -115,7 +115,7 @@ Decisions are made at the beginning of each time period. There are 3 relevant ti
 State is defined by current available and used resources, patient waitlist/demand, and patients already scheduled
 \[  \vec{S}  = (\vec{ul}, \vec{pw}, \vec{ps}) \]
 \begin{itemize}
-	\item $\vec{ul} = ul_{p}$ - Units left over from previous period for resource $p$ plus deviation for that unit for period 1
+	\item $\vec{ul} = ul_{p}$ - Units left over from previous period for resource $p$ plus deviation for that unit for period 1. This is only for resources that can be carried over
     \item $\vec{pw} = pw_{mdc}$ - Patients of complexity $d$, CPU $c$, on a wait list for $m$ periods ($m$ of 0 - just arrived)
     \item $\vec{ps} = ps_{tmdc}$ - Patients of complexity $d$, CPU $c$, scheduled to period $t$, waiting for $m$ periods ($m$ of 0 - just arrived)
 \end{itemize}
@@ -163,7 +163,10 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 				&& \forall tp \\
 			& \hat{uv}_{1p} 
 				&& \le  (\hat{uu}_{1p} - uen_{1p} - ul_{p}) + M(1-uvb_{tp}) \quad
-				&& \forall p \\
+				&& \forall p \in \{\text{Carry Over}\} \\
+			& \hat{uv}_{1p} 
+				&& \le  (\hat{uu}_{1p} - uen_{1p}) + M(1-uvb_{tp}) \quad
+				&& \forall p \in \{\text{Non Carry Over}\} \\
 			& \hat{uv}_{tp} 
 				&& \le  (\hat{uu}_{tp} - uen_{tp}) + M(1-uvb_{tp}) \quad
 				&& \forall t \in \{ 2..T \} p \\
@@ -173,16 +176,16 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 	\begin{alignat}{10}
 			& \hat{ul}_{p} 
 				&& \ge 0 \quad 
-				&& \forall p \\
+				&& \forall p \in \{\text{Non Carry Over}\} \\
 			& \hat{ul}_{p} 
 				&& \ge uen_{1p} + ul_{p} - \hat{uu}_{1p} \quad 
-				&& \forall p \\
+				&& \forall p \in \{\text{Non Carry Over}\} \\
 			& \hat{ul}_{p} 
 				&& \le M (ulb_{p}) \quad 
-				&& \forall p \\
+				&& \forall p \in \{\text{Non Carry Over}\} \\
 			& \hat{ul}_{p} 
 				&& \le (uen_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad 
-				&& \forall p
+				&& \forall p \in \{\text{Non Carry Over}\}
 	\end{alignat}
 \end{itemize}
 
@@ -256,7 +259,7 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 	\begin{alignat}{10}
 		& ul'_{p} 
 			&& = \hat{ul}_{p} + ued_{p} \quad 
-			&& \forall p
+			&& \forall p \in \{ \text{Carry Over}\} \\
 	\end{alignat} 
 
 	
@@ -313,9 +316,9 @@ Cost will come from 4 sources:
 \begin{equation}\begin{alignedat}{10}
 	& C = c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) = 
 		&& 
-			\overbrace{ \sum_{mdc} cw^{m} (\hat{pw}_{mdc}) }^\text{
+			\overbrace{ \sum_{mdc} cw^{m+1} (\hat{pw}_{mdc}) }^\text{
 				cost of waiting}  + 
-			\overbrace{ \sum_{tmdc} cw^{M} (\hat{ps}_{tMdc})}^\text{
+			\overbrace{ \sum_{tmdc} cw^{M+1} (\hat{ps}_{tMdc})}^\text{
 				prevent infinite reschedules} + \\
 	&	&&	+
 				\overbrace{
@@ -503,7 +506,7 @@ To get $\vec{\beta}$ values, which will be used to generate an action follow ste
 \subsection{Generating an Action}
 Once $\vec{\beta}$ values have been approximated, you may use the model below to generate a recommended action for a specific state.
 \begin{equation*}
-	\min_{\vec{A}} c(\vec{S}, \vec{A}) - \gamma v(S')
+	\min_{\vec{A}} c(\vec{S}, \vec{A}) + \gamma v(S')
 \end{equation*}	
 
 \begin{equation}\begin{alignedat}{10}

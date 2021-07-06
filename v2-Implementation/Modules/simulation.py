@@ -106,22 +106,22 @@ def state_action_cost(input_data, state, action) -> float:
 
     # Cost of Waiting
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
-        cost += model_param.cw**mdc[0] * ( action.pw_p_mdc[mdc] )
+        cost += model_param.cw**(mdc[0]+1) * ( action.pw_p_mdc[mdc] )
 
     # Cost of Waiting - Last Period
     for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-        cost += model_param.cw**indices['m'][-1] * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+        cost += model_param.cw**(indices['m'][-1]+1) * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
 
     # Cost of Later Schedulings
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        cost += (model_param.cw**tmdc[1] * tmdc[0] * 1/M) * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
+        cost += (model_param.cs**tmdc[0]) * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
 
     # Cost of Cancelling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] > ttpmdc[1]: #good schedule
-            cost -= (model_param.cc-model_param.cw) * action.rsc_ttpmdc[ttpmdc]
+            cost -= 0.5*(model_param.cc-model_param.cw) * action.rsc_ttpmdc[ttpmdc]
         elif ttpmdc[1] > ttpmdc[0]: #bad schedule
-            cost += (model_param.cc+model_param.cw) * action.rsc_ttpmdc[ttpmdc]
+            cost += 1.5*(model_param.cc+model_param.cw) * action.rsc_ttpmdc[ttpmdc]
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):
@@ -135,7 +135,7 @@ def execute_transition(input_data, state, action) -> state:
     new_state = deepcopy(state)
 
     # UL
-    for p in itertools.product(indices['t'], indices['p']):
+    for p in itertools.product(indices['p']):
         deviation = np.random.uniform(
             input_data.ppe_data[p[0]].deviation[0],
             input_data.ppe_data[p[0]].deviation[1]
@@ -221,8 +221,8 @@ def myopic_policy(input_data, state) -> action:
     var_sc = {}
     var_rsc = {}
     var_uv = {}
-    var_uvb = {}
 
+    var_uvb = {}
     var_ul_p = {}
     var_ulb = {}
     var_uu_p = {}
@@ -240,13 +240,15 @@ def myopic_policy(input_data, state) -> action:
         var_uv[tp] = myopic.addVar(name=f'a_uv_{tp}', vtype=GRB.CONTINUOUS)
         var_uvb[tp] = myopic.addVar(name=f'a_uvb{tp}', vtype=GRB.BINARY)
 
-    # UL Hat
+    # UL Hat & UL B
     for p in itertools.product(indices['p']):
-        var_ul_p[p] = myopic.addVar(name=f'a_ul_p{p}', vtype=GRB.CONTINUOUS)
-        var_ulb[p] = myopic.addVar(name=f'a_ulb{p}', vtype=GRB.BINARY)
-    # UU Hat
+        var_ul_p[p] = myopic.addVar(name=f'a_ul_p_{p}', vtype=GRB.CONTINUOUS, obj=0)
+        var_ulb[p] = myopic.addVar(name=f'a_ulb_{p}', vtype=GRB.BINARY, obj=0)
+    # UU Hat & UV B
     for tp in itertools.product(indices['t'], indices['p']):
         var_uu_p[tp] = myopic.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
+        var_uvb[tp] = myopic.addVar(name=f'a_uvb_{tp}', vtype=GRB.BINARY)
+    
     # PW Hat
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         var_pw_p[mdc] = myopic.addVar(name=f'a_pw_p_{mdc}', vtype=GRB.INTEGER)
@@ -274,26 +276,47 @@ def myopic_policy(input_data, state) -> action:
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         expr.addTerms(1, var_ps_p[tmdc])
-        expr.addConstant(round(-state.ps_tmdc[tmdc],0))
+        expr.addConstant(-state.ps_tmdc[tmdc])
         expr.addTerms(-1, var_sc[tmdc])
         for tp in indices['t']:
             expr.addTerms(-1, var_rsc[(tp, tmdc[0], tmdc[1], tmdc[2], tmdc[3])])
             expr.addTerms(1, var_rsc[(tmdc[0], tp, tmdc[1], tmdc[2], tmdc[3])])
         myopic.addConstr(expr == 0, name=f'ps_hat_{tmdc}')
+        # UV Maximum function
+    for tp in itertools.product(indices['t'], indices['p']):
+        myopic.addConstr(var_uv[tp] <= M * var_uvb[tp], name=f'uv_max_1_{tp}')
+        
+        expr = gp.LinExpr()
+        expr.addTerms(1, var_uu_p[tp])
+        expr.addConstant(-input_data.ppe_data[tp[1]].expected_units)
+        expr.addConstant(M)
+        expr.addTerms(-M, var_uvb[tp])
+        if tp[0] == 1:
+            expr.addConstant(-state.ul_p[(tp[1],)])
+        myopic.addConstr(var_uv[tp] <= expr, name=f'uv_max_2_{tp}')
+        # UL Maximum function
+    for p in itertools.product(indices['p']):
+        myopic.addConstr(var_ul_p[p] >= 0, name=f'ul_hat_1_{tp}')
+        myopic.addConstr(var_ul_p[p] >= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])], name=f'ul_hat_2_{tp}')
+        myopic.addConstr(var_ul_p[p] <= M * var_ulb[p], name=f'ul_max_1_{tp}')
+        myopic.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])] + (M * (1-var_ulb[p])), name=f'ul_hat_2_{tp}')
 
     # Constraints
     # 1) Resource Usage Constraint
     for tp in itertools.product(indices['t'], indices['p']):
-        myopic.addConstr(var_uu_p[tp] <= state.ue_tp[tp] + var_uv[tp], name=f'resource_constraint_{tp}')
+        if tp[0] == 1:
+            myopic.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + state.ul_p[(tp[1],)] + var_uv[tp], name=f'resource_constraint_{tp}')
+        else:
+            myopic.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + var_uv[tp], name=f'resource_constraint_{tp}')
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] == ttpmdc[1]:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # if ttpmdc[0] == ttpmdc[1] == 1:
+        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-        #     myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -318,11 +341,11 @@ def myopic_policy(input_data, state) -> action:
     
         # Cost of Waiting
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
-            expr.addTerms(model_param.cw**mdc[0], var_pw_p[mdc])                    
+            expr.addTerms(model_param.cw**(mdc[0]+1), var_pw_p[mdc])                    
         
         # Cost of Waiting - Last Period
         for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cw**indices['m'][-1], var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
+            expr.addTerms(model_param.cw**(indices['m'][-1]+1), var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return(expr)
     def pref_earlier_appointment() -> gp.LinExpr:
@@ -330,10 +353,7 @@ def myopic_policy(input_data, state) -> action:
         
         # Prefer Earlier Appointments
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(
-                model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M,
-                var_sc[tmdc]
-            )
+            expr.addTerms(model_param.cs**tmdc[0], var_sc[tmdc])
         return(expr)
     def reschedule_cost() -> gp.LinExpr:
 
@@ -341,9 +361,9 @@ def myopic_policy(input_data, state) -> action:
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(model_param.cc+model_param.cw, var_rsc[ttpmdc])
+                expr.addTerms(1.5*model_param.cc, var_rsc[ttpmdc])
             elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-(model_param.cc-model_param.cw), var_rsc[ttpmdc])
+                expr.addTerms(-(0.5*model_param.cc), var_rsc[ttpmdc])
 
         return(expr)
     def goal_violation_cost() -> gp.LinExpr:
@@ -364,10 +384,10 @@ def myopic_policy(input_data, state) -> action:
     
     myopic.setObjective(cost_expr, GRB.MINIMIZE)
     myopic.optimize()
+    # print(f"\tObjective Value: {myopic.ObjVal}")
     myopic.write('myopic.lp')
     if myopic.Status != 2:
-        print(state.ue_tp)
-        print(state.uu_tp)
+        print(state.ul_p)
         print(state.pw_mdc)
         print(state.ps_tmdc)
 
@@ -379,8 +399,17 @@ def myopic_policy(input_data, state) -> action:
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         rsc[ttpmdc] = var_rsc[ttpmdc].X
     uv = {}
+    uvb = {}
     for tp in itertools.product(indices['t'], indices['p']):
         uv[tp] = var_uv[tp].X
+        uvb[tp] = var_uvb[tp].X
+
+    ul_p = {}
+    ulb = {}
+    for p in itertools.product(indices['p']):
+        ul_p[p] = var_ul_p[p].X
+        ulb[p] = var_ulb[p].X
+    
     uu_p = {}
     for tp in itertools.product(indices['t'], indices['p']):
         uu_p[tp] = var_uu_p[tp].X
@@ -391,8 +420,8 @@ def myopic_policy(input_data, state) -> action:
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         ps_p[tmdc] = var_ps_p[tmdc].X
 
-    new_action = action(sc, rsc, uv, uu_p, pw_p, ps_p)
-    return(new_action)
+    new_action = action(sc, rsc, uv, uvb, ul_p, ulb, uu_p, pw_p, ps_p)
+    return new_action
 def mdp_policy(input_data, state, betas) -> action:
 
     # Input Data
@@ -406,8 +435,7 @@ def mdp_policy(input_data, state, betas) -> action:
     arrival = input_data.arrival
 
     # State Data
-    ue = state.ue_tp
-    uu = state.uu_tp
+    ul = state.ul_p
     pw = state.pw_mdc
     ps = state.ps_tmdc
 
@@ -419,6 +447,10 @@ def mdp_policy(input_data, state, betas) -> action:
     var_sc = {}
     var_rsc = {}
     var_uv = {}
+
+    var_uvb = {}
+    var_ul_p = {}
+    var_ulb = {}
     var_uu_p = {}
     var_pw_p = {}
     var_ps_p = {}
@@ -431,11 +463,18 @@ def mdp_policy(input_data, state, betas) -> action:
         var_rsc[ttpmdc] = MDP.addVar(name=f'a_rsc_{ttpmdc}', vtype=GRB.INTEGER)
     # UV
     for tp in itertools.product(indices['t'], indices['p']):
-        ppe_upper_bounds = ppe_data[tp[1]].expected_units + ppe_data[tp[1]].deviation[1]
         var_uv[tp] = MDP.addVar(name=f'a_uv_{tp}', vtype=GRB.CONTINUOUS)
-    # UU Hat
+        var_uvb[tp] = MDP.addVar(name=f'a_uvb{tp}', vtype=GRB.BINARY)
+
+    # UL Hat & UL B
+    for p in itertools.product(indices['p']):
+        var_ul_p[p] = MDP.addVar(name=f'a_ul_p_{p}', vtype=GRB.CONTINUOUS, obj=0)
+        var_ulb[p] = MDP.addVar(name=f'a_ulb_{p}', vtype=GRB.BINARY, obj=0)
+    # UU Hat & UV B
     for tp in itertools.product(indices['t'], indices['p']):
         var_uu_p[tp] = MDP.addVar(name=f'a_uu_p_{tp}', vtype=GRB.CONTINUOUS)
+        var_uvb[tp] = MDP.addVar(name=f'a_uvb_{tp}', vtype=GRB.BINARY)
+    
     # PW Hat
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         var_pw_p[mdc] = MDP.addVar(name=f'a_pw_p_{mdc}', vtype=GRB.INTEGER)
@@ -463,26 +502,47 @@ def mdp_policy(input_data, state, betas) -> action:
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         expr.addTerms(1, var_ps_p[tmdc])
-        expr.addConstant(round(-state.ps_tmdc[tmdc],0))
+        expr.addConstant(-state.ps_tmdc[tmdc])
         expr.addTerms(-1, var_sc[tmdc])
         for tp in indices['t']:
             expr.addTerms(-1, var_rsc[(tp, tmdc[0], tmdc[1], tmdc[2], tmdc[3])])
             expr.addTerms(1, var_rsc[(tmdc[0], tp, tmdc[1], tmdc[2], tmdc[3])])
         MDP.addConstr(expr == 0, name=f'ps_hat_{tmdc}')
+        # UV Maximum function
+    for tp in itertools.product(indices['t'], indices['p']):
+        MDP.addConstr(var_uv[tp] <= M * var_uvb[tp], name=f'uv_max_1_{tp}')
+        
+        expr = gp.LinExpr()
+        expr.addTerms(1, var_uu_p[tp])
+        expr.addConstant(-input_data.ppe_data[tp[1]].expected_units)
+        expr.addConstant(M)
+        expr.addTerms(-M, var_uvb[tp])
+        if tp[0] == 1:
+            expr.addConstant(-state.ul_p[(tp[1],)])
+        MDP.addConstr(var_uv[tp] <= expr, name=f'uv_max_2_{tp}')
+        # UL Maximum function
+    for p in itertools.product(indices['p']):
+        MDP.addConstr(var_ul_p[p] >= 0, name=f'ul_hat_1_{tp}')
+        MDP.addConstr(var_ul_p[p] >= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])], name=f'ul_hat_2_{tp}')
+        MDP.addConstr(var_ul_p[p] <= M * var_ulb[p], name=f'ul_max_1_{tp}')
+        MDP.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])] + (M * (1-var_ulb[p])), name=f'ul_hat_2_{tp}')
 
     # Constraints
     # 1) Resource Usage Constraint
     for tp in itertools.product(indices['t'], indices['p']):
-        MDP.addConstr(var_uu_p[tp] <= state.ue_tp[tp] + var_uv[tp], name=f'resource_constraint_{tp}')
+        if tp[0] == 1:
+            MDP.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + state.ul_p[(tp[1],)] + var_uv[tp], name=f'resource_constraint_{tp}')
+        else:
+            MDP.addConstr(var_uu_p[tp] <= input_data.ppe_data[tp[1]].expected_units + var_uv[tp], name=f'resource_constraint_{tp}')
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] == ttpmdc[1]:
-            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # if ttpmdc[0] == ttpmdc[1] == 1:
+        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
         # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-        #     MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -490,14 +550,14 @@ def mdp_policy(input_data, state, betas) -> action:
         expr = gp.LinExpr()
         for tp in itertools.product(indices['t']):
             expr.addTerms(-1, var_rsc[(tmdc[0], tp[0], tmdc[1], tmdc[2], tmdc[3])])
-        expr.addConstant(round(state.ps_tmdc[tmdc],0))
+        expr.addConstant(state.ps_tmdc[tmdc])
         MDP.addConstr(expr >= 0, f'consistent_resc_{(tmdc)}')
         # Scheduled
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         expr = gp.LinExpr()
         for t in itertools.product(indices['t']):
             expr.addTerms(-1, var_sc[(t[0], mdc[0], mdc[1], mdc[2])])
-        expr.addConstant(round(state.pw_mdc[mdc],0))
+        expr.addConstant(state.pw_mdc[mdc])
         MDP.addConstr(expr >= 0, f'consistent_sch_{(mdc)}')
 
     # Objective Function
@@ -507,90 +567,52 @@ def mdp_policy(input_data, state, betas) -> action:
     
         # Cost of Waiting
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
-            expr.addTerms(model_param.cw**mdc[0], var_pw_p[mdc])                    
+            expr.addTerms(model_param.cw**(mdc[0]+1), var_pw_p[mdc])                    
         
         # Cost of Waiting - Last Period
         for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cw**indices['m'][-1], var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
+            expr.addTerms(model_param.cw**(indices['m'][-1]+1), var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
-        return(expr)
+        return expr
     def pref_earlier_appointment() -> gp.LinExpr:
         expr = gp.LinExpr()
         
         # Prefer Earlier Appointments
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(
-                model_param.cw**tmdc[1] * tmdc[0] * 1/input_data.model_param.M,
-                var_sc[tmdc]
-            )
-        return(expr)
+            expr.addTerms(model_param.cs**tmdc[0], var_sc[tmdc])
+        return expr
     def reschedule_cost() -> gp.LinExpr:
 
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(model_param.cc+model_param.cw, var_rsc[ttpmdc])
+                expr.addTerms(1.5*model_param.cc, var_rsc[ttpmdc])
             elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-(model_param.cc-model_param.cw), var_rsc[ttpmdc])
+                expr.addTerms(-(0.5*model_param.cc), var_rsc[ttpmdc])
 
-        return(expr)
+        return expr
     def goal_violation_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for tp in itertools.product(indices['t'], indices['p']):
             expr.addTerms(M, var_uv[tp])
 
-        return(expr)
-
+        return expr
+    
     # E[V] Function
     def b0_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
         expr.addConstant(betas['b0']['b_0'])
-        return(expr)
-    def b_ue_cost() -> gp.LinExpr:
-        expr = gp.LinExpr()
-        
-        for tp in itertools.product(indices['t'], indices['p']):
-            # When t is 0
-            if tp[0] == 1:
-                expr.addConstant(gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
-                expr.addConstant(gamma * betas['ue'][tp] * state.ue_tp[tp])
-                expr.addTerms(-gamma * betas['ue'][tp], var_uu_p[tp])
+        return expr
+    def b_ul_cost() -> gp.LinExpr:
+        expr = gp.LinExpr() 
 
-            # All other
-            else:
-                expr.addConstant(gamma * betas['ue'][tp] * ppe_data[tp[1]].expected_units)
-                    
-        return(expr)
-    def b_uu_costs() -> gp.LinExpr:
-        expr = gp.LinExpr()
+        for p in itertools.product(indices['p']):
+            expr.addConstant(betas['ul'][p[0]] * state.ul_p[p])
+            expr.addTerms(- (betas['ul'][p[0]] * gamma), var_ul_p[p]) 
 
-        for tp in itertools.product(indices['t'], indices['p']):
-            # When t is T
-            if tp[0] == indices['t'][-1]:
-                pass
-            
-            # All others
-            else:
-                expr.addTerms( betas['uu'][tp] * gamma, var_uu_p[(tp[0]+1, tp[1])] )
-                
-                # Change due to transition in complexity
-                for mc in itertools.product(indices['m'], indices['c']):
-                    for d in range(len(indices['d'])):
-
-                        # When d is D
-                        if d == len(indices['d'])-1: 
-                            pass
-
-                        # Otherwise
-                        else:
-                            transition_prob = transition[(mc[0], d, mc[1])]
-                            usage_change = usage[(tp[1], indices['d'][d+1], mc[1])] - usage[(tp[1], indices['d'][d], mc[1])]
-                            coeff = betas['uu'][tp] * gamma * transition_prob * usage_change
-                            expr.addTerms( coeff, var_ps_p[ (tp[0]+1, mc[0], indices['d'][d], mc[1]) ] )
-
-        return(expr)
+        return expr
     def b_pw_costs() -> gp.LinExpr:
         expr = gp.LinExpr()
 
@@ -703,22 +725,25 @@ def mdp_policy(input_data, state, betas) -> action:
 
         # Value
     b0_expr = b0_cost()
-    b_ue_expr = b_ue_cost()
-    b_uu_expr = b_uu_costs()
+    b_ul_expr = b_ul_cost()
     b_pw_expr = b_pw_costs()
     b_ps_expr = b_ps_costs()
-    value_expr = gp.LinExpr(b0_expr + b_ue_expr + b_uu_expr + b_pw_expr + b_ps_expr)
+    value_expr = gp.LinExpr(b0_expr + b_ul_expr + b_pw_expr + b_ps_expr)
     
     
-    MDP.setObjective(cost_expr - (gamma * value_expr), GRB.MINIMIZE)
+    MDP.setObjective(cost_expr + (gamma * value_expr), GRB.MINIMIZE)
     MDP.optimize()
-    if MDP.Status != 2:
-        print(state.ue_tp)
-        print(state.uu_tp)
-        print(state.pw_mdc)
-        print(state.ps_tmdc)
-
     MDP.write('mdp.lp')
+    if MDP.Status != 2:
+        MDP.computeIIS()
+        MDP.write('MDP.ilp')
+
+        print(state.ul_p)
+        print()
+        print(state.pw_mdc)
+        print()
+        print(state.ps_tmdc)
+        print()
 
     # Saves Action
     sc = {}
@@ -728,8 +753,17 @@ def mdp_policy(input_data, state, betas) -> action:
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         rsc[ttpmdc] = var_rsc[ttpmdc].X
     uv = {}
+    uvb = {}
     for tp in itertools.product(indices['t'], indices['p']):
         uv[tp] = var_uv[tp].X
+        uvb[tp] = var_uvb[tp].X
+
+    ul_p = {}
+    ulb = {}
+    for p in itertools.product(indices['p']):
+        ul_p[p] = var_ul_p[p].X
+        ulb[p] = var_ulb[p].X
+    
     uu_p = {}
     for tp in itertools.product(indices['t'], indices['p']):
         uu_p[tp] = var_uu_p[tp].X
@@ -740,13 +774,12 @@ def mdp_policy(input_data, state, betas) -> action:
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
         ps_p[tmdc] = var_ps_p[tmdc].X
 
-    new_action = action(sc, rsc, uv, uu_p, pw_p, ps_p)
-    return(new_action)
+    new_action = action(sc, rsc, uv, uvb, ul_p, ulb, uu_p, pw_p, ps_p)
+    return new_action
 
 def non_zero_state(state: state):
-    for key,value in state.ue_tp.items():
-        if state.ue_tp[key] >= 0.1: print(f'\tUnits Expected - {key} - {state.ue_tp[key]}')
-        if state.uu_tp[key] >= 0.1: print(f'\tUnits Used - {key} - {state.uu_tp[key]}')
+    for key,value in state.ul_p.items():
+        if state.ul_p[key] >= 0.1: print(f'\tUnits Leftover - {key} - {state.ul_p[key]}')
     for key,value in state.pw_mdc.items(): 
         if value >= 0.1: print(f'\tPatients Waiting- {key} - {value}')
     for key,value in state.ps_tmdc.items(): 
@@ -758,6 +791,8 @@ def non_zero_action(action: action):
         if value >= 0.1: print(f'\tPatients Reschedule- {key} - {value}')
     for key,value in action.uv_tp.items(): 
         if value >= 0.1: print(f'\tUnits Violated- {key} - {value}')
+    for key,value in action.ul_p_p.items(): 
+        if value >= 0.1: print(f'\tUnits Left Over - Post Decision - {key} - {value}')
     for key,value in action.uu_p_tp.items(): 
         if value >= 0.1: print(f'\tUnits Used - Post Decision - {key} - {value}')
     for key,value in action.pw_p_mdc.items(): 
@@ -785,8 +820,8 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
             # print(f'Day - {day+1}')
 
             # Saves Initial State Data
-            if day >= warm_up:
-                repl_data.append(deepcopy(initial_state_val))
+            # if day >= warm_up:
+            repl_data.append(deepcopy(initial_state_val))
 
             # print('Initial State')
             # non_zero_state(initial_state_val)
@@ -806,8 +841,8 @@ def simulation(input_data, replication, days, warm_up, decision_policy, **kwargs
 
             # Calculates cost
             cost = state_action_cost(input_data, initial_state_val, new_action)
+            cost_repl_data.append(cost)
             if day >= warm_up:
-                cost_repl_data.append(cost)
                 discounted_total_cost[repl] = discounted_total_cost[repl]*input_data.model_param.gamma + cost
             # print(f'Cost: {cost}')
 
