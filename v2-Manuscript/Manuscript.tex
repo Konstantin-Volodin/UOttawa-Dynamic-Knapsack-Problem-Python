@@ -163,10 +163,7 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 				&& \forall tp \\
 			& \hat{uv}_{1p} 
 				&& \le  (\hat{uu}_{1p} - uen_{1p} - ul_{p}) + M(1-uvb_{tp}) \quad
-				&& \forall p \in \{\text{Carry Over}\} \\
-			& \hat{uv}_{1p} 
-				&& \le  (\hat{uu}_{1p} - uen_{1p}) + M(1-uvb_{tp}) \quad
-				&& \forall p \in \{\text{Non Carry Over}\} \\
+				&& \forall p \\
 			& \hat{uv}_{tp} 
 				&& \le  (\hat{uu}_{tp} - uen_{tp}) + M(1-uvb_{tp}) \quad
 				&& \forall t \in \{ 2..T \} p \\
@@ -176,16 +173,16 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 	\begin{alignat}{10}
 			& \hat{ul}_{p} 
 				&& \ge 0 \quad 
-				&& \forall p \in \{\text{Non Carry Over}\} \\
+				&& \forall p \\
 			& \hat{ul}_{p} 
 				&& \ge uen_{1p} + ul_{p} - \hat{uu}_{1p} \quad 
-				&& \forall p \in \{\text{Non Carry Over}\} \\
+				&& \forall p \\
 			& \hat{ul}_{p} 
 				&& \le M (ulb_{p}) \quad 
-				&& \forall p \in \{\text{Non Carry Over}\} \\
+				&& \forall p \\
 			& \hat{ul}_{p} 
 				&& \le (uen_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad 
-				&& \forall p \in \{\text{Non Carry Over}\}
+				&& \forall p 
 	\end{alignat}
 \end{itemize}
 
@@ -260,6 +257,9 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 		& ul'_{p} 
 			&& = \hat{ul}_{p} + ued_{p} \quad 
 			&& \forall p \in \{ \text{Carry Over}\} \\
+		& ul'_{p} 
+			&& = ued_{p} \quad 
+			&& \forall p \in \{ \text{Non Carry Over}\} 
 	\end{alignat} 
 
 	
@@ -308,31 +308,28 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 Cost will come from 4 sources:  
 \begin{itemize} 
 	\item waiting ($cw$)
-	\item rescheduling ($cc$)
-	\item scheduling ($cs$)
+	\item rescheduling ($cc$) 
+	\item scheduling ($cs_{t} = \sum_{t}cw^{t}$)
 	\item resource violation ($M$)
 \end{itemize}
 
 \begin{equation}\begin{alignedat}{10}
 	& C = c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) = 
 		&& 
-			\overbrace{ \sum_{mdc} cw^{m+1} (\hat{pw}_{mdc}) }^\text{
+			\overbrace{ \sum_{mdc} cw (\hat{pw}_{mdc}) }^\text{
 				cost of waiting}  + 
-			\overbrace{ \sum_{tmdc} cw^{M+1} (\hat{ps}_{tMdc})}^\text{
-				prevent infinite reschedules} + \\
-	&	&&	+
-				\overbrace{
-					\sum_{tmdc} cs^{t} (sc_{tmdc})
-				}^\text{Prefer earlier appointments} \\ 
+			\overbrace{
+				\sum_{tmdc} cs_{t} (sc_{tmdc})
+			}^\text{Prefer earlier appointments} \\ 
 	&	&&  +
 			\overbrace{
-				(1.5cc) \sum_{
+				\sum_{
 				\substack{tt`mdc \\ t' > t}} 
-				rsc_{tt'mdc}}^\text{Bad Reschedule} - 
+				(cs_{t'-t} + cc) * (rsc_{tt'mdc})}^\text{Bad Reschedule} - 
 			\overbrace{ 
-				(0.5cc) \sum_{
+				\sum_{
 				\substack{tt`mdc \\ t' < t}}
-				rsc_{tt'mdc}}^\text{Good Reschedule} + 
+				(cs_{t-t'} - cc) * (rsc_{tt'mdc})}^\text{Good Reschedule} + 
 			M \sum_{tp} uv_{tp}
 \end{alignedat}\end{equation}
 

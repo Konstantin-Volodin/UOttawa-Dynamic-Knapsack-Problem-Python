@@ -48,13 +48,12 @@ def generate_feasible_sa_list(input_data, init_state_actions):
     return(state_action_list)
 
 # %% Solve the problem (Phase 2)
-def generate_optimal_sa_list(input_data, init_state_actions, stabilization_parameter, error_parameter):
+def generate_optimal_sa_list(input_data, init_state_actions, stabilization_parameter):
 
     # Initializes
     state_action_list = init_state_actions
     count = len(state_action_list)
-    count_same = 0
-    resets_counts = 0
+    count_same = 1
     mast_model, mast_var, mast_const = generate_master_model(input_data, state_action_list)
 
     # Initializes Stabilization Parameters
@@ -67,6 +66,11 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
         mast_model.Params.LogToConsole = 0
         mast_model.optimize()
         betas = generate_beta_values(input_data, mast_const)
+
+        # Trims
+        if (count_same%100) == 0:
+            count_same += 1
+            state_action_list, mast_model, mast_var, mast_const = trim_sa_list(input_data, state_action_list, mast_var)
 
         # Update beta estimate 
         beta_avg = update_beta_estimate(input_data, beta_avg, betas, stabilization_parameter)

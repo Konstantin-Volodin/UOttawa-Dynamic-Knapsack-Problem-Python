@@ -72,22 +72,24 @@ def cost_function(input_data: input_data_class, state: state, action: action):
     cost = 0
     # Cost of Waiting
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
-        cost += model_param.cw**(mdc[0]+1) * ( action.pw_p_mdc[mdc] )
+        cost += model_param.cw * ( action.pw_p_mdc[mdc] )
     
     # Cost of Waiting - Last Period
-    for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-        cost += model_param.cw**(indices['m'][-1]+1) * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+    # for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+    #     cost += model_param.cw**(indices['m'][-1]+1) * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
 
     # Prefer Earlier Appointments
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        cost += model_param.cs**tmdc[0] * ( action.sc_tmdc[tmdc] )
+        cost += model_param.cs[tmdc[0]] * ( action.sc_tmdc[tmdc] )
 
     # Cost of Rescheduling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
         if ttpmdc[0] > ttpmdc[1]: # good schedule
-            cost -= (0.5*model_param.cc) * action.rsc_ttpmdc[ttpmdc]
+            difference = ttpmdc[0] - ttpmdc[1]
+            cost -= (model_param.cs[difference] - model_param.cc) * action.rsc_ttpmdc[ttpmdc]
         elif ttpmdc[1] > ttpmdc[0]: #bad schedule
-            cost += (1.5*model_param.cc) * action.rsc_ttpmdc[ttpmdc]
+            difference = ttpmdc[1] - ttpmdc[0]
+            cost += (model_param.cs[difference] + model_param.cc) * action.rsc_ttpmdc[ttpmdc]
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):

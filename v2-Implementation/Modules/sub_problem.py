@@ -145,12 +145,10 @@ def generate_sub_model(input_data, betas, phase1 = False):
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        # if ttpmdc[0] == ttpmdc[1] == 1:
-        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-        sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        if ttpmdc[0] == ttpmdc[1] == 1:
+            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+            sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -175,11 +173,11 @@ def generate_sub_model(input_data, betas, phase1 = False):
 
         # Cost of Waiting
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
-            expr.addTerms(model_param.cw**(mdc[0]+1), var.a_pw_p[mdc])                    
+            expr.addTerms(model_param.cw, var.a_pw_p[mdc])                    
         
         # Cost of Waiting - Last Period
-        for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cw**(indices['m'][-1]+1), var.a_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
+        # for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+        #     expr.addTerms(model_param.cw**(indices['m'][-1]+1), var.a_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return expr
     def pref_earlier_appointment(var: variables, betas) -> gp.LinExpr:
@@ -187,7 +185,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
         
         # Prefer Earlier Appointments
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cs**tmdc[0], var.a_sc[tmdc])
+            expr.addTerms(model_param.cs[tmdc[0]], var.a_sc[tmdc])
 
         return expr
     def reschedule_cost(var: variables, betas) -> gp.LinExpr:
@@ -195,9 +193,11 @@ def generate_sub_model(input_data, betas, phase1 = False):
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
             if ttpmdc[0] > ttpmdc[1]: # Good Reschedule
-                expr.addTerms(-(0.5*model_param.cc), var.a_rsc[ttpmdc])
+                difference = ttpmdc[0] - ttpmdc[1]
+                expr.addTerms(-(model_param.cs[difference] - model_param.cc), var.a_rsc[ttpmdc])
             elif ttpmdc[0] < ttpmdc[1]: # Bad Reschedule
-                expr.addTerms(1.5*model_param.cc, var.a_rsc[ttpmdc])
+                difference = ttpmdc[1] - ttpmdc[0]
+                expr.addTerms(model_param.cs[difference] + model_param.cc, var.a_rsc[ttpmdc])
 
         return expr
     def goal_violation_cost(var: variables, betas) -> gp.LinExpr:

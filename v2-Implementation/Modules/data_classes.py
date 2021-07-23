@@ -13,7 +13,7 @@ class ppe_data_class:
 class model_param_class:
     cw: float
     cc: float
-    cs: float
+    cs: List[float]
     M: float
     gamma: float
 @dataclass()

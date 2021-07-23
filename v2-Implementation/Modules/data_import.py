@@ -95,10 +95,16 @@ def read_data(data_file_path):
     model_param = model_param_class(
         model_param_sheet.cell(row=2, column=1).value,
         model_param_sheet.cell(row=2, column=2).value,
+        None, 
         model_param_sheet.cell(row=2, column=3).value,
-        model_param_sheet.cell(row=2, column=4).value,
-        model_param_sheet.cell(row=2, column=5).value
+        model_param_sheet.cell(row=2, column=4).value
     )
+
+    cs_l = [0]
+    for time in t:
+        cs_l.append(cs_l[-1] + model_param.cw * (model_param.gamma**time) )
+
+    model_param.cs = cs_l
 
     # Expected Data
     expected_vals_sheet = book.get_sheet_by_name('Expected State Values')

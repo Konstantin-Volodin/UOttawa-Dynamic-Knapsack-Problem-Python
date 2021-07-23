@@ -106,22 +106,24 @@ def state_action_cost(input_data, state, action) -> float:
 
     # Cost of Waiting
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
-        cost += model_param.cw**(mdc[0]+1) * ( action.pw_p_mdc[mdc] )
+        cost += model_param.cw * ( action.pw_p_mdc[mdc] )
 
     # Cost of Waiting - Last Period
-    for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-        cost += model_param.cw**(indices['m'][-1]+1) * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+    # for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+    #     cost += model_param.cw**(indices['m'][-1]+1) * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
 
     # Cost of Later Schedulings
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        cost += (model_param.cs**tmdc[0]) * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
+        cost += (model_param.cs[tmdc[0]]) * ( action.sc_tmdc[(tmdc[0],tmdc[1],tmdc[2],tmdc[3])] )
 
-    # Cost of Cancelling
+    # Cost of Rescheduling
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] > ttpmdc[1]: #good schedule
-            cost -= 0.5*(model_param.cc-model_param.cw) * action.rsc_ttpmdc[ttpmdc]
+        if ttpmdc[0] > ttpmdc[1]: # good schedule
+            difference = ttpmdc[0] - ttpmdc[1]
+            cost -= (model_param.cs[difference] - model_param.cc) * action.rsc_ttpmdc[ttpmdc]
         elif ttpmdc[1] > ttpmdc[0]: #bad schedule
-            cost += 1.5*(model_param.cc+model_param.cw) * action.rsc_ttpmdc[ttpmdc]
+            difference = ttpmdc[1] - ttpmdc[0]
+            cost += (model_param.cs[difference] + model_param.cc) * action.rsc_ttpmdc[ttpmdc]
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):
@@ -311,12 +313,10 @@ def myopic_policy(input_data, state) -> action:
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        # if ttpmdc[0] == ttpmdc[1] == 1:
-        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-        myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        if ttpmdc[0] == ttpmdc[1] == 1:
+            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+            myopic.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -341,31 +341,33 @@ def myopic_policy(input_data, state) -> action:
     
         # Cost of Waiting
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
-            expr.addTerms(model_param.cw**(mdc[0]+1), var_pw_p[mdc])                    
+            expr.addTerms(model_param.cw, var_pw_p[mdc])                    
         
         # Cost of Waiting - Last Period
-        for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cw**(indices['m'][-1]+1), var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
+        # for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+        #     expr.addTerms(model_param.cw**(indices['m'][-1]+1), var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
-        return(expr)
+        return expr
     def pref_earlier_appointment() -> gp.LinExpr:
         expr = gp.LinExpr()
         
         # Prefer Earlier Appointments
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cs**tmdc[0], var_sc[tmdc])
-        return(expr)
+            expr.addTerms(model_param.cs[tmdc[0]], var_sc[tmdc])
+        return expr
     def reschedule_cost() -> gp.LinExpr:
 
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-            if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(1.5*model_param.cc, var_rsc[ttpmdc])
-            elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-(0.5*model_param.cc), var_rsc[ttpmdc])
+            if ttpmdc[0] > ttpmdc[1]: # good reschedule
+                difference = ttpmdc[0] - ttpmdc[1]
+                expr.addTerms(-(model_param.cs[difference] - model_param.cc), var_rsc[ttpmdc])
+            elif ttpmdc[1] > ttpmdc[0]: # bad reschedule
+                difference = ttpmdc[1] - ttpmdc[0]
+                expr.addTerms(model_param.cs[difference] + model_param.cc, var_rsc[ttpmdc])
 
-        return(expr)
+        return expr
     def goal_violation_cost() -> gp.LinExpr:
         expr = gp.LinExpr()
 
@@ -537,12 +539,10 @@ def mdp_policy(input_data, state, betas) -> action:
 
     # 2) Bounds on Reschedules
     for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        # if ttpmdc[0] == ttpmdc[1] == 1:
-        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        # elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
-        #     sub_model.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
-        # elif ttpmdc[0] == 1 and ttpmdc[1] >= 3:
-        MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        if ttpmdc[0] == ttpmdc[1] == 1:
+            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
+        elif ttpmdc[0] >= 2 and ttpmdc[1] >= 2:
+            MDP.addConstr(var_rsc[ttpmdc] == 0, f'resc_bound_{ttpmdc}')
 
     # 3) Number of people schedules/reschedules must be consistent
         # Reschedules
@@ -567,11 +567,11 @@ def mdp_policy(input_data, state, betas) -> action:
     
         # Cost of Waiting
         for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
-            expr.addTerms(model_param.cw**(mdc[0]+1), var_pw_p[mdc])                    
+            expr.addTerms(model_param.cw, var_pw_p[mdc])                    
         
         # Cost of Waiting - Last Period
-        for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cw**(indices['m'][-1]+1), var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
+        # for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+        #     expr.addTerms(model_param.cw**(indices['m'][-1]+1), var_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
 
         return expr
     def pref_earlier_appointment() -> gp.LinExpr:
@@ -579,17 +579,20 @@ def mdp_policy(input_data, state, betas) -> action:
         
         # Prefer Earlier Appointments
         for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-            expr.addTerms(model_param.cs**tmdc[0], var_sc[tmdc])
+            expr.addTerms(model_param.cs[tmdc[0]], var_sc[tmdc])
         return expr
     def reschedule_cost() -> gp.LinExpr:
 
         expr = gp.LinExpr()
 
         for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-            if ttpmdc[1] > ttpmdc[0]:
-                expr.addTerms(1.5*model_param.cc, var_rsc[ttpmdc])
-            elif ttpmdc[1] < ttpmdc[0]:
-                expr.addTerms(-(0.5*model_param.cc), var_rsc[ttpmdc])
+            if ttpmdc[0] > ttpmdc[1]: # good reschedule
+                difference = ttpmdc[0] - ttpmdc[1]
+                expr.addTerms(-(model_param.cs[difference] - model_param.cc), var_rsc[ttpmdc])
+            elif ttpmdc[1] > ttpmdc[0]: # bad reschedule
+                difference = ttpmdc[1] - ttpmdc[0]
+                expr.addTerms(model_param.cs[difference] + model_param.cc, var_rsc[ttpmdc])
+
 
         return expr
     def goal_violation_cost() -> gp.LinExpr:

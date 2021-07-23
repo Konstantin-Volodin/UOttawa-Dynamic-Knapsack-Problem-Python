@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.3.14)  6 JUL 2021 15:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.3.14)  22 JUL 2021 19:27
 entering extended mode
 **./Manuscript.tex
 (Manuscript.tex
@@ -397,9 +397,9 @@ Package rerunfilecheck Info: File `Manuscript.out' has not changed.
 (rerunfilecheck)             Checksum: EFF9E76E9C40D5264DA3102A1D98633D;3830.
  ) 
 Here is how much of TeX's memory you used:
- 9633 strings out of 479300
- 137230 string characters out of 2863755
- 505955 words of memory out of 3000000
+ 9632 strings out of 479300
+ 137217 string characters out of 2863755
+ 502955 words of memory out of 3000000
  26888 multiletter control sequences out of 15000+200000
  411628 words of font info for 59 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -417,9 +417,9 @@ rogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program F
 iles/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Program Files/MiKT
 eX 2.9/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9/fo
 nts/type1/public/cm-super/sfrm1000.pfb>
-Output written on Manuscript.pdf (8 pages, 212894 bytes).
+Output written on Manuscript.pdf (8 pages, 212063 bytes).
 PDF statistics:
- 327 PDF objects out of 1000 (max. 8388607)
- 105 named destinations out of 1000 (max. 500000)
+ 326 PDF objects out of 1000 (max. 8388607)
+ 104 named destinations out of 1000 (max. 500000)
  217 words of extra memory for PDF output out of 10000 (max. 10000000)
 
