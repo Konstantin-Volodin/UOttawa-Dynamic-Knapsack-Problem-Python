@@ -80,12 +80,16 @@ def initial_action(input_data) -> action:
 # Executes Action
 def execute_action(input_data, state, action) -> state:
     
+    ppe_data = input_data.ppe_data
     indices = input_data.indices
     new_state = deepcopy(state)
 
     # Units Left Over
-    for p in itertools.product(indices['p']):
-        new_state.ul_p[p] = action.ul_p_p[p]
+    for p in itertools.product(indices['p']):    
+        if ppe_data[p[0]].ppe_type == 'carry-over':
+            new_state.ul_p[p] = action.ul_p_p[p]    
+        elif ppe_data[p[0]].ppe_type == 'non-carry-over':
+            new_state.ul_p[p] = 0    
 
     # Patients Scheduled
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
@@ -611,9 +615,12 @@ def mdp_policy(input_data, state, betas) -> action:
     def b_ul_cost() -> gp.LinExpr:
         expr = gp.LinExpr() 
 
-        for p in itertools.product(indices['p']):
-            expr.addConstant(betas['ul'][p[0]] * state.ul_p[p])
-            expr.addTerms(- (betas['ul'][p[0]] * gamma), var_ul_p[p]) 
+        for p in itertools.product(indices['p']):    
+            if ppe_data[p[0]].ppe_type == 'carry-over':
+                expr.addConstant(betas['ul'][p[0]] * state.ul_p[p])
+                expr.addTerms(- (betas['ul'][p[0]] * gamma), var_ul_p[p])     
+            elif ppe_data[p[0]].ppe_type == 'non-carry-over':
+                expr.addConstant(betas['ul'][p[0]] * state.ul_p[p])
 
         return expr
     def b_pw_costs() -> gp.LinExpr:

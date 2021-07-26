@@ -365,7 +365,8 @@ Subject to:
 \label{full-adp-equation}
 	& c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p \Bigg( 
 		\beta^0 +
-		\bigg( \beta^{ul}_{p} (\hat{ul}_{p} + uen_{d}) \bigg) + \\  
+		\bigg( \beta^{ul}_{p \in \text{co}} (\hat{ul}_{p} + uen_{d}) \bigg) + 
+		\bigg( \beta^{ul}_{p \in \text{nco}} (uen_{d}) \bigg) + \\  
 	& 	\bigg( \sum_{dc} \beta_{0dc}^{pw} pea_{dc} \bigg) +
 		\bigg( \sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} 
 			(\hat{pw}_{m-1dc} + pwt_{m-1d-1c} - pwt_{m-1dc}) \bigg) + \\
@@ -399,7 +400,8 @@ Steps for rearranging and converting the constraint (\ref{full-adp-equation}) in
 \end{equation}
 \begin{equation}
 \beta^{ul}_{p}: \qquad 
-	\sum_{p} \beta_{p}^{ul} \Big( ul_{p} - \gamma ( \hat{ul}_{p}) \Big)
+	\sum_{p \in \text{co}} \beta_{p}^{ul} \Big( ul_{p} - \gamma ( \hat{ul}_{p}) \Big) + 
+	\sum_{p \in \text{nco}} \beta_{p}^{ul} ( ul_{p}) 
 \end{equation}
 \begin{equation}\begin{alignedat}{10}
 & \beta^{pw}_{mdc}: \qquad 
@@ -447,8 +449,10 @@ Subject To:
 		&&	\sum_{\vec{S}\vec{A}}\vec{w} (1 - \gamma) = 1 \\
 	& \beta^{ul}: 
 		&& 	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ul_{p} - 
-			\gamma (\hat{ul}_{p}) \Big) \ge E[ul_{p}]
-		&&	\forall p \\
+			\gamma (\hat{ul}_{p}) \Big) \ge E[ul_{p}] 
+		&&	\forall p \in \{ \text{carry over} \} \\ 
+	&	&& 	\sum_{\vec{S}\vec{A}}\vec{w} ( ul_{p}) \ge E[ul_{p}]
+		&&	\forall p \in \{ \text{non carry over} \}\\
 	&	\beta^{pw}: 
 		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{0dc} - 
 		\gamma (pea_{dc}) \Big) \ge E[ps_{0dc}]

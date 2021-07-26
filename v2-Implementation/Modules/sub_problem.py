@@ -212,15 +212,18 @@ def generate_sub_model(input_data, betas, phase1 = False):
     def b0_cost(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
         expr.addConstant((1-gamma) * betas['b0']['b_0'])
-        return(expr)
+        return expr
     def b_ul_cost(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
         
-        for p in itertools.product(indices['p']):
-            expr.addTerms(betas['ul'][p], var.s_ul[p])
-            expr.addTerms(- (betas['ul'][p] * gamma), var.a_ul_p[p])
+        for p in itertools.product(indices['p']):    
+            if ppe_data[p[0]].ppe_type == 'carry-over':
+                expr.addTerms(betas['ul'][p], var.s_ul[p])
+                expr.addTerms(- (betas['ul'][p] * gamma), var.a_ul_p[p])    
+            elif ppe_data[p[0]].ppe_type == 'non-carry-over':
+                expr.addTerms(betas['ul'][p], var.s_ul[p])
                     
-        return(expr)
+        return expr
     def b_pw_costs(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
 

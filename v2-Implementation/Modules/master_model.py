@@ -122,7 +122,11 @@ def b_ul_constraint(input_data: input_data_class, state: state, action: action) 
     # Creates Data
     for p in itertools.product(indices['p']):
         
-        lhs[p] = state.ul_p[p] - gamma * action.ul_p_p[p]
+        if ppe_data[p[0]].ppe_type == 'carry-over':
+            lhs[p] = state.ul_p[p] - gamma * action.ul_p_p[p]    
+        elif ppe_data[p[0]].ppe_type == 'non-carry-over':
+            lhs[p] = state.ul_p[p]
+
         rhs[p] = input_data.expected_state_values['ul'][p]
         sign[p] = ">="
         name[p] = f'b_ul_{str(p)[1:][:-1].replace(" ","_").replace(",","")}'

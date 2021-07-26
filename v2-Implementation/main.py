@@ -27,7 +27,7 @@ input_data = read_data(os.path.join(my_path, 'Data', 'Data-complex-newcost.xlsx'
 # Import betas
 fig, axes = plt.subplots(1, 1)
 betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-complex-newcost.xlsx'))
-compare_policies(input_data, betas, 1, 10000, 5000, axes)
+compare_policies(input_data, betas, 3, 10000, 5000, axes)
 fig.savefig(os.path.join(my_path, 'Data', f'Optimal-Betas-complex-newcost-long.pdf'))
 
 # # %% Test out policies
