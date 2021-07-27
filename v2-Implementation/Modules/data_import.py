@@ -3,7 +3,7 @@ import openpyxl
 from typing import Dict, Tuple, List, Callable
 from dataclasses import dataclass
 
-from Modules.data_classes import ppe_data_class, model_param_class, input_data_class
+from Modules.data_classes import ppe_data_class, model_param_class, transition_data_class, input_data_class
 
 # Reads All input data from excel
 def read_data(data_file_path):
@@ -82,12 +82,10 @@ def read_data(data_file_path):
     # Patient Transitions
     transition_sheet = book.get_sheet_by_name('Patient Transitions')
     transition = {}
-    for row in transition_sheet.iter_rows(min_row=2, min_col=2, max_col=5, values_only=True):
+    for row in transition_sheet.iter_rows(min_row=2, min_col=1, max_col=4, values_only=True):
         if row[0] == None: break
-
-        transition[
-            (row[2], row[1], row[0])
-        ] = row[3]
+        print(row)
+        transition[(row[1], row[0])] = transition_data_class(row[2], row[3])
 
 
     # Model Parameters

@@ -53,13 +53,13 @@
 	\item It is assumed that patients do not change complexities within some limit ($TL$). 
 	\begin{itemize}
 		\item Let's assume our limit is 10 periods, patients will never change complexities within the 10 periods.  
-		\item However, if a patient waits for 11 periods there is a possibility they increase complexity
+		\item However, on their 10th period, they can increase complexity
 	\end{itemize}		
 	
-	\item We assume patient complexity transitions follow binary distribution - each period a patient can become more complex with a certain probability
+	\item We assume patient complexity transitions follow binary distribution - each period a patient can become more complex with a static probability
 	\begin{itemize}
 		\item While patient is waiting less that $TL$, the transition probability is 0.
-		\item After $TL$, transition probability is some arbitrary value
+		\item After $TL$, a patient has some probability they move to a higher complexity in that period
 	\end{itemize}
 	
 	\item It is assumed if a patient is scheduled in period one, it means they are served "immediately", regardless if in practice the appointment is at the beginning or end of the period.
@@ -231,10 +231,11 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 			\item $pea_{dc}$ - represents the random number of patients arriving. Follows a poisson distribution.
 		\end{itemize}
 	
-	\item Transition between patient complexities within the wait list - $pw_{m>=1,dc}$
+	\item Transition between patient complexities within the wait list - $pw_{mdc}$
 		\begin{itemize}
 			\item $pwt_{mdc}$ represents the random number of patients of complexity $d$, CPU $c$, waiting for $m$ period, who became more complex. Follows binomial distribution.
-			\item $ptp_{mdc}$ represents transition probability to a higher complexity
+			\item $ptp_{dc}$ represents transition probability to a higher complexity
+			\item $TL_{dc}$ represents the time at which this transition probability starts to have an effect (must be less than M)
 		\end{itemize}
 		
 	\item Transition between patient complexities within the scheduled list - $ps_{tmdc}$
@@ -269,10 +270,13 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 				&& = pea_{dc} \quad
 				&& \forall dc \\  
 			& pw'_{mdc} 
+				&& = \hat{pw}_{m-1,dc}
+				&& \forall m \in \{ 1...(TL_{dc}-1) \} dc \\  
+			& pw'_{mdc} 
 				&& = \hat{pw}_{m-1,dc} + 
 				\overbrace{pwt_{m-1,d-1,c} - pwt_{m-1,dc}}^\text{
 					change in complexities} \quad
-				&& \forall m \in \{ 1...M-1 \} dc \\  
+				&& \forall m \in \{ TL_{dc}...M-1 \} dc \\  
 			& pw'_{Mdc} 
 				&& = \sum_{M-1}^{M} \big( 
 					\hat{pw}_{mdc} + 
@@ -291,10 +295,13 @@ Decision consists of rescheduling currently scheduled patients, and scheduling p
 				&& = 0 \quad
 				&& \forall mdc \\  
 			& ps'_{tmdc} 
+				&& = \hat{ps}_{t+1,m-1,dc} \quad 
+				&& \forall t \in \{1...T-1\} m \in \{ 1... (TL_{dc}-1) \} dc \\ 
+			& ps'_{tmdc} 
 				&& = \hat{ps}_{t+1,m-1,dc} + 
 				\overbrace{pst_{t+1,m-1,d-1,c} - pst_{t+1,m-1,dc}}^\text{
 					change in complexities} \quad
-				&& \forall t \in \{1...T-1\} m \in \{ 1...M-1 \} dc \\  
+				&& \forall t \in \{1...T-1\} m \in \{ TL_{dc}...M-1 \} dc \\  
 			& ps'_{tMdc} 
 				&& = \sum_{M-1}^{M} \big( 
 				\hat{ps}_{t+1mdc} + 

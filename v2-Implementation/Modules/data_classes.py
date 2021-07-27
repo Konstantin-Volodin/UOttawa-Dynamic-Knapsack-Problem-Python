@@ -16,13 +16,17 @@ class model_param_class:
     cs: List[float]
     M: float
     gamma: float
+@dataclass(frozen=False)
+class transition_data_class:
+    wait_limit: int
+    transition_rate: float
 @dataclass()
 class input_data_class:
     indices: Dict[ str, List[int] ]
     ppe_data: Dict[ str,ppe_data_class ]
     usage: Dict[ Tuple[str], List[int] ]
     arrival: Dict[ Tuple[str], List[int] ]
-    transition: Dict[ Tuple[str], List[int] ]
+    transition: Dict[ Tuple[str], transition_data_class ]
     model_param: model_param_class
     expected_state_values: Dict[ str, Dict[Tuple[str], float] ]
 
