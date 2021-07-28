@@ -230,6 +230,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
         for mc in itertools.product(indices['m'], indices['c']):
             for d in range(len(indices['d'])):
                 mdc = (mc[0], indices['d'][d], mc[1])
+                dc = (indices['d'][d], mc[1])
 
                 # When m is 0
                 if mc[0] == 0: 
@@ -244,17 +245,22 @@ def generate_sub_model(input_data, betas, phase1 = False):
                         expr.addTerms(-betas['pw'][mdc] * gamma, var.a_pw_p[(mm, mdc[1], mdc[2])])
            
                         # Transitioned In
-                        if d != 0:
+                        if d != 0 & (mm >= transition[dc].wait_limit+1):
                             expr.addTerms(
-                                -betas['pw'][mdc] * gamma * transition[( mm, indices['d'][d-1], mdc[2] )],
+                                -betas['pw'][mdc] * gamma * transition[dc].transition_rate,
                                 var.a_pw_p[( mm, indices['d'][d-1], mdc[2] )]
                             )
                         # Transitioned Out
                         if d != indices['d'][-1]:
                             expr.addTerms(
-                                betas['pw'][mdc] * gamma * transition[( mm, mdc[1], mdc[2] )],
+                                betas['pw'][mdc] * gamma * transition[dc].transition_rate,
                                 var.a_pw_p[( mm, mdc[1], mdc[2] )]
                             )
+
+                # When m is less than TL_dc
+                elif mc[0] <= (transition[dc].wait_limit - 1):
+                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
+                    expr.addTerms(-betas['pw'][mdc] * gamma, var.a_pw_p[(mdc[0]-1, mdc[1], mdc[2])])
 
                 # All others
                 else:                   
@@ -262,25 +268,26 @@ def generate_sub_model(input_data, betas, phase1 = False):
                     expr.addTerms(-betas['pw'][mdc] * gamma, var.a_pw_p[(mdc[0]-1, mdc[1], mdc[2])])
            
                     # Transitioned In
-                    if d != 0:
+                    if d != 0 & (mdc[0] >= transition[dc].wait_limit+1):
                         expr.addTerms(
-                            -betas['pw'][mdc] * gamma * transition[( mdc[0]-1, indices['d'][d-1], mdc[2] )],
+                            -betas['pw'][mdc] * gamma * transition[dc].transition_rate,
                             var.a_pw_p[( mdc[0]-1, indices['d'][d-1], mdc[2] )]
                         )
                     # Transitioned Out
                     if d != indices['d'][-1]:
                         expr.addTerms(
-                            betas['pw'][mdc] * gamma * transition[( mdc[0]-1, mdc[1], mdc[2] )],
+                            betas['pw'][mdc] * gamma * transition[dc].transition_rate,
                             var.a_pw_p[( mdc[0]-1, mdc[1], mdc[2] )]
                         )
 
-        return(expr)
+        return expr
     def b_ps_costs(var: variables, betas) -> gp.LinExpr:
         expr = gp.LinExpr()
 
         for tmc in itertools.product(indices['t'], indices['m'], indices['c']):
             for d in range(len(indices['d'])):
                 tmdc = (tmc[0], tmc[1], indices['d'][d], tmc[2])
+                dc = (indices['d'][d], tmc[2])
 
                 # When m is 0
                 if tmdc[1] == 0: 
@@ -298,33 +305,38 @@ def generate_sub_model(input_data, betas, phase1 = False):
                         expr.addTerms(-betas['ps'][tmdc] * gamma, var.a_ps_p[(tmdc[0]+1, mm, tmdc[2], tmdc[3])])
            
                         # Transitioned In
-                        if d != 0:
+                        if d != 0 & (mm >= transition[dc].wait_limit+1):
                             expr.addTerms(
-                                -betas['ps'][tmdc] * gamma * transition[( mm, indices['d'][d-1], tmdc[3] )],
+                                -betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
                                 var.a_ps_p[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )]
                             )
                         # Transitioned Out
                         if d != indices['d'][-1]:
                             expr.addTerms(
-                                betas['ps'][tmdc] * gamma * transition[( mm, tmdc[2], tmdc[3] )],
+                                betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
                                 var.a_ps_p[( tmdc[0]+ 1, mm, tmdc[2], tmdc[3] )]
                             )
                 
+                # When m is less than TL_dc
+                elif tmdc[1] <= (transition[dc].wait_limit - 1):
+                    expr.addTerms(betas['ps'][tmdc], var.s_ps[tmdc])
+                    expr.addTerms(-betas['ps'][tmdc] * gamma, var.a_ps_p[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
+           
                 # Everything Else
                 else:
                     expr.addTerms(betas['ps'][tmdc], var.s_ps[tmdc])
                     expr.addTerms(-betas['ps'][tmdc] * gamma, var.a_ps_p[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
            
                     # Transitioned In
-                    if d != 0:
+                    if d != 0 & (tmdc[1] >= transition[dc].wait_limit+1):
                         expr.addTerms(
-                            -betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, indices['d'][d-1], tmdc[3] )],
+                            -betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
                             var.a_ps_p[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )]
                         )
                     # Transitioned Out
                     if d != indices['d'][-1]:
                         expr.addTerms(
-                            betas['ps'][tmdc] * gamma * transition[( tmdc[1]-1, tmdc[2], tmdc[3] )],
+                            betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
                             var.a_ps_p[( tmdc[0]+ 1, tmdc[1]-1, tmdc[2], tmdc[3] )]
                         )
 

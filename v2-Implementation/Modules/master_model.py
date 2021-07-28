@@ -151,6 +151,7 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
     for mc in itertools.product(indices['m'], indices['c']):
         for d in range(len(indices['d'])):
             mdc = (mc[0], indices['d'][d], mc[1])
+            dc = (indices['d'][d], mc[1])
 
             # When m = 0
             if mc[0] == 0: 
@@ -164,24 +165,28 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
                     lhs[mdc] -= gamma * action.pw_p_mdc[(mm, mdc[1], mdc[2])]
                     
                     transitioned_in = 0
-                    if d != 0:
-                        transitioned_in = transition[( mm, indices['d'][d-1], mdc[2] )] * action.pw_p_mdc[( mm, indices['d'][d-1], mdc[2] )]
+                    if d != 0 & (mm >= transition[dc].wait_limit+1):
+                        transitioned_in = transition[dc].transition_rate * action.pw_p_mdc[( mm, indices['d'][d-1], mdc[2] )]
                     transitioned_out = 0
                     if d != indices['d'][-1]:
-                        transitioned_out = transition[( mm, mdc[1], mdc[2] )] * action.pw_p_mdc[( mm, mdc[1], mdc[2] )]
+                        transitioned_out = transition[dc].transition_rate * action.pw_p_mdc[( mm, mdc[1], mdc[2] )]
                     
                     lhs[mdc] -= gamma * (transitioned_in - transitioned_out )
+
+            # When m is less than TL_dc
+            elif mc[0] <= (transition[dc].wait_limit - 1):
+                lhs[mdc] = state.pw_mdc[mdc] - gamma * action.pw_p_mdc[(mdc[0]-1,mdc[1],mdc[2])]
 
             # All others
             else:      
                 lhs[mdc] = state.pw_mdc[mdc] - gamma*(action.pw_p_mdc[(mdc[0]-1,mdc[1],mdc[2])])
 
                 transitioned_in = 0
-                if d != 0:
-                    transitioned_in = transition[( mdc[0]-1, indices['d'][d-1], mdc[2] )] * action.pw_p_mdc[( mdc[0]-1, indices['d'][d-1], mdc[2] )]
+                if d != 0 & (mdc[0] >= transition[dc].wait_limit+1):
+                    transitioned_in = transition[dc].transition_rate * action.pw_p_mdc[( mdc[0]-1, indices['d'][d-1], mdc[2] )]
                 transitioned_out = 0
                 if d != indices['d'][-1]:
-                    transitioned_out = transition[( mdc[0]-1, mdc[1], mdc[2] )] * action.pw_p_mdc[( mdc[0]-1, mdc[1], mdc[2] )]
+                    transitioned_out = transition[dc].transition_rate * action.pw_p_mdc[( mdc[0]-1, mdc[1], mdc[2] )]
                 
                 lhs[mdc] -= gamma * (transitioned_in - transitioned_out )
 
@@ -207,6 +212,7 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
     for tmc in itertools.product(indices['t'], indices['m'], indices['c']):
         for d in range(len(indices['d'])):
             tmdc = (tmc[0], tmc[1], indices['d'][d], tmc[2])
+            dc = (indices['d'][d], tmc[2])
 
             # When m is 0
             if tmdc[1] == 0: 
@@ -224,24 +230,28 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
                     lhs[tmdc] -= gamma * action.ps_p_tmdc[(tmdc[0] + 1, mm, tmdc[2], tmdc[3])]
 
                     transitioned_in = 0
-                    if d != 0:
-                        transitioned_in = transition[( mm, indices['d'][d-1], tmdc[3] )] * action.ps_p_tmdc[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )]
+                    if d != 0 & (mm >= transition[dc].wait_limit+1):
+                        transitioned_in = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )]
                     transitioned_out = 0
                     if d != indices['d'][-1]:
-                        transitioned_out = transition[( mm, tmdc[2], tmdc[3] )] * action.ps_p_tmdc[( tmdc[0]+1, mm, tmdc[2], tmdc[3] )]
+                        transitioned_out = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, mm, tmdc[2], tmdc[3] )]
                         
                     lhs[tmdc] -= gamma * (transitioned_in - transitioned_out )
-
+                    
+            # When m is less than TL_dc
+            elif tmdc[1] <= (transition[dc].wait_limit - 1):
+                lhs[tmdc] = state.ps_tmdc[tmdc] - gamma*(action.ps_p_tmdc[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
+            
             # Everything Else
             else:
                 lhs[tmdc] = state.ps_tmdc[tmdc] - gamma*(action.ps_p_tmdc[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
                 
                 transitioned_in = 0
-                if d != 0:
-                    transitioned_in = transition[( tmdc[1]-1, indices['d'][d-1], tmdc[3] )] * action.ps_p_tmdc[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )]
+                if d != 0  & (tmdc[1] >= transition[dc].wait_limit+1):
+                    transitioned_in = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )]
                 transitioned_out = 0
                 if d != indices['d'][-1]:
-                    transitioned_out = transition[( tmdc[1]-1, tmdc[2], tmdc[3] )] * action.ps_p_tmdc[( tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3] )]
+                    transitioned_out = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3] )]
 
                 lhs[tmdc] -= gamma * (transitioned_in - transitioned_out )
                 

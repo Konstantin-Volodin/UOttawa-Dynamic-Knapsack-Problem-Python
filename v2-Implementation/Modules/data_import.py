@@ -84,7 +84,6 @@ def read_data(data_file_path):
     transition = {}
     for row in transition_sheet.iter_rows(min_row=2, min_col=1, max_col=4, values_only=True):
         if row[0] == None: break
-        print(row)
         transition[(row[1], row[0])] = transition_data_class(row[2], row[3])
 
 

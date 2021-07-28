@@ -2,8 +2,14 @@
 from Modules.data_import import *
 from Modules.data_export import *
 from Modules.master_model import *
-from Modules.sub_problem import *    
+from Modules.sub_problem import * 
+import gurobipy as gp
 
+import Modules.decorators
+# generate_master_model = Modules.decorators.timer(generate_master_model)
+# generate_phase1_master_model = Modules.decorators.timer(generate_phase1_master_model)
+# generate_sub_model = Modules.decorators.timer(generate_sub_model)
+# gp.Model.optimize = Modules.decorators.timer(gp.Model.optimize)
 # %% Generate Initial Feasible Set (Phase 1)
 def generate_feasible_sa_list(input_data, init_state_actions):
     state_action_list = init_state_actions
@@ -18,6 +24,7 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         # Generates and Solves Master
         p1_mast_model, p1_mast_const = generate_phase1_master_model(input_data, mast_model)
         p1_mast_model.Params.LogToConsole = 0
+        # p1_mast_model.Params.MIPGap = 100
         p1_mast_model.optimize()
         betas = generate_beta_values(input_data, p1_mast_const)
             
@@ -33,6 +40,7 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         # Generates and solves Subproblem 
         p1_sub_model, p1_sub_var = generate_sub_model(input_data, betas, True)
         p1_sub_model.Params.LogToConsole = 0
+        # p1_sub_model.Params.MIPGap = 100
         p1_sub_model.optimize()
         
         # Update State-Actions

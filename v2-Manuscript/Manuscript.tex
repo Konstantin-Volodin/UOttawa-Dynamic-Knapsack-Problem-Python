@@ -2,7 +2,7 @@
 \documentclass{article}
 
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath, amssymb}
+\usepackage{amsmath, amssymb, nccmath}
 
 \usepackage{xcolor, hyperref}
 \hypersetup{
@@ -350,11 +350,15 @@ Given a full MDP model, the equivalent LP would look as follows:
 
 subject to
 \begin{equation}
-	c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p(\vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) v( \vec{S'} | \vec{S}, \vec{A}, \vec{pea}, \vec{pwt}, \vec{pst}, \vec{ued}) \ge v(\vec{S}) \quad \forall \vec{S} \vec{A}
+\label{full-adp-equation}
+	c(\vec{S}, \vec{A}) + \gamma \sum_{\vec{p}} p * v( \vec{S'}) 
+		\ge v(\vec{S}) \quad \forall \vec{S} \vec{A}
 \end{equation}
 
+And all auxiliary constraints in "\nameref{auxiliary constraints}"
+
 \section{Aproximate Dynamic Programming Model}
-\subsection{Full ADP Model}
+\subsection{Expectation ADP Model}
 Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximation as follows:
 \begin{equation}\begin{alignedat}{10}
 	& v(\vec{ul}, \vec{pw}, \vec{ps}) 
@@ -363,83 +367,70 @@ Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximati
 			\sum_{tmdc} \beta_{tmdc}^{ps} ps_{tmdc}
 \end{alignedat} \end{equation}
 
-This gives the following LP
-\begin{equation}
-	\max_{\vec{\beta}} \sum \alpha (\vec{ul}, \vec{pw}, \vec{ps}) v(\vec{ul}, \vec{pw}, \vec{ps})
-\end{equation}
-Subject to:
-\begin{equation}\begin{alignedat}{10}
-\label{full-adp-equation}
-	& c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) + \gamma \sum_{\vec{p}} p \Bigg( 
-		\beta^0 +
-		\bigg( \beta^{ul}_{p \in \text{co}} (\hat{ul}_{p} + uen_{d}) \bigg) + 
-		\bigg( \beta^{ul}_{p \in \text{nco}} (uen_{d}) \bigg) + \\  
-	& 	\bigg( \sum_{dc} \beta_{0dc}^{pw} pea_{dc} \bigg) +
-		\bigg( \sum_{m=1,dc}^{M-1} \beta_{mdc}^{pw} 
-			(\hat{pw}_{m-1dc} + pwt_{m-1d-1c} - pwt_{m-1dc}) \bigg) + \\
-	&	\qquad \qquad \bigg( \sum_{dc} \beta_{Mdc}^{pw} 
-			(\sum_{M-1}^{M} \hat{pw}_{mdc} + pwt_{md-1c} - pwt_{mdc})\bigg) + \\
-	& 	\bigg( \sum_{tdc} \beta_{t0dc}^{ps} 0 \bigg) +
-		\bigg( \sum_{mdc} \beta_{Tmdc}^{ps} 0 \bigg) +
-		\bigg( \sum_{t=1m=1dc}^{T-1M-1} \beta_{tmdc}^{ps} 
-			(\hat{ps}_{t+1m-1dc} + pst_{t+1m-1d-1c} - pst_{t+1m-1dc}) \bigg) + \\	
-	&	\bigg( \sum_{t=1Mdc}^{T-1} \beta_{tmdc}^{ps} 
-			(\sum_{M-1}^{M} (\hat{ps}_{t+1mdc} + pst_{t+1md-1c} - pst_{t+1mdc})) \bigg)
-	\Bigg) \ge v(\vec{ul}, \vec{pw}, \vec{ps}) \quad \forall \vec{S} \vec{A}
-\end{alignedat} \end{equation}
-\begin{equation}
-	\vec{\beta} \ge 0 \quad \forall \beta
-\end{equation}
-And all auxiliary constraints in "\nameref{auxiliary constraints}"
+Next we need to convert a part of equation \ref{full-adp-equation} into expectation. \\ 
+(To make it easier later, we will format is as $v(\vec{S}) - E[v(\vec{S}')]$)
 
-
-
-\subsection{Expectation ADP Model}
-Steps for rearranging and converting the constraint (\ref{full-adp-equation}) into expectation:
 \begin{itemize}
 	\item $E[ued_p] = 0$
-	\item $E[pwt_{mdc}] = ptp_{mdc} * \hat{pw}_{mdc}$ 
-	\item $E[pst_{tmdc}] = ptp_{mdc} * \hat{ps}_{tmdc}$ 
+	\item $E[pwt_{mdc}] = ptp_{dc} * \hat{pw}_{mdc}$ 
+	\item $E[pst_{tmdc}] = ptp_{dc} * \hat{ps}_{tmdc}$ 
 \end{itemize}
 
+\begin{fleqn}[\parindent]
 \begin{equation}
 	\beta^{0}: \qquad (1-\gamma) \beta^{0}
 \end{equation}
+\end{fleqn}
+
+\begin{fleqn}[\parindent]
 \begin{equation}
 \beta^{ul}_{p}: \qquad 
 	\sum_{p \in \text{co}} \beta_{p}^{ul} \Big( ul_{p} - \gamma ( \hat{ul}_{p}) \Big) + 
 	\sum_{p \in \text{nco}} \beta_{p}^{ul} ( ul_{p}) 
 \end{equation}
+\end{fleqn}
+
+\begin{fleqn}[\parindent]
 \begin{equation}\begin{alignedat}{10}
 & \beta^{pw}_{mdc}: \qquad 
-	&& \sum_{dc} \beta_{0dc}^{pw} \Big( pw_{0dc} - \gamma (pea_{dc}) \Big) + 
-	\sum_{m=1dc}^{M-1} \beta_{mdc}^{pw} 
+	&& 	\sum_{dc} \beta_{0dc}^{pw} \Big( pw_{0dc} - \gamma (pea_{dc}) \Big) +
+	\sum_{m=1dc}^{TL_{dc}-1} \beta_{mdc}^{pw} 
 	\Big( pw_{mdc} - \gamma 
+		(\hat{pw}_{m-1dc}) \Big) + \\
+	& && \sum_{m=TL_{dc}dc}^{M-1} \beta_{mdc}^{pw} 
+		\Big( pw_{mdc} - \gamma 
 		(\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \Big) + \\
-&	&& \sum_{dc} \beta_{Mdc}^{pw} 
-	\Big( pw_{Mdc} - \gamma \sum_{M-1}^{M}
+	& && \sum_{dc} \beta_{Mdc}^{pw} 
+		\Big( pw_{Mdc} - \gamma \sum_{M-1}^{M}
 		(\hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}]) \Big)
 \end{alignedat} \end{equation}
+\end{fleqn}
+
+\begin{fleqn}[\parindent]
 \begin{equation}\begin{alignedat}{10}
 & \beta^{ps}_{tmdc}: \qquad 
 	&& \sum_{tdc} \beta_{t0dc}^{ps} \Big( ps_{t0dc}) \Big) + 
-	\sum_{mdc} \beta_{Tmdc}^{ps} \Big( ps_{Tmdc}) \Big) + \\
+\sum_{mdc} \beta_{Tmdc}^{ps} \Big( ps_{Tmdc}) \Big) + 
+	\sum_{t=1m=1dc}^{T-1, TL_{dc}-1} \beta_{tmdc}^{ps} 
+	\Big( ps_{tmdc} - \gamma 
+	(\hat{ps}_{t+1m-1dc}) \Big) + \\
 &	&& 
-	\sum_{t=1m=1dc}^{T-1M-1} \beta_{tmdc}^{ps} 
+	\sum_{t=1m=TL_{dc}dc}^{T-1,M-1} \beta_{tmdc}^{ps} 
 	\Big( ps_{tmdc} - \gamma 
 		(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{t+1m-1dc}]) \Big) + \\
 &	&& \sum_{t=1dc}^{T-1} \beta_{tMdc}^{ps} 
 	\Big( ps_{tMdc} - \gamma \sum_{M-1}^{M}
 		(\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{t+1mdc}]) \Big)
 \end{alignedat} \end{equation}
+\end{fleqn}
 
-Let's say $E[V]$ is the addition of all parts above. Then the ADP model converted to expectation would look as follows:
+Using the numbers above we rearrange the original equation as follows:
 \begin{equation}
 	\max_{\vec{\beta}} \Big( \sum \beta^{0} + \sum \beta^{ut} E[ut] + \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps] \Big)
 \end{equation}
 Subject to:
 \begin{equation}
-	E[V] \le c(\vec{pw}, \vec{sc}, \vec{rsc}, \vec{uv}) \quad \forall \vec{S} \vec{A} 
+	v(\vec{S}) - E[v(\vec{S}')] \le c(\vec{S}, \vec{A}) \quad \forall \vec{S} \vec{A} 
 \end{equation}
 
 
@@ -465,8 +456,11 @@ Subject To:
 		\gamma (pea_{dc}) \Big) \ge E[ps_{0dc}]
 		&&	\forall dc \\
 	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdc} - 
+		\gamma (\hat{pw}_{m-1dc}) \Big) \ge E[pw_{mdc}]
+		&&	\forall m \in \{1...TL_{dc}-1\} dc \\
+	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdc} - 
 		\gamma (\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \Big) \ge E[pw_{mdc}]
-		&&	\forall m \in \{1...M-1\} dc \\
+		&&	\forall m \in \{TL_{dc}...M-1\} dc \\
 	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{Mdc} - \gamma 
 			\sum_{M-1}^{M} (\hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}]) \Big) \ge E[pw_{Mdc}]
 		&&	\forall dc \\ 
@@ -476,8 +470,11 @@ Subject To:
 	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{Tmdc} \Big) \ge E[ps_{Tmdc}]
 		&&	\forall mdc \\
 	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdc} - \gamma 
+		(\hat{ps}_{t+1m-1dc}) \Big) \ge E[ps_{tmdc}] \;
+		&&	\forall \{1...T-1\} \{1...TL_{dc}-1\}dc \\
+	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdc} - \gamma 
 			(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{d}]) \Big) \ge E[ps_{tmdc}] \;
-		&&	\forall \{1...T-1\} \{1...M-1\}dc \\
+		&&	\forall \{1...T-1\} \{TL_{dc}...M-1\}dc \\
 	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tMdc} - \gamma \sum_{M-1}^{M}
 		(\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{d}]) \Big) \ge E[ps_{tMdc}] \;
 		&&	\forall \{1...T-1\} dc
@@ -491,7 +488,7 @@ Subject To:
 \subsection{ADP Pricing Problem}
 \label{Pricing Problem}
 \begin{equation}
-	\min_{(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \in S,  (\vec{sc}, \vec{rsc}) \in A } c(\vec{pw},\vec{sc},\vec{rsc},\vec{uv}) - E[V]
+	\min_{(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \in S,  (\vec{sc}, \vec{rsc}) \in A } c(\vec{pw},\vec{sc},\vec{rsc},\vec{uv}) - \Big(v(\vec{S}) - E[v(\vec{S}')] \Big)
 \end{equation}
 Subject to:
 constraints in sections "\nameref{state-action constraints}" and "\nameref{auxiliary constraints}"

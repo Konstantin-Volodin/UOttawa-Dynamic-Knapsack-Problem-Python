@@ -2714,7 +2714,7 @@ Subject To
    + a_sc_(8,_0,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_0,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_0,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(0,_'Complexity_1',_'CPU_1') = 11
+   + a_pw_p_(0,_'Complexity_1',_'CPU_1') = 8
  pw_hat_(0,_'Complexity_1',_'CPU_2'): a_sc_(1,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_0,_'Complexity_1',_'CPU_2')
@@ -2725,7 +2725,7 @@ Subject To
    + a_sc_(8,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(9,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(10,_0,_'Complexity_1',_'CPU_2')
-   + a_pw_p_(0,_'Complexity_1',_'CPU_2') = 10
+   + a_pw_p_(0,_'Complexity_1',_'CPU_2') = 5
  pw_hat_(1,_'Complexity_1',_'CPU_1'): a_sc_(1,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(2,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(3,_1,_'Complexity_1',_'CPU_1')
@@ -2736,7 +2736,7 @@ Subject To
    + a_sc_(8,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_1,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(1,_'Complexity_1',_'CPU_1') = 7
+   + a_pw_p_(1,_'Complexity_1',_'CPU_1') = 8
  pw_hat_(1,_'Complexity_1',_'CPU_2'): a_sc_(1,_1,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_1,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_1,_'Complexity_1',_'CPU_2')
@@ -2747,7 +2747,7 @@ Subject To
    + a_sc_(8,_1,_'Complexity_1',_'CPU_2')
    + a_sc_(9,_1,_'Complexity_1',_'CPU_2')
    + a_sc_(10,_1,_'Complexity_1',_'CPU_2')
-   + a_pw_p_(1,_'Complexity_1',_'CPU_2') = 11
+   + a_pw_p_(1,_'Complexity_1',_'CPU_2') = 1
  pw_hat_(2,_'Complexity_1',_'CPU_1'): a_sc_(1,_2,_'Complexity_1',_'CPU_1')
    + a_sc_(2,_2,_'Complexity_1',_'CPU_1')
    + a_sc_(3,_2,_'Complexity_1',_'CPU_1')
@@ -2758,7 +2758,7 @@ Subject To
    + a_sc_(8,_2,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_2,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_2,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(2,_'Complexity_1',_'CPU_1') = 2
+   + a_pw_p_(2,_'Complexity_1',_'CPU_1') = 4
  pw_hat_(2,_'Complexity_1',_'CPU_2'): a_sc_(1,_2,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_2,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_2,_'Complexity_1',_'CPU_2')
@@ -2780,7 +2780,7 @@ Subject To
    + a_sc_(8,_3,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_3,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_3,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(3,_'Complexity_1',_'CPU_1') = 1
+   + a_pw_p_(3,_'Complexity_1',_'CPU_1') = 4
  pw_hat_(3,_'Complexity_1',_'CPU_2'): a_sc_(1,_3,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_3,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_3,_'Complexity_1',_'CPU_2')
@@ -2824,7 +2824,7 @@ Subject To
    + a_sc_(8,_5,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_5,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_5,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(5,_'Complexity_1',_'CPU_1') = 1
+   + a_pw_p_(5,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(5,_'Complexity_1',_'CPU_2'): a_sc_(1,_5,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_5,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_5,_'Complexity_1',_'CPU_2')
@@ -2846,7 +2846,7 @@ Subject To
    + a_sc_(8,_6,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_6,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_6,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(6,_'Complexity_1',_'CPU_1') = 6
+   + a_pw_p_(6,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(6,_'Complexity_1',_'CPU_2'): a_sc_(1,_6,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_6,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_6,_'Complexity_1',_'CPU_2')
@@ -7570,10 +7570,10 @@ Subject To
    + a_ps_p_(10,_10,_'Complexity_1',_'CPU_2') = 0
  uv_max_1_(1,_'PPE_1'): a_uv_(1,_'PPE_1') - 10000 a_uvb_(1,_'PPE_1') <= 0
  uv_max_2_(1,_'PPE_1'): a_uv_(1,_'PPE_1') - a_uu_p_(1,_'PPE_1')
-   + 10000 a_uvb_(1,_'PPE_1') <= 9993.015502654653
+   + 10000 a_uvb_(1,_'PPE_1') <= 9981.872983605464
  uv_max_1_(1,_'PPE_2'): a_uv_(1,_'PPE_2') - 10000 a_uvb_(1,_'PPE_2') <= 0
  uv_max_2_(1,_'PPE_2'): a_uv_(1,_'PPE_2') - a_uu_p_(1,_'PPE_2')
-   + 10000 a_uvb_(1,_'PPE_2') <= 9981.761343659673
+   + 10000 a_uvb_(1,_'PPE_2') <= 9979.839940135254
  uv_max_1_(2,_'PPE_1'): a_uv_(2,_'PPE_1') - 10000 a_uvb_(2,_'PPE_1') <= 0
  uv_max_2_(2,_'PPE_1'): a_uv_(2,_'PPE_1') - a_uu_p_(2,_'PPE_1')
    + 10000 a_uvb_(2,_'PPE_1') <= 9990
@@ -7632,20 +7632,20 @@ Subject To
    + 10000 a_uvb_(10,_'PPE_2') <= 9980
  ul_hat_1_(10,_'PPE_2'): a_ul_p_('PPE_1',) >= 0
  ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_1',) + a_uu_p_(1,_'PPE_1')
-   >= 6.984497345347428
+   >= 18.12701639453538
  ul_max_1_(10,_'PPE_2'): a_ul_p_('PPE_1',) - 10000 a_ulb_('PPE_1',) <= 0
  ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_1',) + 10000 a_ulb_('PPE_1',)
-   + a_uu_p_(1,_'PPE_1') <= 10006.98449734535
+   + a_uu_p_(1,_'PPE_1') <= 10018.12701639454
  ul_hat_1_(10,_'PPE_2'): a_ul_p_('PPE_2',) >= 0
  ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_2',) + a_uu_p_(1,_'PPE_2')
-   >= 18.23865634032753
+   >= 20.16005986474635
  ul_max_1_(10,_'PPE_2'): a_ul_p_('PPE_2',) - 10000 a_ulb_('PPE_2',) <= 0
  ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_2',) + 10000 a_ulb_('PPE_2',)
-   + a_uu_p_(1,_'PPE_2') <= 10018.23865634033
+   + a_uu_p_(1,_'PPE_2') <= 10020.16005986475
  resource_constraint_(1,_'PPE_1'): - a_uv_(1,_'PPE_1')
-   + a_uu_p_(1,_'PPE_1') <= 6.984497345347428
+   + a_uu_p_(1,_'PPE_1') <= 18.12701639453538
  resource_constraint_(1,_'PPE_2'): - a_uv_(1,_'PPE_2')
-   + a_uu_p_(1,_'PPE_2') <= 18.23865634032753
+   + a_uu_p_(1,_'PPE_2') <= 20.16005986474635
  resource_constraint_(2,_'PPE_1'): - a_uv_(2,_'PPE_1')
    + a_uu_p_(2,_'PPE_1') <= 10
  resource_constraint_(2,_'PPE_2'): - a_uv_(2,_'PPE_2')
@@ -13720,7 +13720,7 @@ Subject To
    - a_sc_(7,_0,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_0,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_0,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_0,_'Complexity_1',_'CPU_1') >= -11
+   - a_sc_(10,_0,_'Complexity_1',_'CPU_1') >= -8
  consistent_sch_(0,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_0,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_0,_'Complexity_1',_'CPU_2')
@@ -13731,7 +13731,7 @@ Subject To
    - a_sc_(7,_0,_'Complexity_1',_'CPU_2')
    - a_sc_(8,_0,_'Complexity_1',_'CPU_2')
    - a_sc_(9,_0,_'Complexity_1',_'CPU_2')
-   - a_sc_(10,_0,_'Complexity_1',_'CPU_2') >= -10
+   - a_sc_(10,_0,_'Complexity_1',_'CPU_2') >= -5
  consistent_sch_(1,_'Complexity_1',_'CPU_1'):
    - a_sc_(1,_1,_'Complexity_1',_'CPU_1')
    - a_sc_(2,_1,_'Complexity_1',_'CPU_1')
@@ -13742,7 +13742,7 @@ Subject To
    - a_sc_(7,_1,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_1,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_1,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_1,_'Complexity_1',_'CPU_1') >= -7
+   - a_sc_(10,_1,_'Complexity_1',_'CPU_1') >= -8
  consistent_sch_(1,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_1,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_1,_'Complexity_1',_'CPU_2')
@@ -13753,7 +13753,7 @@ Subject To
    - a_sc_(7,_1,_'Complexity_1',_'CPU_2')
    - a_sc_(8,_1,_'Complexity_1',_'CPU_2')
    - a_sc_(9,_1,_'Complexity_1',_'CPU_2')
-   - a_sc_(10,_1,_'Complexity_1',_'CPU_2') >= -11
+   - a_sc_(10,_1,_'Complexity_1',_'CPU_2') >= -1
  consistent_sch_(2,_'Complexity_1',_'CPU_1'):
    - a_sc_(1,_2,_'Complexity_1',_'CPU_1')
    - a_sc_(2,_2,_'Complexity_1',_'CPU_1')
@@ -13764,7 +13764,7 @@ Subject To
    - a_sc_(7,_2,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_2,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_2,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_2,_'Complexity_1',_'CPU_1') >= -2
+   - a_sc_(10,_2,_'Complexity_1',_'CPU_1') >= -4
  consistent_sch_(2,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_2,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_2,_'Complexity_1',_'CPU_2')
@@ -13786,7 +13786,7 @@ Subject To
    - a_sc_(7,_3,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_3,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_3,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_3,_'Complexity_1',_'CPU_1') >= -1
+   - a_sc_(10,_3,_'Complexity_1',_'CPU_1') >= -4
  consistent_sch_(3,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_3,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_3,_'Complexity_1',_'CPU_2')
@@ -13830,7 +13830,7 @@ Subject To
    - a_sc_(7,_5,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_5,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_5,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_5,_'Complexity_1',_'CPU_1') >= -1
+   - a_sc_(10,_5,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(5,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_5,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_5,_'Complexity_1',_'CPU_2')
@@ -13852,7 +13852,7 @@ Subject To
    - a_sc_(7,_6,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_6,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_6,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_6,_'Complexity_1',_'CPU_1') >= -6
+   - a_sc_(10,_6,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(6,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_6,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_6,_'Complexity_1',_'CPU_2')
