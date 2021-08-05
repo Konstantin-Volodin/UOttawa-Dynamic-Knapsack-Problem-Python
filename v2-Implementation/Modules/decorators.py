@@ -9,6 +9,6 @@ def timer(func):
         value = func(*args, **kwargs)
         end_time = time.perf_counter()      # 2
         run_time = end_time - start_time    # 3
-        print(f"Finished {func.__name__!r} in {run_time:.4f} secs")
+        print(f"\tFinished {func.__name__!r} in {run_time:.4f} secs")
         return value
     return wrapper_timer

@@ -18,9 +18,9 @@ state_action_list = [(init_state, init_action)]
 feasible_list = generate_feasible_sa_list(input_data, state_action_list)
  
 # Phase 2
-stabilization_parameter = 0.3
-optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list,stabilization_parameter)
-export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost.xlsx'))
+# stabilization_parameter = 0.3
+# optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list,stabilization_parameter)
+# export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost.xlsx'))
 
 
 

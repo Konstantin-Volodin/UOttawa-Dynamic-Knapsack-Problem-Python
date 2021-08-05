@@ -8,8 +8,10 @@ import gurobipy as gp
 import Modules.decorators
 # generate_master_model = Modules.decorators.timer(generate_master_model)
 # generate_phase1_master_model = Modules.decorators.timer(generate_phase1_master_model)
+# update_master_model = Modules.decorators.timer(update_master_model)
 # generate_sub_model = Modules.decorators.timer(generate_sub_model)
-# gp.Model.optimize = Modules.decorators.timer(gp.Model.optimize)
+# update_sub_model = Modules.decorators.timer(update_sub_model)
+gp.Model.optimize = Modules.decorators.timer(gp.Model.optimize)
 # %% Generate Initial Feasible Set (Phase 1)
 def generate_feasible_sa_list(input_data, init_state_actions):
     state_action_list = init_state_actions
@@ -18,13 +20,21 @@ def generate_feasible_sa_list(input_data, init_state_actions):
     count = len(state_action_list)-1
     mast_model, mast_var, mast_const = generate_master_model(input_data, state_action_list)
 
+    # Initialize Sub model
+    p1_mast_model, p1_mast_const = generate_phase1_master_model(input_data, mast_model)
+    p1_mast_model.Params.LogToConsole = 0
+    p1_mast_model.optimize()
+
+    betas = generate_beta_values(input_data, p1_mast_const)
+    p1_sub_model, p1_sub_var = generate_sub_model(input_data, betas, True)
+    
     # Generates
-    while True:
+    for i in range(1000):
     
         # Generates and Solves Master
         p1_mast_model, p1_mast_const = generate_phase1_master_model(input_data, mast_model)
         p1_mast_model.Params.LogToConsole = 0
-        # p1_mast_model.Params.MIPGap = 100
+        p1_mast_model.Params.method = 2
         p1_mast_model.optimize()
         betas = generate_beta_values(input_data, p1_mast_const)
             
@@ -38,9 +48,9 @@ def generate_feasible_sa_list(input_data, init_state_actions):
             break
         
         # Generates and solves Subproblem 
-        p1_sub_model, p1_sub_var = generate_sub_model(input_data, betas, True)
+        p1_sub_model, p1_sub_var = update_sub_model(input_data, p1_sub_model, p1_sub_var, betas, True)
         p1_sub_model.Params.LogToConsole = 0
-        # p1_sub_model.Params.MIPGap = 100
+        p1_sub_model.Params.MIPGap = 1
         p1_sub_model.optimize()
         
         # Update State-Actions
@@ -53,7 +63,7 @@ def generate_feasible_sa_list(input_data, init_state_actions):
             print('Unable to find feasible set')
             break
 
-    return(state_action_list)
+    return state_action_list
 
 # %% Solve the problem (Phase 2)
 def generate_optimal_sa_list(input_data, init_state_actions, stabilization_parameter):
@@ -68,6 +78,9 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
     beta_avg = generate_beta_estimate(input_data)
     non_neg_count = 0
 
+    # Initialize Sub model
+    sub_model, sub_var = generate_sub_model(input_data, beta_avg)
+
     while True:
 
         # Generates and Solves Master
@@ -76,6 +89,9 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
         betas = generate_beta_values(input_data, mast_const)
 
         # Trims
+        # if (count%100) == 0:
+        #     state_action_list, mast_model, mast_var, mast_const = trim_sa_list(input_data, state_action_list, mast_var)
+
         if (count_same%100) == 0:
             count_same += 1
             state_action_list, mast_model, mast_var, mast_const = trim_sa_list(input_data, state_action_list, mast_var)
@@ -84,7 +100,7 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
         beta_avg = update_beta_estimate(input_data, beta_avg, betas, stabilization_parameter)
 
         # Generates and solves Subproblem
-        sub_model, sub_var = generate_sub_model(input_data, beta_avg)
+        sub_model, sub_var = update_sub_model(input_data, sub_model, sub_var, beta_avg)
         sub_model.Params.LogToConsole = 0
         sub_model.optimize()
 
@@ -131,7 +147,7 @@ def trim_sa_list(input_data, init_state_actions, variables):
     mast_model, mast_var, mast_const = generate_master_model(input_data, state_action_list)
     print(f'Trimmed SA List - removed {final_len - initial_len}')
 
-    return(state_action_list, mast_model, mast_var, mast_const)
+    return state_action_list, mast_model, mast_var, mast_const
 # Initializes betas for stabilization algorithm
 def generate_beta_estimate(input_data):
     indices = input_data.indices

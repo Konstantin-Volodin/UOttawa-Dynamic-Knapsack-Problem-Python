@@ -15,7 +15,6 @@ def generate_sub_model(input_data, betas, phase1 = False):
     model_param = input_data.model_param
     transition = input_data.transition
     usage = input_data.usage
-
     M = model_param.M
     gamma = model_param.gamma
 
@@ -340,7 +339,219 @@ def generate_sub_model(input_data, betas, phase1 = False):
                             var.a_ps_p[( tmdc[0]+ 1, tmdc[1]-1, tmdc[2], tmdc[3] )]
                         )
 
+        return expr
+    
+    # Generates Objective Function
+        # Cost
+    wait_cost_expr = wait_cost(sub_vars, betas)
+    pref_early = pref_earlier_appointment(sub_vars, betas)
+    rescheduling_cost_expr = reschedule_cost(sub_vars, betas)
+    goal_vio_cost_expr = goal_violation_cost(sub_vars, betas)
+    cost_expr = gp.LinExpr(wait_cost_expr + pref_early + rescheduling_cost_expr + goal_vio_cost_expr)
+    
+        # Value
+    b0_expr = b0_cost(sub_vars, betas)
+    b_ul_expr = b_ul_cost(sub_vars, betas)
+    b_pw_expr = b_pw_costs(sub_vars, betas)
+    b_ps_expr = b_ps_costs(sub_vars, betas)
+    value_expr = gp.LinExpr(b0_expr + b_ul_expr + b_pw_expr + b_ps_expr)
+
+    if phase1:
+        sub_model.setObjective(-value_expr, GRB.MINIMIZE)
+    else:
+        sub_model.setObjective(cost_expr - value_expr, GRB.MINIMIZE)
+
+    return sub_model, sub_vars
+
+# Updates sub problem model
+def update_sub_model(input_data, model, variables, betas, phase1 = False):
+    indices = input_data.indices
+    arrival = input_data.arrival
+    ppe_data = input_data.ppe_data
+    model_param = input_data.model_param
+    transition = input_data.transition
+    usage = input_data.usage
+    M = model_param.M
+    gamma = model_param.gamma
+
+    sub_model = model
+    sub_vars = variables
+
+    # Objective Function
+    # Cost Function
+    def wait_cost(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+
+        # Cost of Waiting
+        for mdc in itertools.product(indices['m'], indices['d'], indices['c']):  
+            expr.addTerms(model_param.cw, var.a_pw_p[mdc])                    
+        
+        # Cost of Waiting - Last Period
+        # for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
+        #     expr.addTerms(model_param.cw**(indices['m'][-1]+1), var.a_ps_p[(tdc[0],indices['m'][-1],tdc[1],tdc[2])])     
+
+        return expr
+    def pref_earlier_appointment(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+        
+        # Prefer Earlier Appointments
+        for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
+            expr.addTerms(model_param.cs[tmdc[0]], var.a_sc[tmdc])
+
+        return expr
+    def reschedule_cost(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+
+        for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
+            if ttpmdc[0] > ttpmdc[1]: # Good Reschedule
+                difference = ttpmdc[0] - ttpmdc[1]
+                expr.addTerms(-(model_param.cs[difference] - model_param.cc), var.a_rsc[ttpmdc])
+            elif ttpmdc[0] < ttpmdc[1]: # Bad Reschedule
+                difference = ttpmdc[1] - ttpmdc[0]
+                expr.addTerms(model_param.cs[difference] + model_param.cc, var.a_rsc[ttpmdc])
+
+        return expr
+    def goal_violation_cost(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+
+        for tp in itertools.product(indices['t'], indices['p']):
+            expr.addTerms(M, var.a_uv[tp])
+
         return(expr)
+    
+    # E[V] Function
+    def b0_cost(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+        expr.addConstant((1-gamma) * betas['b0']['b_0'])
+        return expr
+    def b_ul_cost(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+        
+        for p in itertools.product(indices['p']):    
+            if ppe_data[p[0]].ppe_type == 'carry-over':
+                expr.addTerms(betas['ul'][p], var.s_ul[p])
+                expr.addTerms(- (betas['ul'][p] * gamma), var.a_ul_p[p])    
+            elif ppe_data[p[0]].ppe_type == 'non-carry-over':
+                expr.addTerms(betas['ul'][p], var.s_ul[p])
+                    
+        return expr
+    def b_pw_costs(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+
+        for mc in itertools.product(indices['m'], indices['c']):
+            for d in range(len(indices['d'])):
+                mdc = (mc[0], indices['d'][d], mc[1])
+                dc = (indices['d'][d], mc[1])
+
+                # When m is 0
+                if mc[0] == 0: 
+                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
+                    expr.addConstant(-betas['pw'][mdc] * gamma * arrival[(mdc[1], mdc[2])])
+
+                # When m is M
+                elif mc[0] == indices['m'][-1]:
+                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
+
+                    for mm in input_data.indices['m'][-2:]:
+                        expr.addTerms(-betas['pw'][mdc] * gamma, var.a_pw_p[(mm, mdc[1], mdc[2])])
+           
+                        # Transitioned In
+                        if d != 0 & (mm >= transition[dc].wait_limit+1):
+                            expr.addTerms(
+                                -betas['pw'][mdc] * gamma * transition[dc].transition_rate,
+                                var.a_pw_p[( mm, indices['d'][d-1], mdc[2] )]
+                            )
+                        # Transitioned Out
+                        if d != indices['d'][-1]:
+                            expr.addTerms(
+                                betas['pw'][mdc] * gamma * transition[dc].transition_rate,
+                                var.a_pw_p[( mm, mdc[1], mdc[2] )]
+                            )
+
+                # When m is less than TL_dc
+                elif mc[0] <= (transition[dc].wait_limit - 1):
+                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
+                    expr.addTerms(-betas['pw'][mdc] * gamma, var.a_pw_p[(mdc[0]-1, mdc[1], mdc[2])])
+
+                # All others
+                else:                   
+                    expr.addTerms(betas['pw'][mdc], var.s_pw[mdc])
+                    expr.addTerms(-betas['pw'][mdc] * gamma, var.a_pw_p[(mdc[0]-1, mdc[1], mdc[2])])
+           
+                    # Transitioned In
+                    if d != 0 & (mdc[0] >= transition[dc].wait_limit+1):
+                        expr.addTerms(
+                            -betas['pw'][mdc] * gamma * transition[dc].transition_rate,
+                            var.a_pw_p[( mdc[0]-1, indices['d'][d-1], mdc[2] )]
+                        )
+                    # Transitioned Out
+                    if d != indices['d'][-1]:
+                        expr.addTerms(
+                            betas['pw'][mdc] * gamma * transition[dc].transition_rate,
+                            var.a_pw_p[( mdc[0]-1, mdc[1], mdc[2] )]
+                        )
+
+        return expr
+    def b_ps_costs(var: variables, betas) -> gp.LinExpr:
+        expr = gp.LinExpr()
+
+        for tmc in itertools.product(indices['t'], indices['m'], indices['c']):
+            for d in range(len(indices['d'])):
+                tmdc = (tmc[0], tmc[1], indices['d'][d], tmc[2])
+                dc = (indices['d'][d], tmc[2])
+
+                # When m is 0
+                if tmdc[1] == 0: 
+                    expr.addTerms(betas['ps'][tmdc], var.s_ps[tmdc])
+
+                # When t is T
+                elif tmdc[0] == indices['t'][-1]:
+                    expr.addTerms(betas['ps'][tmdc], var.s_ps[tmdc])
+
+                # when m is M
+                elif tmdc[1] == indices['m'][-1]:
+                    expr.addTerms(betas['ps'][tmdc], var.s_ps[tmdc])
+
+                    for mm in input_data.indices['m'][-2:]:
+                        expr.addTerms(-betas['ps'][tmdc] * gamma, var.a_ps_p[(tmdc[0]+1, mm, tmdc[2], tmdc[3])])
+           
+                        # Transitioned In
+                        if d != 0 & (mm >= transition[dc].wait_limit+1):
+                            expr.addTerms(
+                                -betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
+                                var.a_ps_p[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )]
+                            )
+                        # Transitioned Out
+                        if d != indices['d'][-1]:
+                            expr.addTerms(
+                                betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
+                                var.a_ps_p[( tmdc[0]+ 1, mm, tmdc[2], tmdc[3] )]
+                            )
+                
+                # When m is less than TL_dc
+                elif tmdc[1] <= (transition[dc].wait_limit - 1):
+                    expr.addTerms(betas['ps'][tmdc], var.s_ps[tmdc])
+                    expr.addTerms(-betas['ps'][tmdc] * gamma, var.a_ps_p[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
+           
+                # Everything Else
+                else:
+                    expr.addTerms(betas['ps'][tmdc], var.s_ps[tmdc])
+                    expr.addTerms(-betas['ps'][tmdc] * gamma, var.a_ps_p[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
+           
+                    # Transitioned In
+                    if d != 0 & (tmdc[1] >= transition[dc].wait_limit+1):
+                        expr.addTerms(
+                            -betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
+                            var.a_ps_p[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )]
+                        )
+                    # Transitioned Out
+                    if d != indices['d'][-1]:
+                        expr.addTerms(
+                            betas['ps'][tmdc] * gamma * transition[dc].transition_rate,
+                            var.a_ps_p[( tmdc[0]+ 1, tmdc[1]-1, tmdc[2], tmdc[3] )]
+                        )
+
+        return expr
     
     # Generates Objective Function
         # Cost

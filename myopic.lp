@@ -2201,27 +2201,20 @@ Minimize
    - 0.49 a_rsc_(10,_9,_9,_'Complexity_1',_'CPU_2')
    - 0.49 a_rsc_(10,_9,_10,_'Complexity_1',_'CPU_1')
    - 0.49 a_rsc_(10,_9,_10,_'Complexity_1',_'CPU_2')
-   + 10000 a_uv_(1,_'PPE_1') + 0 a_uvb(1,_'PPE_1')
-   + 10000 a_uv_(1,_'PPE_2') + 0 a_uvb(1,_'PPE_2')
-   + 10000 a_uv_(2,_'PPE_1') + 0 a_uvb(2,_'PPE_1')
-   + 10000 a_uv_(2,_'PPE_2') + 0 a_uvb(2,_'PPE_2')
-   + 10000 a_uv_(3,_'PPE_1') + 0 a_uvb(3,_'PPE_1')
-   + 10000 a_uv_(3,_'PPE_2') + 0 a_uvb(3,_'PPE_2')
-   + 10000 a_uv_(4,_'PPE_1') + 0 a_uvb(4,_'PPE_1')
-   + 10000 a_uv_(4,_'PPE_2') + 0 a_uvb(4,_'PPE_2')
-   + 10000 a_uv_(5,_'PPE_1') + 0 a_uvb(5,_'PPE_1')
-   + 10000 a_uv_(5,_'PPE_2') + 0 a_uvb(5,_'PPE_2')
-   + 10000 a_uv_(6,_'PPE_1') + 0 a_uvb(6,_'PPE_1')
-   + 10000 a_uv_(6,_'PPE_2') + 0 a_uvb(6,_'PPE_2')
-   + 10000 a_uv_(7,_'PPE_1') + 0 a_uvb(7,_'PPE_1')
-   + 10000 a_uv_(7,_'PPE_2') + 0 a_uvb(7,_'PPE_2')
-   + 10000 a_uv_(8,_'PPE_1') + 0 a_uvb(8,_'PPE_1')
-   + 10000 a_uv_(8,_'PPE_2') + 0 a_uvb(8,_'PPE_2')
-   + 10000 a_uv_(9,_'PPE_1') + 0 a_uvb(9,_'PPE_1')
-   + 10000 a_uv_(9,_'PPE_2') + 0 a_uvb(9,_'PPE_2')
-   + 10000 a_uv_(10,_'PPE_1') + 0 a_uvb(10,_'PPE_1')
-   + 10000 a_uv_(10,_'PPE_2') + 0 a_uvb(10,_'PPE_2')
-   + a_pw_p_(0,_'Complexity_1',_'CPU_1')
+   + 500 a_uv_(1,_'PPE_1') + 0 a_uvb(1,_'PPE_1') + 500 a_uv_(1,_'PPE_2')
+   + 0 a_uvb(1,_'PPE_2') + 500 a_uv_(2,_'PPE_1') + 0 a_uvb(2,_'PPE_1')
+   + 500 a_uv_(2,_'PPE_2') + 0 a_uvb(2,_'PPE_2') + 500 a_uv_(3,_'PPE_1')
+   + 0 a_uvb(3,_'PPE_1') + 500 a_uv_(3,_'PPE_2') + 0 a_uvb(3,_'PPE_2')
+   + 500 a_uv_(4,_'PPE_1') + 0 a_uvb(4,_'PPE_1') + 500 a_uv_(4,_'PPE_2')
+   + 0 a_uvb(4,_'PPE_2') + 500 a_uv_(5,_'PPE_1') + 0 a_uvb(5,_'PPE_1')
+   + 500 a_uv_(5,_'PPE_2') + 0 a_uvb(5,_'PPE_2') + 500 a_uv_(6,_'PPE_1')
+   + 0 a_uvb(6,_'PPE_1') + 500 a_uv_(6,_'PPE_2') + 0 a_uvb(6,_'PPE_2')
+   + 500 a_uv_(7,_'PPE_1') + 0 a_uvb(7,_'PPE_1') + 500 a_uv_(7,_'PPE_2')
+   + 0 a_uvb(7,_'PPE_2') + 500 a_uv_(8,_'PPE_1') + 0 a_uvb(8,_'PPE_1')
+   + 500 a_uv_(8,_'PPE_2') + 0 a_uvb(8,_'PPE_2') + 500 a_uv_(9,_'PPE_1')
+   + 0 a_uvb(9,_'PPE_1') + 500 a_uv_(9,_'PPE_2') + 0 a_uvb(9,_'PPE_2')
+   + 500 a_uv_(10,_'PPE_1') + 0 a_uvb(10,_'PPE_1') + 500 a_uv_(10,_'PPE_2')
+   + 0 a_uvb(10,_'PPE_2') + a_pw_p_(0,_'Complexity_1',_'CPU_1')
    + a_pw_p_(0,_'Complexity_1',_'CPU_2')
    + a_pw_p_(1,_'Complexity_1',_'CPU_1')
    + a_pw_p_(1,_'Complexity_1',_'CPU_2')
@@ -2714,7 +2707,7 @@ Subject To
    + a_sc_(8,_0,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_0,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_0,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(0,_'Complexity_1',_'CPU_1') = 8
+   + a_pw_p_(0,_'Complexity_1',_'CPU_1') = 10
  pw_hat_(0,_'Complexity_1',_'CPU_2'): a_sc_(1,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_0,_'Complexity_1',_'CPU_2')
@@ -2725,7 +2718,7 @@ Subject To
    + a_sc_(8,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(9,_0,_'Complexity_1',_'CPU_2')
    + a_sc_(10,_0,_'Complexity_1',_'CPU_2')
-   + a_pw_p_(0,_'Complexity_1',_'CPU_2') = 6
+   + a_pw_p_(0,_'Complexity_1',_'CPU_2') = 7
  pw_hat_(1,_'Complexity_1',_'CPU_1'): a_sc_(1,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(2,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(3,_1,_'Complexity_1',_'CPU_1')
@@ -2736,7 +2729,7 @@ Subject To
    + a_sc_(8,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_1,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_1,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(1,_'Complexity_1',_'CPU_1') = 4
+   + a_pw_p_(1,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(1,_'Complexity_1',_'CPU_2'): a_sc_(1,_1,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_1,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_1,_'Complexity_1',_'CPU_2')
@@ -2758,7 +2751,7 @@ Subject To
    + a_sc_(8,_2,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_2,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_2,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(2,_'Complexity_1',_'CPU_1') = 7
+   + a_pw_p_(2,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(2,_'Complexity_1',_'CPU_2'): a_sc_(1,_2,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_2,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_2,_'Complexity_1',_'CPU_2')
@@ -2780,7 +2773,7 @@ Subject To
    + a_sc_(8,_3,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_3,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_3,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(3,_'Complexity_1',_'CPU_1') = 2
+   + a_pw_p_(3,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(3,_'Complexity_1',_'CPU_2'): a_sc_(1,_3,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_3,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_3,_'Complexity_1',_'CPU_2')
@@ -2791,7 +2784,7 @@ Subject To
    + a_sc_(8,_3,_'Complexity_1',_'CPU_2')
    + a_sc_(9,_3,_'Complexity_1',_'CPU_2')
    + a_sc_(10,_3,_'Complexity_1',_'CPU_2')
-   + a_pw_p_(3,_'Complexity_1',_'CPU_2') = 7
+   + a_pw_p_(3,_'Complexity_1',_'CPU_2') = 0
  pw_hat_(4,_'Complexity_1',_'CPU_1'): a_sc_(1,_4,_'Complexity_1',_'CPU_1')
    + a_sc_(2,_4,_'Complexity_1',_'CPU_1')
    + a_sc_(3,_4,_'Complexity_1',_'CPU_1')
@@ -2802,7 +2795,7 @@ Subject To
    + a_sc_(8,_4,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_4,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_4,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(4,_'Complexity_1',_'CPU_1') = 4
+   + a_pw_p_(4,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(4,_'Complexity_1',_'CPU_2'): a_sc_(1,_4,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_4,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_4,_'Complexity_1',_'CPU_2')
@@ -2824,7 +2817,7 @@ Subject To
    + a_sc_(8,_5,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_5,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_5,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(5,_'Complexity_1',_'CPU_1') = 11
+   + a_pw_p_(5,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(5,_'Complexity_1',_'CPU_2'): a_sc_(1,_5,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_5,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_5,_'Complexity_1',_'CPU_2')
@@ -2846,7 +2839,7 @@ Subject To
    + a_sc_(8,_6,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_6,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_6,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(6,_'Complexity_1',_'CPU_1') = 12
+   + a_pw_p_(6,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(6,_'Complexity_1',_'CPU_2'): a_sc_(1,_6,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_6,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_6,_'Complexity_1',_'CPU_2')
@@ -2868,7 +2861,7 @@ Subject To
    + a_sc_(8,_7,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_7,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_7,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(7,_'Complexity_1',_'CPU_1') = 9
+   + a_pw_p_(7,_'Complexity_1',_'CPU_1') = 0
  pw_hat_(7,_'Complexity_1',_'CPU_2'): a_sc_(1,_7,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_7,_'Complexity_1',_'CPU_2')
    + a_sc_(3,_7,_'Complexity_1',_'CPU_2')
@@ -2935,7 +2928,7 @@ Subject To
    + a_sc_(8,_10,_'Complexity_1',_'CPU_1')
    + a_sc_(9,_10,_'Complexity_1',_'CPU_1')
    + a_sc_(10,_10,_'Complexity_1',_'CPU_1')
-   + a_pw_p_(10,_'Complexity_1',_'CPU_1') = 19529
+   + a_pw_p_(10,_'Complexity_1',_'CPU_1') = 3
  pw_hat_(10,_'Complexity_1',_'CPU_2'):
    a_sc_(1,_10,_'Complexity_1',_'CPU_2')
    + a_sc_(2,_10,_'Complexity_1',_'CPU_2')
@@ -7568,84 +7561,82 @@ Subject To
    + a_rsc_(10,_8,_10,_'Complexity_1',_'CPU_2')
    + a_rsc_(10,_9,_10,_'Complexity_1',_'CPU_2')
    + a_ps_p_(10,_10,_'Complexity_1',_'CPU_2') = 0
- uv_max_1_(1,_'PPE_1'): a_uv_(1,_'PPE_1') - 10000 a_uvb_(1,_'PPE_1') <= 0
+ uv_max_1_(1,_'PPE_1'): a_uv_(1,_'PPE_1') - 500 a_uvb_(1,_'PPE_1') <= 0
  uv_max_2_(1,_'PPE_1'): a_uv_(1,_'PPE_1') - a_uu_p_(1,_'PPE_1')
-   + 10000 a_uvb_(1,_'PPE_1') <= -12.16986874944996
- uv_max_1_(1,_'PPE_2'): a_uv_(1,_'PPE_2') - 10000 a_uvb_(1,_'PPE_2') <= 0
+   + 500 a_uvb_(1,_'PPE_1') <= -14.43645978509437
+ uv_max_1_(1,_'PPE_2'): a_uv_(1,_'PPE_2') - 500 a_uvb_(1,_'PPE_2') <= 0
  uv_max_2_(1,_'PPE_2'): a_uv_(1,_'PPE_2') - a_uu_p_(1,_'PPE_2')
-   + 10000 a_uvb_(1,_'PPE_2') <= 9974.826284372451
- uv_max_1_(2,_'PPE_1'): a_uv_(2,_'PPE_1') - 10000 a_uvb_(2,_'PPE_1') <= 0
+   + 500 a_uvb_(1,_'PPE_2') <= 480.3165469742297
+ uv_max_1_(2,_'PPE_1'): a_uv_(2,_'PPE_1') - 500 a_uvb_(2,_'PPE_1') <= 0
  uv_max_2_(2,_'PPE_1'): a_uv_(2,_'PPE_1') - a_uu_p_(2,_'PPE_1')
-   + 10000 a_uvb_(2,_'PPE_1') <= 9990
- uv_max_1_(2,_'PPE_2'): a_uv_(2,_'PPE_2') - 10000 a_uvb_(2,_'PPE_2') <= 0
+   + 500 a_uvb_(2,_'PPE_1') <= 490
+ uv_max_1_(2,_'PPE_2'): a_uv_(2,_'PPE_2') - 500 a_uvb_(2,_'PPE_2') <= 0
  uv_max_2_(2,_'PPE_2'): a_uv_(2,_'PPE_2') - a_uu_p_(2,_'PPE_2')
-   + 10000 a_uvb_(2,_'PPE_2') <= 9980
- uv_max_1_(3,_'PPE_1'): a_uv_(3,_'PPE_1') - 10000 a_uvb_(3,_'PPE_1') <= 0
+   + 500 a_uvb_(2,_'PPE_2') <= 480
+ uv_max_1_(3,_'PPE_1'): a_uv_(3,_'PPE_1') - 500 a_uvb_(3,_'PPE_1') <= 0
  uv_max_2_(3,_'PPE_1'): a_uv_(3,_'PPE_1') - a_uu_p_(3,_'PPE_1')
-   + 10000 a_uvb_(3,_'PPE_1') <= 9990
- uv_max_1_(3,_'PPE_2'): a_uv_(3,_'PPE_2') - 10000 a_uvb_(3,_'PPE_2') <= 0
+   + 500 a_uvb_(3,_'PPE_1') <= 490
+ uv_max_1_(3,_'PPE_2'): a_uv_(3,_'PPE_2') - 500 a_uvb_(3,_'PPE_2') <= 0
  uv_max_2_(3,_'PPE_2'): a_uv_(3,_'PPE_2') - a_uu_p_(3,_'PPE_2')
-   + 10000 a_uvb_(3,_'PPE_2') <= 9980
- uv_max_1_(4,_'PPE_1'): a_uv_(4,_'PPE_1') - 10000 a_uvb_(4,_'PPE_1') <= 0
+   + 500 a_uvb_(3,_'PPE_2') <= 480
+ uv_max_1_(4,_'PPE_1'): a_uv_(4,_'PPE_1') - 500 a_uvb_(4,_'PPE_1') <= 0
  uv_max_2_(4,_'PPE_1'): a_uv_(4,_'PPE_1') - a_uu_p_(4,_'PPE_1')
-   + 10000 a_uvb_(4,_'PPE_1') <= 9990
- uv_max_1_(4,_'PPE_2'): a_uv_(4,_'PPE_2') - 10000 a_uvb_(4,_'PPE_2') <= 0
+   + 500 a_uvb_(4,_'PPE_1') <= 490
+ uv_max_1_(4,_'PPE_2'): a_uv_(4,_'PPE_2') - 500 a_uvb_(4,_'PPE_2') <= 0
  uv_max_2_(4,_'PPE_2'): a_uv_(4,_'PPE_2') - a_uu_p_(4,_'PPE_2')
-   + 10000 a_uvb_(4,_'PPE_2') <= 9980
- uv_max_1_(5,_'PPE_1'): a_uv_(5,_'PPE_1') - 10000 a_uvb_(5,_'PPE_1') <= 0
+   + 500 a_uvb_(4,_'PPE_2') <= 480
+ uv_max_1_(5,_'PPE_1'): a_uv_(5,_'PPE_1') - 500 a_uvb_(5,_'PPE_1') <= 0
  uv_max_2_(5,_'PPE_1'): a_uv_(5,_'PPE_1') - a_uu_p_(5,_'PPE_1')
-   + 10000 a_uvb_(5,_'PPE_1') <= 9990
- uv_max_1_(5,_'PPE_2'): a_uv_(5,_'PPE_2') - 10000 a_uvb_(5,_'PPE_2') <= 0
+   + 500 a_uvb_(5,_'PPE_1') <= 490
+ uv_max_1_(5,_'PPE_2'): a_uv_(5,_'PPE_2') - 500 a_uvb_(5,_'PPE_2') <= 0
  uv_max_2_(5,_'PPE_2'): a_uv_(5,_'PPE_2') - a_uu_p_(5,_'PPE_2')
-   + 10000 a_uvb_(5,_'PPE_2') <= 9980
- uv_max_1_(6,_'PPE_1'): a_uv_(6,_'PPE_1') - 10000 a_uvb_(6,_'PPE_1') <= 0
+   + 500 a_uvb_(5,_'PPE_2') <= 480
+ uv_max_1_(6,_'PPE_1'): a_uv_(6,_'PPE_1') - 500 a_uvb_(6,_'PPE_1') <= 0
  uv_max_2_(6,_'PPE_1'): a_uv_(6,_'PPE_1') - a_uu_p_(6,_'PPE_1')
-   + 10000 a_uvb_(6,_'PPE_1') <= 9990
- uv_max_1_(6,_'PPE_2'): a_uv_(6,_'PPE_2') - 10000 a_uvb_(6,_'PPE_2') <= 0
+   + 500 a_uvb_(6,_'PPE_1') <= 490
+ uv_max_1_(6,_'PPE_2'): a_uv_(6,_'PPE_2') - 500 a_uvb_(6,_'PPE_2') <= 0
  uv_max_2_(6,_'PPE_2'): a_uv_(6,_'PPE_2') - a_uu_p_(6,_'PPE_2')
-   + 10000 a_uvb_(6,_'PPE_2') <= 9980
- uv_max_1_(7,_'PPE_1'): a_uv_(7,_'PPE_1') - 10000 a_uvb_(7,_'PPE_1') <= 0
+   + 500 a_uvb_(6,_'PPE_2') <= 480
+ uv_max_1_(7,_'PPE_1'): a_uv_(7,_'PPE_1') - 500 a_uvb_(7,_'PPE_1') <= 0
  uv_max_2_(7,_'PPE_1'): a_uv_(7,_'PPE_1') - a_uu_p_(7,_'PPE_1')
-   + 10000 a_uvb_(7,_'PPE_1') <= 9990
- uv_max_1_(7,_'PPE_2'): a_uv_(7,_'PPE_2') - 10000 a_uvb_(7,_'PPE_2') <= 0
+   + 500 a_uvb_(7,_'PPE_1') <= 490
+ uv_max_1_(7,_'PPE_2'): a_uv_(7,_'PPE_2') - 500 a_uvb_(7,_'PPE_2') <= 0
  uv_max_2_(7,_'PPE_2'): a_uv_(7,_'PPE_2') - a_uu_p_(7,_'PPE_2')
-   + 10000 a_uvb_(7,_'PPE_2') <= 9980
- uv_max_1_(8,_'PPE_1'): a_uv_(8,_'PPE_1') - 10000 a_uvb_(8,_'PPE_1') <= 0
+   + 500 a_uvb_(7,_'PPE_2') <= 480
+ uv_max_1_(8,_'PPE_1'): a_uv_(8,_'PPE_1') - 500 a_uvb_(8,_'PPE_1') <= 0
  uv_max_2_(8,_'PPE_1'): a_uv_(8,_'PPE_1') - a_uu_p_(8,_'PPE_1')
-   + 10000 a_uvb_(8,_'PPE_1') <= 9990
- uv_max_1_(8,_'PPE_2'): a_uv_(8,_'PPE_2') - 10000 a_uvb_(8,_'PPE_2') <= 0
+   + 500 a_uvb_(8,_'PPE_1') <= 490
+ uv_max_1_(8,_'PPE_2'): a_uv_(8,_'PPE_2') - 500 a_uvb_(8,_'PPE_2') <= 0
  uv_max_2_(8,_'PPE_2'): a_uv_(8,_'PPE_2') - a_uu_p_(8,_'PPE_2')
-   + 10000 a_uvb_(8,_'PPE_2') <= 9980
- uv_max_1_(9,_'PPE_1'): a_uv_(9,_'PPE_1') - 10000 a_uvb_(9,_'PPE_1') <= 0
+   + 500 a_uvb_(8,_'PPE_2') <= 480
+ uv_max_1_(9,_'PPE_1'): a_uv_(9,_'PPE_1') - 500 a_uvb_(9,_'PPE_1') <= 0
  uv_max_2_(9,_'PPE_1'): a_uv_(9,_'PPE_1') - a_uu_p_(9,_'PPE_1')
-   + 10000 a_uvb_(9,_'PPE_1') <= 9990
- uv_max_1_(9,_'PPE_2'): a_uv_(9,_'PPE_2') - 10000 a_uvb_(9,_'PPE_2') <= 0
+   + 500 a_uvb_(9,_'PPE_1') <= 490
+ uv_max_1_(9,_'PPE_2'): a_uv_(9,_'PPE_2') - 500 a_uvb_(9,_'PPE_2') <= 0
  uv_max_2_(9,_'PPE_2'): a_uv_(9,_'PPE_2') - a_uu_p_(9,_'PPE_2')
-   + 10000 a_uvb_(9,_'PPE_2') <= 9980
- uv_max_1_(10,_'PPE_1'): a_uv_(10,_'PPE_1') - 10000 a_uvb_(10,_'PPE_1')
-   <= 0
+   + 500 a_uvb_(9,_'PPE_2') <= 480
+ uv_max_1_(10,_'PPE_1'): a_uv_(10,_'PPE_1') - 500 a_uvb_(10,_'PPE_1') <= 0
  uv_max_2_(10,_'PPE_1'): a_uv_(10,_'PPE_1') - a_uu_p_(10,_'PPE_1')
-   + 10000 a_uvb_(10,_'PPE_1') <= 9990
- uv_max_1_(10,_'PPE_2'): a_uv_(10,_'PPE_2') - 10000 a_uvb_(10,_'PPE_2')
-   <= 0
+   + 500 a_uvb_(10,_'PPE_1') <= 490
+ uv_max_1_(10,_'PPE_2'): a_uv_(10,_'PPE_2') - 500 a_uvb_(10,_'PPE_2') <= 0
  uv_max_2_(10,_'PPE_2'): a_uv_(10,_'PPE_2') - a_uu_p_(10,_'PPE_2')
-   + 10000 a_uvb_(10,_'PPE_2') <= 9980
+   + 500 a_uvb_(10,_'PPE_2') <= 480
  ul_hat_1_(10,_'PPE_2'): a_ul_p_('PPE_1',) >= 0
  ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_1',) + a_uu_p_(1,_'PPE_1')
-   >= 10012.16986874945
- ul_max_1_(10,_'PPE_2'): a_ul_p_('PPE_1',) - 10000 a_ulb_('PPE_1',) <= 0
- ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_1',) + 10000 a_ulb_('PPE_1',)
-   + a_uu_p_(1,_'PPE_1') <= 20012.16986874945
+   >= 514.4364597850944
+ ul_max_1_(10,_'PPE_2'): a_ul_p_('PPE_1',) - 500 a_ulb_('PPE_1',) <= 0
+ ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_1',) + 500 a_ulb_('PPE_1',)
+   + a_uu_p_(1,_'PPE_1') <= 1014.436459785094
  ul_hat_1_(10,_'PPE_2'): a_ul_p_('PPE_2',) >= 0
  ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_2',) + a_uu_p_(1,_'PPE_2')
-   >= 25.17371562754912
- ul_max_1_(10,_'PPE_2'): a_ul_p_('PPE_2',) - 10000 a_ulb_('PPE_2',) <= 0
- ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_2',) + 10000 a_ulb_('PPE_2',)
-   + a_uu_p_(1,_'PPE_2') <= 10025.17371562755
+   >= 19.68345302577033
+ ul_max_1_(10,_'PPE_2'): a_ul_p_('PPE_2',) - 500 a_ulb_('PPE_2',) <= 0
+ ul_hat_2_(10,_'PPE_2'): a_ul_p_('PPE_2',) + 500 a_ulb_('PPE_2',)
+   + a_uu_p_(1,_'PPE_2') <= 519.6834530257703
  resource_constraint_(1,_'PPE_1'): - a_uv_(1,_'PPE_1')
-   + a_uu_p_(1,_'PPE_1') <= 10012.16986874945
+   + a_uu_p_(1,_'PPE_1') <= 514.4364597850944
  resource_constraint_(1,_'PPE_2'): - a_uv_(1,_'PPE_2')
-   + a_uu_p_(1,_'PPE_2') <= 25.17371562754912
+   + a_uu_p_(1,_'PPE_2') <= 19.68345302577033
  resource_constraint_(2,_'PPE_1'): - a_uv_(2,_'PPE_1')
    + a_uu_p_(2,_'PPE_1') <= 10
  resource_constraint_(2,_'PPE_2'): - a_uv_(2,_'PPE_2')
@@ -13720,7 +13711,7 @@ Subject To
    - a_sc_(7,_0,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_0,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_0,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_0,_'Complexity_1',_'CPU_1') >= -8
+   - a_sc_(10,_0,_'Complexity_1',_'CPU_1') >= -10
  consistent_sch_(0,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_0,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_0,_'Complexity_1',_'CPU_2')
@@ -13731,7 +13722,7 @@ Subject To
    - a_sc_(7,_0,_'Complexity_1',_'CPU_2')
    - a_sc_(8,_0,_'Complexity_1',_'CPU_2')
    - a_sc_(9,_0,_'Complexity_1',_'CPU_2')
-   - a_sc_(10,_0,_'Complexity_1',_'CPU_2') >= -6
+   - a_sc_(10,_0,_'Complexity_1',_'CPU_2') >= -7
  consistent_sch_(1,_'Complexity_1',_'CPU_1'):
    - a_sc_(1,_1,_'Complexity_1',_'CPU_1')
    - a_sc_(2,_1,_'Complexity_1',_'CPU_1')
@@ -13742,7 +13733,7 @@ Subject To
    - a_sc_(7,_1,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_1,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_1,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_1,_'Complexity_1',_'CPU_1') >= -4
+   - a_sc_(10,_1,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(1,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_1,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_1,_'Complexity_1',_'CPU_2')
@@ -13764,7 +13755,7 @@ Subject To
    - a_sc_(7,_2,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_2,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_2,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_2,_'Complexity_1',_'CPU_1') >= -7
+   - a_sc_(10,_2,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(2,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_2,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_2,_'Complexity_1',_'CPU_2')
@@ -13786,7 +13777,7 @@ Subject To
    - a_sc_(7,_3,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_3,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_3,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_3,_'Complexity_1',_'CPU_1') >= -2
+   - a_sc_(10,_3,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(3,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_3,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_3,_'Complexity_1',_'CPU_2')
@@ -13797,7 +13788,7 @@ Subject To
    - a_sc_(7,_3,_'Complexity_1',_'CPU_2')
    - a_sc_(8,_3,_'Complexity_1',_'CPU_2')
    - a_sc_(9,_3,_'Complexity_1',_'CPU_2')
-   - a_sc_(10,_3,_'Complexity_1',_'CPU_2') >= -7
+   - a_sc_(10,_3,_'Complexity_1',_'CPU_2') >= 0
  consistent_sch_(4,_'Complexity_1',_'CPU_1'):
    - a_sc_(1,_4,_'Complexity_1',_'CPU_1')
    - a_sc_(2,_4,_'Complexity_1',_'CPU_1')
@@ -13808,7 +13799,7 @@ Subject To
    - a_sc_(7,_4,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_4,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_4,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_4,_'Complexity_1',_'CPU_1') >= -4
+   - a_sc_(10,_4,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(4,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_4,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_4,_'Complexity_1',_'CPU_2')
@@ -13830,7 +13821,7 @@ Subject To
    - a_sc_(7,_5,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_5,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_5,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_5,_'Complexity_1',_'CPU_1') >= -11
+   - a_sc_(10,_5,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(5,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_5,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_5,_'Complexity_1',_'CPU_2')
@@ -13852,7 +13843,7 @@ Subject To
    - a_sc_(7,_6,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_6,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_6,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_6,_'Complexity_1',_'CPU_1') >= -12
+   - a_sc_(10,_6,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(6,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_6,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_6,_'Complexity_1',_'CPU_2')
@@ -13874,7 +13865,7 @@ Subject To
    - a_sc_(7,_7,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_7,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_7,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_7,_'Complexity_1',_'CPU_1') >= -9
+   - a_sc_(10,_7,_'Complexity_1',_'CPU_1') >= 0
  consistent_sch_(7,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_7,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_7,_'Complexity_1',_'CPU_2')
@@ -13940,7 +13931,7 @@ Subject To
    - a_sc_(7,_10,_'Complexity_1',_'CPU_1')
    - a_sc_(8,_10,_'Complexity_1',_'CPU_1')
    - a_sc_(9,_10,_'Complexity_1',_'CPU_1')
-   - a_sc_(10,_10,_'Complexity_1',_'CPU_1') >= -19529
+   - a_sc_(10,_10,_'Complexity_1',_'CPU_1') >= -3
  consistent_sch_(10,_'Complexity_1',_'CPU_2'):
    - a_sc_(1,_10,_'Complexity_1',_'CPU_2')
    - a_sc_(2,_10,_'Complexity_1',_'CPU_2')

@@ -7,6 +7,9 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
+import Modules.decorators
+import time
+
 # Initialization 
 def generate_initial_state_action(input_data):
     # Input Data
@@ -386,28 +389,37 @@ def generate_master_model(input_data, state_action_data):
 
     # Returns model
     return mast_model, w_sa_var, constraints
+# Updates master problem
 def update_master_model(input_data, master_model, master_variables, master_constraints, new_state_action, sa_index):
     
     indices = input_data.indices
 
     # Adds Variables Variables and updates objective function
     cost_val = cost_function(input_data, new_state_action[0], new_state_action[1])
+
+
     master_variables.append(master_model.addVar(name=f'sa_{sa_index}', obj=cost_val))
 
     # Modifies Constrain Values
-    master_model.chgCoeff(master_constraints['b0']['b_0'], master_variables[-1], b_0_constraint(input_data, new_state_action[0], new_state_action[1]).lhs_param['b_0'])
-    for p in itertools.product(indices['p']):
-        # Beta ul
-        master_model.chgCoeff(master_constraints['ul'][p], master_variables[-1], b_ul_constraint(input_data, new_state_action[0], new_state_action[1]).lhs_param[p])
-
-    # Beta pw
-    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-        master_model.chgCoeff(master_constraints['pw'][mdc], master_variables[-1], b_pw_constraint(input_data, new_state_action[0], new_state_action[1]).lhs_param[mdc])
+    # Beta b0
+    b0_constraint_params = b_0_constraint(input_data, new_state_action[0], new_state_action[1])
+    master_model.chgCoeff(master_constraints['b0']['b_0'], master_variables[-1], b0_constraint_params.lhs_param['b_0'])
     
+    # Beta ul
+    ul_constraint_params = b_ul_constraint(input_data, new_state_action[0], new_state_action[1])
+    for p in itertools.product(indices['p']):
+        master_model.chgCoeff(master_constraints['ul'][p], master_variables[-1], ul_constraint_params.lhs_param[p])
+ 
+    # Beta pw
+    pw_constraint_params = b_pw_constraint(input_data, new_state_action[0], new_state_action[1])
+    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
+        master_model.chgCoeff(master_constraints['pw'][mdc], master_variables[-1], pw_constraint_params.lhs_param[mdc])
+ 
     # Beta ps
+    ps_constraint_params = b_ps_constraint(input_data, new_state_action[0], new_state_action[1])
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        master_model.chgCoeff(master_constraints['ps'][tmdc], master_variables[-1], b_ps_constraint(input_data, new_state_action[0], new_state_action[1]).lhs_param[tmdc])
-
+        master_model.chgCoeff(master_constraints['ps'][tmdc], master_variables[-1], ps_constraint_params.lhs_param[tmdc])
+ 
     master_model.update()
     return master_model, master_variables, master_constraints
 
