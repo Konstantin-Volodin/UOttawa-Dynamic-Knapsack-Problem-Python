@@ -305,6 +305,7 @@ def generate_phase1_master_model(input_data, model):
     indices = input_data.indices    
 
     mast_model = model.copy()
+
     # Resets objective function
     obj_expr = gp.LinExpr()
     mast_model.setObjective(obj_expr, GRB.MINIMIZE)

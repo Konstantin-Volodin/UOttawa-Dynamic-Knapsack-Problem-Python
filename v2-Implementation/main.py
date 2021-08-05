@@ -18,18 +18,18 @@ state_action_list = [(init_state, init_action)]
 feasible_list = generate_feasible_sa_list(input_data, state_action_list)
  
 # Phase 2
-# stabilization_parameter = 0.3
-# optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list,stabilization_parameter)
-# export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost.xlsx'))
+stabilization_parameter = 0.3
+optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list,stabilization_parameter)
+export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost.xlsx'))
 
 
 
 # %% Compare Policies
 # Import betas
-fig, axes = plt.subplots(1, 1)
-betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost.xlsx'))
-compare_policies(input_data, betas, 3, 10000, 5000, axes)
-fig.savefig(os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost-long.pdf'))
+# fig, axes = plt.subplots(1, 1)
+# betas = read_betas(os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost.xlsx'))
+# compare_policies(input_data, betas, 3, 10000, 5000, axes)
+# fig.savefig(os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost-long.pdf'))
 
 # # %% Test out policies
 # input_data.arrival[('Complexity 1', 'CPU 1')] = 20

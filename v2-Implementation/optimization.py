@@ -11,7 +11,7 @@ import Modules.decorators
 # update_master_model = Modules.decorators.timer(update_master_model)
 # generate_sub_model = Modules.decorators.timer(generate_sub_model)
 # update_sub_model = Modules.decorators.timer(update_sub_model)
-gp.Model.optimize = Modules.decorators.timer(gp.Model.optimize)
+# gp.Model.optimize = Modules.decorators.timer(gp.Model.optimize)
 # %% Generate Initial Feasible Set (Phase 1)
 def generate_feasible_sa_list(input_data, init_state_actions):
     state_action_list = init_state_actions
@@ -29,7 +29,7 @@ def generate_feasible_sa_list(input_data, init_state_actions):
     p1_sub_model, p1_sub_var = generate_sub_model(input_data, betas, True)
     
     # Generates
-    for i in range(1000):
+    while True:
     
         # Generates and Solves Master
         p1_mast_model, p1_mast_const = generate_phase1_master_model(input_data, mast_model)
@@ -46,6 +46,10 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         if p1_mast_model.getObjective().getValue() <= 0.00000000001:
             print('Found Feasible Set')
             break
+
+        # Trims
+        if (count%100) == 0:
+            state_action_list, p1_mast_model, p1_mast_const = trim_sa_list_p1(input_data, state_action_list, p1_mast_model)
         
         # Generates and solves Subproblem 
         p1_sub_model, p1_sub_var = update_sub_model(input_data, p1_sub_model, p1_sub_var, betas, True)
@@ -94,7 +98,7 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
 
         if (count_same%100) == 0:
             count_same += 1
-            state_action_list, mast_model, mast_var, mast_const = trim_sa_list(input_data, state_action_list, mast_var)
+            state_action_list, mast_model, mast_var, mast_const = trim_sa_list_p2(input_data, state_action_list, mast_var)
 
         # Update beta estimate 
         beta_avg = update_beta_estimate(input_data, beta_avg, betas, stabilization_parameter)
@@ -133,8 +137,28 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
         count += 1
 
     return(state_action_list, betas)
-# Trim zero state-action pairs occasionally
-def trim_sa_list(input_data, init_state_actions, variables):
+# Trim zero state-action pairs occasionally (for p1 model)
+def trim_sa_list_p1(input_data, init_state_actions, model):
+    initial_len = len(init_state_actions)
+    state_action_list = []
+    vars = model.getVars()
+    
+    # Trims
+    for var in range(initial_len): 
+        if vars[var].x != 0:
+            state_action_list.append(init_state_actions[var])
+
+    # Updates The Model
+    final_len = len(state_action_list)
+    mast_model, mast_var, mast_const = generate_master_model(input_data, state_action_list)
+    p1_mast_model, p1_mast_const = generate_phase1_master_model(input_data, mast_model)
+
+    print(f'Trimmed SA List - removed {final_len - initial_len}')
+        
+    return state_action_list, p1_mast_model, p1_mast_const
+
+# Trim zero state-action pairs occasionally (for p2 model)
+def trim_sa_list_p2(input_data, init_state_actions, variables):
     
     initial_len = len(init_state_actions)
     state_action_list = []
@@ -145,6 +169,7 @@ def trim_sa_list(input_data, init_state_actions, variables):
 
     final_len = len(state_action_list)
     mast_model, mast_var, mast_const = generate_master_model(input_data, state_action_list)
+    
     print(f'Trimmed SA List - removed {final_len - initial_len}')
 
     return state_action_list, mast_model, mast_var, mast_const
