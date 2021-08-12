@@ -11,6 +11,7 @@ from matplotlib import pyplot as plt
 my_path = os.path.dirname(__file__)
 input_data = read_data(os.path.join(my_path, 'Data', 'Data-full-newcost.xlsx'))
 # generate_optimal_sa_list = Modules.decorators.timer(generate_optimal_sa_list)
+
 # %% Optimization
 # Phase 1
 init_state, init_action = generate_initial_state_action(input_data)
@@ -18,11 +19,9 @@ state_action_list = [(init_state, init_action)]
 feasible_list = generate_feasible_sa_list(input_data, state_action_list)
  
 # Phase 2
-stabilization_parameter = 0.3
+stabilization_parameter = 0
 optimal_list, betas = generate_optimal_sa_list(input_data, feasible_list,stabilization_parameter)
 export_betas(betas, os.path.join(my_path, 'Data', f'Optimal-Betas-full-newcost.xlsx'))
-
-
 
 # %% Compare Policies
 # Import betas

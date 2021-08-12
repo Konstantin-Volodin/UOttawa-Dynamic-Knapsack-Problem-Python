@@ -93,8 +93,8 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
         betas = generate_beta_values(input_data, mast_const)
 
         # Trims
-        # if (count%100) == 0:
-        #     state_action_list, mast_model, mast_var, mast_const = trim_sa_list(input_data, state_action_list, mast_var)
+        if (count%300) == 0:
+            state_action_list, mast_model, mast_var, mast_const = trim_sa_list_p2(input_data, state_action_list, mast_var)
 
         if (count_same%100) == 0:
             count_same += 1
