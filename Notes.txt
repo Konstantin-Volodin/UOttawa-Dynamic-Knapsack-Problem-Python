@@ -153,3 +153,9 @@ Notes - set the waiting cost to start at max scheduling cost
 - priority appears to be different from complexity 
 we will come up in english of what the model does
 
+try to solve on the university computers
+revised model to show to stephen - 
+	- make sure to show the assumptions well
+	- show pictures from the model to show that it is serious!
+	- 
+

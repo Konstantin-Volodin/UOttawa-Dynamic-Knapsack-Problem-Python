@@ -4,6 +4,7 @@ from Modules.data_export import *
 from Modules.master_model import *
 from Modules.sub_problem import * 
 import gurobipy as gp
+import os.path
 
 import Modules.decorators
 # generate_master_model = Modules.decorators.timer(generate_master_model)
@@ -50,6 +51,8 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         # Trims
         if (count%100) == 0:
             state_action_list, p1_mast_model, p1_mast_const = trim_sa_list_p1(input_data, state_action_list, p1_mast_model)
+            # my_path = os.path.dirname(__file__)
+            # export_betas(betas, os.path.join(my_path, 'Data', f'Feasible-Betas-full-newcost-intermediate.xlsx'))
         
         # Generates and solves Subproblem 
         p1_sub_model, p1_sub_var = update_sub_model(input_data, p1_sub_model, p1_sub_var, betas, True)
@@ -70,7 +73,7 @@ def generate_feasible_sa_list(input_data, init_state_actions):
     return state_action_list
 
 # %% Solve the problem (Phase 2)
-def generate_optimal_sa_list(input_data, init_state_actions, stabilization_parameter):
+def generate_optimal_sa_list(input_data, init_state_actions, stabilization_parameter, start=False):
 
     # Initializes
     state_action_list = init_state_actions
@@ -79,7 +82,12 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
     mast_model, mast_var, mast_const = generate_master_model(input_data, state_action_list)
 
     # Initializes Stabilization Parameters
-    beta_avg = generate_beta_estimate(input_data)
+    beta_avg = 0
+    if start == False:
+        beta_avg = generate_beta_estimate(input_data)
+    else:
+        beta_avg = start
+
     non_neg_count = 0
 
     # Initialize Sub model
@@ -89,12 +97,16 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
 
         # Generates and Solves Master
         mast_model.Params.LogToConsole = 0
+        mast_model.Params.SimplexPricing = 3
         mast_model.optimize()
         betas = generate_beta_values(input_data, mast_const)
 
         # Trims
         if (count%300) == 0:
             state_action_list, mast_model, mast_var, mast_const = trim_sa_list_p2(input_data, state_action_list, mast_var)
+            my_path = os.path.dirname(__file__)
+            export_betas(betas, os.path.join(my_path, 'Data', f'Intermediate-Betas.xlsx'))
+            # export_all_state_action(state_action_list, os.path.join(my_path, 'Data', f'Intermediate-States.xlsx'))
 
         if (count_same%100) == 0:
             count_same += 1
@@ -106,6 +118,7 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
         # Generates and solves Subproblem
         sub_model, sub_var = update_sub_model(input_data, sub_model, sub_var, beta_avg)
         sub_model.Params.LogToConsole = 0
+        sub_model.Params.DegenMoves = 2
         sub_model.optimize()
 
         # Debugging 

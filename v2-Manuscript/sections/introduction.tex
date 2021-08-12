@@ -1,0 +1,23 @@
+\section{Introduction}
+
+\subsection{Goals}
+The goal of this paper is to describe a patient surgery scheduling policy. This policy should consider the following items:
+\begin{itemize}
+	\item Different surgery types
+	\item Usage of various resources
+	\item Consider changes in patient complexity and patient priority
+	\item Consider randomness in various aspects
+	\item Take into account long term impact of scheduling
+	\item Modeling of the wait list 
+	\item It should allow for rescheduling
+\end{itemize}
+
+\subsection{Outcomes}
+The outcomes of the model should be the following:
+\begin{itemize}
+	\item The model should optimize overall system metrics
+	\item It should provide suggested schedule times for an input
+\end{itemize}
+
+\subsection{Model Description}
+The model's decisions will be done at the beginning of each period (in our case weekly). At the beginning of the period the model will take the current number of patients waiting, current waitlist, and current resource into account to make a decision. The model will output how many of each patient type to schedule into which period. And it will also say how many of each patient type to reschedule to which period.

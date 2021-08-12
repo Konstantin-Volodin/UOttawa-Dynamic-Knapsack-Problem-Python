@@ -139,7 +139,7 @@ def read_betas(data_file_path):
     betas['ul'] = {}
     for row in betas_sheet.iter_rows(min_row=2, min_col=3, max_col=4, values_only=True):
         if row[0] == None: break
-        betas['ul'][(row[0])] = row[1]
+        betas['ul'][(row[0],)] = row[1]
 
     betas['pw'] = {}
     for row in betas_sheet.iter_rows(min_row=2, min_col=5, max_col=8, values_only=True):

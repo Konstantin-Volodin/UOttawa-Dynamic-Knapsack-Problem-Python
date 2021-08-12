@@ -1,0 +1,44 @@
+\section{Data}
+
+\subsection{Sets}
+\begin{itemize}
+	\item $\vec{m}$ - 
+		period defining how long a patient has been waiting so far. 0 represents patients who have arrived. 
+		$m \in \{0 ... M\}$
+	\item $\vec{t}$ - 
+		denotes time of various things - scheduled into, waitlist period, rescheduled from. 
+		$t \in \{1 ... T\}$
+	\item $\vec{d}$ - 
+		denotes complexity of a patient. 
+		$d \in \{ 1 ... D \}$
+	\item $\vec{k}$ - 
+		denotes priority of a patient. 
+		$d \in \{ 1 ... K \}$
+	\item $\vec{c}$ - 
+		denotes surgery type of a patient. 
+		$c \in \{ 1 ... C \}$
+	\item $\vec{p}$ - 
+		denotes resource type. 
+		$p \in \{ 1 ... P \}$
+\end{itemize}
+
+\subsection{Input Data}
+\begin{itemize}
+	\item $p\_co_{p}$ - set of resources that carries over between periods
+	\item $p\_nco_{p}$ - set of resources that doesn't carry over between periods
+	\item $p\_ue_{p}$ - amount of resources expected each period
+	\item $p\_ued_{p}$ - Deviation from $p\_ue$. Uniform, defined by lower and upper value. The mean must be zero
+	\item $U_{pdc}$ - Usage of resource $p$, of complexity $d$, surgery type $c$
+	\item $pea_{dc}$ - Patient Expected Arrival
+	\item $TL\_d_{dc}$ - Time Limit after which patient can transition in complexity
+	\item $TL\_k_{kc}$ - Time Limit after which patient can transition in priority
+	\item $ptp\_c_{dc}$ - Probability to transition to higher complexity
+	\item $ptp\_p_{kc}$ - Probability to transition to higher priority
+\end{itemize}
+
+\subsection{Model Parameters}
+\begin{itemize}
+	\item $cw_{d}$ - defines cost of waiting, by priority $d$
+	\item $cc$ - additional cost of rescheduling 
+	\item $\alpha$ - discount factor to be used in the model
+\end{itemize}

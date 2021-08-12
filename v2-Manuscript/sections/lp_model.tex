@@ -1,0 +1,16 @@
+\section{LP Model}
+
+\subsection{Full LP} 
+Given a full MDP model, the equivalent LP would look as follows:
+\begin{equation}
+	\max_{\vec{v}} \sum \alpha (\vec{S}) v(\vec{S}) 
+\end{equation}
+
+subject to
+\begin{equation}
+	\label{full-adp-equation}
+	c(\vec{S}, \vec{A}) + \gamma \sum_{\vec{p}} p * v( \vec{S'}) 
+	\ge v(\vec{S}) \quad \forall \vec{S} \vec{A}
+\end{equation}
+
+And all auxiliary constraints in "\nameref{auxiliary constraints}"
