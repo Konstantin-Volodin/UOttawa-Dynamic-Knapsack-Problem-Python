@@ -46,12 +46,12 @@ def generate_sub_model(input_data, betas, phase1 = False):
     # PW
     for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
         if mdc[0] == indices['m'][-1]:
-            var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=1*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
+            var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=2*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
         else:
-            var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=1*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
+            var_pw[mdc] = sub_model.addVar(name=f's_pw_{mdc}', ub=2*arrival[(mdc[1],mdc[2])], vtype=GRB.INTEGER)
     # PS
     for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        var_ps[tmdc] = sub_model.addVar(name=f's_ps_{tmdc}', ub=2*arrival[(tmdc[2],tmdc[3])], vtype=GRB.INTEGER)
+        var_ps[tmdc] = sub_model.addVar(name=f's_ps_{tmdc}', ub=1*arrival[(tmdc[2],tmdc[3])], vtype=GRB.INTEGER)
 
     # Actions
     # SC

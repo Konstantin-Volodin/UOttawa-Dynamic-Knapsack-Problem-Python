@@ -29,16 +29,15 @@
 	\item $p\_ue_{p}$ - amount of resources expected each period
 	\item $p\_ued_{p}$ - Deviation from $p\_ue$. Uniform, defined by lower and upper value. The mean must be zero
 	\item $U_{pdc}$ - Usage of resource $p$, of complexity $d$, surgery type $c$
-	\item $pea_{dc}$ - Patient Expected Arrival
-	\item $TL\_d_{dc}$ - Time Limit after which patient can transition in complexity
-	\item $TL\_k_{kc}$ - Time Limit after which patient can transition in priority
-	\item $ptp\_c_{dc}$ - Probability to transition to higher complexity
+	\item $pea_{dkc}$ - Patient Expected Arrival
+	\item $TL_{c}$ - Time Limit after which patient can transition in complexity/priority
+	\item $ptp\_d_{dc}$ - Probability to transition to higher complexity
 	\item $ptp\_p_{kc}$ - Probability to transition to higher priority
 \end{itemize}
 
 \subsection{Model Parameters}
 \begin{itemize}
-	\item $cw_{d}$ - defines cost of waiting, by priority $d$
-	\item $cc$ - additional cost of rescheduling 
+	\item $cw_{k}$ - defines cost of waiting, by priority $k$
+	\item $cc_{k}$ - additional cost of rescheduling, by priority $k$ 
 	\item $\alpha$ - discount factor to be used in the model
 \end{itemize}

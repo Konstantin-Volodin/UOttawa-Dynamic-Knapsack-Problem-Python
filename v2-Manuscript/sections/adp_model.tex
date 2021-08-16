@@ -6,17 +6,17 @@ Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximati
 \begin{equation}\begin{alignedat}{10}
 		& v(\vec{ul}, \vec{pw}, \vec{ps}) 
 		&& =  \beta^0 + \sum_{p} \beta_{p}^{ul} ul_{p} +
-		\sum_{mdc} \beta_{mdc}^{pw} pw_{mdc}  + 
-		\sum_{tmdc} \beta_{tmdc}^{ps} ps_{tmdc}
+		\sum_{mdkc} \beta_{mdkc}^{pw} pw_{mdkc}  + 
+		\sum_{tmdkc} \beta_{tmdkc}^{ps} ps_{tmdkc}
 \end{alignedat} \end{equation}
 
 Next we need to convert a part of equation \ref{full-adp-equation} into expectation. \\ 
 (To make it easier later, we will format is as $v(\vec{S}) - E[v(\vec{S}')]$)
 
 \begin{itemize}
-	\item $E[ued_p] = 0$
-	\item $E[pwt_{mdc}] = ptp_{dc} * \hat{pw}_{mdc}$ 
-	\item $E[pst_{tmdc}] = ptp_{dc} * \hat{ps}_{tmdc}$ 
+	\item $E[p\_ued_p] = 0$
+	\item $E[pwt_{mdkc}] = ptp\_d_{dc} * \hat{pw}_{mdkc}$ 
+	\item $E[pst_{tmdkc}] = ptp\_k_{kc} * \hat{ps}_{tmdkc}$ 
 \end{itemize}
 
 \begin{fleqn}[\parindent]
@@ -28,42 +28,47 @@ Next we need to convert a part of equation \ref{full-adp-equation} into expectat
 \begin{fleqn}[\parindent]
 	\begin{equation}
 		\beta^{ul}_{p}: \qquad 
-		\sum_{p \in \text{co}} \beta_{p}^{ul} \Big( ul_{p} - \gamma ( \hat{ul}_{p}) \Big) + 
-		\sum_{p \in \text{nco}} \beta_{p}^{ul} ( ul_{p}) 
+		\sum_{p \in \text{p\_co}} \beta_{p}^{ul} \Big( ul_{p} - \gamma ( \hat{ul}_{p}) \Big) + 
+		\sum_{p \in \text{p\_nco}} \beta_{p}^{ul} ( ul_{p}) 
 	\end{equation}
 \end{fleqn}
 
 \begin{fleqn}[\parindent]
 	\begin{equation}\begin{alignedat}{10}
-			& \beta^{pw}_{mdc}: \qquad 
-			&& 	\sum_{dc} \beta_{0dc}^{pw} \Big( pw_{0dc} - \gamma (pea_{dc}) \Big) +
-			\sum_{m=1dc}^{TL_{dc}-1} \beta_{mdc}^{pw} 
-			\Big( pw_{mdc} - \gamma 
-			(\hat{pw}_{m-1dc}) \Big) + \\
-			& && \sum_{m=TL_{dc}dc}^{M-1} \beta_{mdc}^{pw} 
-			\Big( pw_{mdc} - \gamma 
-			(\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \Big) + \\
-			& && \sum_{dc} \beta_{Mdc}^{pw} 
-			\Big( pw_{Mdc} - \gamma \sum_{M-1}^{M}
-			(\hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}]) \Big)
+			& \beta^{pw}_{mdkc}: \qquad 
+				&& 	\sum_{dkc} \beta_{0dkc}^{pw} \Big( pw_{0dkc} - \gamma (pea_{dkc}) \Big) +
+					\sum_{m=1dkc}^{TL_{c}-1} \beta_{mdkc}^{pw} 
+					\Big( pw_{mdkc} - \gamma 
+					(\hat{pw}_{m-1dkc}) \Big) + \\
+			& 
+				&& \sum_{m=TL_{c}dkc}^{M-1} \beta_{mdkc}^{pw} 
+					\Big( pw_{mdkc} - \gamma 
+					(\hat{pw}_{m-1dkc} + E[pwt\_d_{m-1d-1c}] - E[pwt\_d_{d}] + E[pwt\_k_{k-1}] - + E[pwt\_k_{k}]) \Big) + \\
+			& 
+				&& \sum_{dc} \beta_{Mdkc}^{pw} 
+					\Big( pw_{Mdkc} - \gamma \sum_{M-1}^{M}
+					(\hat{pw}_{mdkc} + E[pwt\_d_{md-1c}] - E[pwt\_d_{d}] + E[pwt\_k_{k-1}] - E[pwt\_k_{k}]) \Big)
 	\end{alignedat} \end{equation}
 \end{fleqn}
 
 \begin{fleqn}[\parindent]
 	\begin{equation}\begin{alignedat}{10}
-			& \beta^{ps}_{tmdc}: \qquad 
-			&& \sum_{tdc} \beta_{t0dc}^{ps} \Big( ps_{t0dc}) \Big) + 
-			\sum_{mdc} \beta_{Tmdc}^{ps} \Big( ps_{Tmdc}) \Big) + 
-			\sum_{t=1m=1dc}^{T-1, TL_{dc}-1} \beta_{tmdc}^{ps} 
-			\Big( ps_{tmdc} - \gamma 
-			(\hat{ps}_{t+1m-1dc}) \Big) + \\
-			&	&& 
-			\sum_{t=1m=TL_{dc}dc}^{T-1,M-1} \beta_{tmdc}^{ps} 
-			\Big( ps_{tmdc} - \gamma 
-			(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{t+1m-1dc}]) \Big) + \\
-			&	&& \sum_{t=1dc}^{T-1} \beta_{tMdc}^{ps} 
-			\Big( ps_{tMdc} - \gamma \sum_{M-1}^{M}
-			(\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{t+1mdc}]) \Big)
+			& \beta^{ps}_{tmdkc}: \qquad 
+				&& \sum_{tdkc} \beta_{t0dkc}^{ps} \Big( ps_{t0dkc}) \Big) + 
+					\sum_{mdkc} \beta_{Tmdkc}^{ps} \Big( ps_{Tmdkc}) \Big) + 
+					\sum_{t=1m=1dkc}^{T-1, TL_{c}-1} \beta_{tmdkc}^{ps} 
+					\Big( ps_{tmdkc} - \gamma 
+					(\hat{ps}_{t+1m-1dkc}) \Big) + \\
+			&	
+				&& 
+					\sum_{t=1m=TL_{c}dkc}^{T-1,M-1} \beta_{tmdkc}^{ps} 
+					\Big( ps_{tmdkc} - \gamma 
+					(\hat{ps}_{t+1m-1dkc} + E[pst\_d_{t+1m-1d-1c}] - E[pst\_d_{d}]  + E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big) + \\
+			&	
+				&& 
+					\sum_{t=1dkc}^{T-1} \beta_{tMdkc}^{ps} 
+					\Big( ps_{tMdkc} - \gamma \sum_{M-1}^{M}
+					(\hat{ps}_{t+1mdkc} + E[pst\_d_{t+1md-1c}] - E[pst\_d_{d}] + E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big)
 	\end{alignedat} \end{equation}
 \end{fleqn}
 
@@ -79,7 +84,7 @@ Subject to:
 
 \subsection{ADP Master Problem}
 \label{Dual of ADP LP}
-Converting to Dual
+The equation above has a reasonable amount of decision variables, but an uncountable amount of constraints. Let's use column generation to solve it. First converting to dual
 \begin{equation}
 	\min_{w} \sum_{\vec{S} \vec{A}} w(\vec{S} \vec{A}) c(\vec{S} \vec{A})
 \end{equation}
@@ -87,40 +92,52 @@ Subject To:
 
 \begin{alignat}{10}
 	& \beta^{0}: 
-	&&	\sum_{\vec{S}\vec{A}}\vec{w} (1 - \gamma) = 1 \\
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} (1 - \gamma) = 1 \\
 	& \beta^{ul}: 
-	&& 	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ul_{p} - 
-	\gamma (\hat{ul}_{p}) \Big) \ge E[ul_{p}] 
-	&&	\forall p \in \{ \text{carry over} \} \\ 
-	&	&& 	\sum_{\vec{S}\vec{A}}\vec{w} ( ul_{p}) \ge E[ul_{p}]
-	&&	\forall p \in \{ \text{non carry over} \}\\
+		&& 	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ul_{p} - 
+		\gamma (\hat{ul}_{p}) \Big) \ge E[ul_{p}] 
+		&&	\forall p \in p\_co \\ 
+	&	
+		&& 	\sum_{\vec{S}\vec{A}}\vec{w} ( ul_{p}) \ge E[ul_{p}]
+		&&	\forall p \in p\_nco \\
 	&	\beta^{pw}: 
-	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{0dc} - 
-	\gamma (pea_{dc}) \Big) \ge E[ps_{0dc}]
-	&&	\forall dc \\
-	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdc} - 
-	\gamma (\hat{pw}_{m-1dc}) \Big) \ge E[pw_{mdc}]
-	&&	\forall m \in \{1...TL_{dc}-1\} dc \\
-	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdc} - 
-	\gamma (\hat{pw}_{m-1dc} + E[pwt_{m-1d-1c}] - E[pwt_{m-1dc}]) \Big) \ge E[pw_{mdc}]
-	&&	\forall m \in \{TL_{dc}...M-1\} dc \\
-	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{Mdc} - \gamma 
-	\sum_{M-1}^{M} (\hat{pw}_{mdc} + E[pwt_{md-1c}] - E[pwt_{mdc}]) \Big) \ge E[pw_{Mdc}]
-	&&	\forall dc \\ 
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{0dkc} - 
+		\gamma (pea_{dkc}) \Big) \ge E[ps_{0dkc}]
+		&&	\forall dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdkc} - 
+		\gamma (\hat{pw}_{m-1dkc}) \Big) \ge E[pw_{mdkc}]
+		&&	\forall m \in \{1...TL_{c}-1\} dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdkc} - 
+		\gamma (\hat{pw}_{m-1dkc}  + E[pwt\_d_{m-1d-1c}] - E[pwt\_d_{d}] +\\ 
+		& && \qquad + E[pwt\_k_{k-1}] - E[pwt\_k_{k}]) \Big) \ge E[pw_{mdkc}]
+		&&	\forall m \in \{TL_{c}...M-1\} dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{Mdc} - \gamma 
+		\sum_{M-1}^{M} (\hat{pw}_{mdc} + E[pwt\_d_{md-1c}] - E[pwt\_d_{d}] + \\
+		&	&& \qquad  + E[pwt\_k_{k-1k}] - E[pwt\_k_{k}] )  \Big) \ge E[pw_{Mdc}]
+		&&	\forall dkc \\ 
 	&	\beta^{ps}: 
-	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{t0dc} \Big) \ge E[ps_{t0dc}]
-	&&	\forall tdc \\
-	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{Tmdc} \Big) \ge E[ps_{Tmdc}]
-	&&	\forall mdc \\
-	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdc} - \gamma 
-	(\hat{ps}_{t+1m-1dc}) \Big) \ge E[ps_{tmdc}] \;
-	&&	\forall \{1...T-1\} \{1...TL_{dc}-1\}dc \\
-	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdc} - \gamma 
-	(\hat{ps}_{t+1m-1dc} + E[pst_{t+1m-1d-1c}] - E[pst_{d}]) \Big) \ge E[ps_{tmdc}] \;
-	&&	\forall \{1...T-1\} \{TL_{dc}...M-1\}dc \\
-	&	&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tMdc} - \gamma \sum_{M-1}^{M}
-	(\hat{ps}_{t+1mdc} + E[pst_{t+1md-1c}] - E[pst_{d}]) \Big) \ge E[ps_{tMdc}] \;
-	&&	\forall \{1...T-1\} dc
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{t0dkc} \Big) \ge E[ps_{t0dkc}]
+		&&	\forall tdkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{Tmdkc} \Big) \ge E[ps_{Tmdkc}]
+		&&	\forall mdkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdkc} - \gamma 
+				(\hat{ps}_{t+1m-1dkc}) \Big) \ge E[ps_{tmdkc}] \;
+		&&	\forall \{1...T-1\} \{1...TL_{c}-1\}dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdkc} - \gamma 
+				(\hat{ps}_{t+1m-1dc} + E[pst\_d_{t+1m-1d-1c}] - E[pst\_d_{d}] + \\
+		& &&	+ E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big) \ge E[ps_{tmdkc}] 
+		&&	\forall \{1...T-1\} \{TL_{c}...M-1\}dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tMdkc} - \gamma \sum_{M-1}^{M}
+				(\hat{ps}_{t+1mdkc} + E[pst\_d_{t+1md-1c}] - E[pst\_d_{d}] + \\
+		& &&	+ E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big) \ge E[ps_{tMdkc}]
+		&&	\forall \{1...T-1\} dkc
 \end{alignat}
 
 \begin{equation}
