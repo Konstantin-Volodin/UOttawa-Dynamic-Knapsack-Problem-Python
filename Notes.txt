@@ -153,17 +153,19 @@ Notes - set the waiting cost to start at max scheduling cost
 - priority appears to be different from complexity 
 we will come up in english of what the model does
 
-<<<<<<< Updated upstream
 try to solve on the university computers
 revised model to show to stephen - 
 	- make sure to show the assumptions well
 	- show pictures from the model to show that it is serious!
 	- 
 
-=======
 - interier point solution for subproblem
 - instead of reformulating - update subproblem
 - que jumping - going from one priority to the next
 
-- its important also that you could get stuck in the type of position you were in, people might be hesitant about what you actually know
->>>>>>> Stashed changes
+- provide main things
+- provide a timeline
+
+ - ask IT for METlab computers IP
+
+Ahmet could know more about DEA

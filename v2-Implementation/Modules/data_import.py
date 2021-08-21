@@ -35,14 +35,19 @@ def read_data(data_file_path):
     for comp_row in indices_sheet.iter_rows(min_row=2, min_col=4, max_col=4, values_only=True):
         if comp_row[0] == None: break
         d.append(comp_row[0])
+    # Generates K
+    k = []
+    for prio_row in indices_sheet.iter_rows(min_row=2, min_col=5, max_col=5, values_only=True):
+        if prio_row[0] == None: break
+        k.append(prio_row[0])
     # Generates C
     c = []
-    for cpu_row in indices_sheet.iter_rows(min_row=2, min_col=5, max_col=5, values_only=True):
+    for cpu_row in indices_sheet.iter_rows(min_row=2, min_col=6, max_col=6, values_only=True):
         if cpu_row[0] == None: break
         c.append(cpu_row[0])
 
     # Saves Indices
-    indices = {'t': t, 'm': m, 'p': p, 'd': d, 'c': c }
+    indices = {'t': t, 'm': m, 'p': p, 'd': d, 'k': k, 'c': c }
     
 
     # PPE Data

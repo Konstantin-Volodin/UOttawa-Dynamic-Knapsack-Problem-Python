@@ -11,9 +11,9 @@ class ppe_data_class:
 
 @dataclass(frozen=False)
 class model_param_class:
-    cw: float
-    cc: float
-    cs: List[float]
+    cw: Dict[ str, float ]
+    cc: Dict[ str, float ]
+    cs: Dict[ str, List[float] ]
     M: float
     gamma: float
 @dataclass(frozen=False)

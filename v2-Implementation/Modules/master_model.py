@@ -297,7 +297,7 @@ def generate_constraint(
             results[index_iter] = model.addConstr(expr[index_iter] <= init_iterables.rhs_param[index_iter], name=init_iterables.name[index_iter])
         else: 
             print('\terror')
-    return(results)
+    return results
     
 
 # Generate Phase 1 Master Model (finding initial feasible solution)
