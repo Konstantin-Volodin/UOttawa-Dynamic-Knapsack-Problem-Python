@@ -19,11 +19,11 @@ def generate_initial_state_action(input_data):
 
     # Patient States
     pw = {}
-    for mdc in itertools.product(indices['m'],indices['d'], indices['c']):
-        pw[mdc] = 0
+    for mdkc in itertools.product(indices['m'],indices['d'], indices['k'], indices['c']):
+        pw[mdkc] = 0
     ps = {}
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        ps[tmdc] = 0
+    for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        ps[tmdkc] = 0
 
     # Unit States
     ul = {}
@@ -32,11 +32,11 @@ def generate_initial_state_action(input_data):
 
     # Actions
     sc = {}
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        sc[tmdc] = 0
+    for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        sc[tmdkc] = 0
     rsc = {}
-    for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        rsc[ttpmdc] = 0
+    for ttpmdkc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        rsc[ttpmdkc] = 0
     
     # Violation
     uv = {}
@@ -55,11 +55,11 @@ def generate_initial_state_action(input_data):
         uvb[tp] = 0
         uu_p[tp] = 0
     pw_p = {}
-    for mdc in itertools.product(indices['m'],indices['d'], indices['c']):
-        pw_p[mdc] = 0
+    for mdkc in itertools.product(indices['m'],indices['d'], indices['k'], indices['c']):
+        pw_p[mdkc] = 0
     ps_p = {}
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        ps_p[tmdc] = 0
+    for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        ps_p[tmdkc] = 0
 
     # Returns
     test_state = state(ul, pw, ps)
@@ -74,25 +74,21 @@ def cost_function(input_data: input_data_class, state: state, action: action):
 
     cost = 0
     # Cost of Waiting
-    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):            
-        cost += model_param.cw * ( action.pw_p_mdc[mdc] )
-    
-    # Cost of Waiting - Last Period
-    # for tdc in itertools.product(indices['t'], indices['d'], indices['c']):
-    #     cost += model_param.cw**(indices['m'][-1]+1) * ( action.ps_p_tmdc[(tdc[0],indices['m'][-1],tdc[1],tdc[2])] )
+    for mdkc in itertools.product(indices['m'], indices['d'], indices['k'], indices['c']):            
+        cost += model_param.cw[mdkc[2]] * ( action.pw_p_mdkc[mdkc] )
 
     # Prefer Earlier Appointments
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        cost += model_param.cs[tmdc[0]] * ( action.sc_tmdc[tmdc] )
+    for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        cost += model_param.cs[tmdkc[3]][tmdkc[0]] * ( action.sc_tmdkc[tmdkc] )
 
     # Cost of Rescheduling
-    for ttpmdc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['c']):
-        if ttpmdc[0] > ttpmdc[1]: # good schedule
-            difference = ttpmdc[0] - ttpmdc[1]
-            cost -= (model_param.cs[difference] - model_param.cc) * action.rsc_ttpmdc[ttpmdc]
-        elif ttpmdc[1] > ttpmdc[0]: #bad schedule
-            difference = ttpmdc[1] - ttpmdc[0]
-            cost += (model_param.cs[difference] + model_param.cc) * action.rsc_ttpmdc[ttpmdc]
+    for ttpmdkc in itertools.product(indices['t'], indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        if ttpmdkc[0] > ttpmdkc[1]: # good schedule
+            difference = ttpmdkc[0] - ttpmdkc[1]
+            cost -= (model_param.cs[ttpmdkc[4]][difference] - model_param.cc[ttpmdkc[4]]) * action.rsc_ttpmdkc[ttpmdkc]
+        elif ttpmdkc[1] > ttpmdkc[0]: #bad schedule
+            difference = ttpmdkc[1] - ttpmdkc[0]
+            cost += (model_param.cs[ttpmdkc[4]][difference] + model_param.cc[ttpmdkc[4]]) * action.rsc_ttpmdkc[ttpmdkc]
 
     # Violating unit bounds
     for tp in itertools.product(indices['t'], indices['p']):
@@ -124,12 +120,15 @@ def b_ul_constraint(input_data: input_data_class, state: state, action: action) 
 
     # Creates Data
     for p in itertools.product(indices['p']):
-        
+
+        # Left Hand Side        
         if ppe_data[p[0]].ppe_type == 'carry-over':
             lhs[p] = state.ul_p[p] - gamma * action.ul_p_p[p]    
+
         elif ppe_data[p[0]].ppe_type == 'non-carry-over':
             lhs[p] = state.ul_p[p]
 
+        # Rest
         rhs[p] = input_data.expected_state_values['ul'][p]
         sign[p] = ">="
         name[p] = f'b_ul_{str(p)[1:][:-1].replace(" ","_").replace(",","")}'
@@ -153,49 +152,87 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
     # Creates Data
     for mc in itertools.product(indices['m'], indices['c']):
         for d in range(len(indices['d'])):
-            mdc = (mc[0], indices['d'][d], mc[1])
-            dc = (indices['d'][d], mc[1])
+            for k in range(len(indices['k'])):
 
-            # When m = 0
-            if mc[0] == 0: 
-                lhs[mdc] = state.pw_mdc[mdc] - (gamma * arrival[(mdc[1], mc[1])] )
+                # Left Hand Side
+                mdkc = (mc[0], indices['d'][d], indices['k'][k], mc[1])
 
-            # When m = M
-            elif mc[0] == indices['m'][-1]:
-                lhs[mdc] = state.pw_mdc[mdc]
+                # When m = 0
+                if mdkc[0] == 0: 
+                    lhs[mdkc] = state.pw_mdkc[mdkc] - (gamma * arrival[(mdkc[1], mdkc[2], mdkc[3])] )
 
-                for mm in input_data.indices['m'][-2:]:
-                    lhs[mdc] -= gamma * action.pw_p_mdc[(mm, mdc[1], mdc[2])]
+                # When m is less than TL_dc
+                elif mdkc[0] < (transition.wait_limit[mdkc[3]]):
+                    lhs[mdkc] = state.pw_mdkc[mdkc] - gamma * action.pw_p_mdkc[(mdkc[0]-1,mdkc[1],mdkc[2], mdkc[3])]
+
+                # When m = M
+                elif mdkc[0] == indices['m'][-1]:
+                    lhs[mdkc] = state.pw_mdkc[mdkc]
+
+                    for mm in input_data.indices['m'][-2:]:
+                        lhs[mdkc] -= gamma * action.pw_p_mdkc[(mm, mdkc[1], mdkc[2], mdkc[3])]
+                        
+                        # Complexity Change
+                        tr_lim = input_data.transition.wait_limit[mdkc[3]]
+                        tr_rate_d = transition.transition_rate_comp[(mdkc[1], mdkc[3])]
+                        
+                        tr_in_d = 0
+                        if (d != 0) & (mm >= tr_lim):
+                            tr_in_d = tr_rate_d * action.pw_p_mdkc[( mm, indices['d'][d-1], mdkc[2], mdkc[3] )]
+                            
+                        tr_out_d = 0
+                        if (d != indices['d'][-1]) & (mm >= tr_lim):
+                            tr_out_d = tr_rate_d * action.pw_p_mdkc[( mm, mdkc[1], mdkc[2], mdkc[3] )]
+
+                        # Priority Change
+                        tr_rate_k = transition.transition_rate_pri[(mdkc[2], mdkc[3])]
+                        
+                        tr_in_k = 0
+                        if (k != 0) & (mm >= tr_lim):
+                            tr_in_k = tr_rate_k * action.pw_p_mdkc[( mm, mdkc[1], indices['k'][k-1], mdkc[3] )]
+
+                        tr_out_k = 0
+                        if (k != indices['k'][-1]) & (mm >= tr_lim):
+                            tr_out_k = tr_rate_k * action.pw_p_mdkc[( mm, mdkc[1], mdkc[2], mdkc[3] )]
+                        
+                        lhs[mdkc] -= gamma * (tr_in_d - tr_out_d )
+                        lhs[mdkc] -= gamma * (tr_in_k - tr_out_k )
+
+
+                # All others
+                else:      
+                    lhs[mdkc] = state.pw_mdkc[mdkc] - gamma*(action.pw_p_mdkc[(mdkc[0]-1,mdkc[1],mdkc[2],mdkc[3])])
+                  
+                    # Complexity Change
+                    tr_lim = input_data.transition.wait_limit[mdkc[3]]
+                    tr_rate_d = transition.transition_rate_comp[(mdkc[1], mdkc[3])]
                     
-                    transitioned_in = 0
-                    if d != 0 & (mm >= transition[dc].wait_limit+1):
-                        transitioned_in = transition[dc].transition_rate * action.pw_p_mdc[( mm, indices['d'][d-1], mdc[2] )]
-                    transitioned_out = 0
-                    if d != indices['d'][-1]:
-                        transitioned_out = transition[dc].transition_rate * action.pw_p_mdc[( mm, mdc[1], mdc[2] )]
+                    tr_in_d = 0
+                    if (d != 0) & (mdkc[0]-1 >= tr_lim):
+                        tr_in_d = tr_rate_d * action.pw_p_mdkc[( mdkc[0]-1, indices['d'][d-1], mdkc[2], mdkc[3] )]
+                            
+                    tr_out_d = 0
+                    if (d != indices['d'][-1]) & (mdkc[0]-1 >= tr_lim):
+                        tr_out_d = tr_rate_d * action.pw_p_mdkc[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )]
+
+                    # Priority Change
+                    tr_rate_k = transition.transition_rate_pri[(mdkc[2], mdkc[3])]
                     
-                    lhs[mdc] -= gamma * (transitioned_in - transitioned_out )
+                    tr_in_k = 0
+                    if (k != 0) & (mdkc[0]-1 >= tr_lim):
+                        tr_in_k = tr_rate_k * action.pw_p_mdkc[( mdkc[0]-1, mdkc[1], indices['k'][k-1], mdkc[3] )]
 
-            # When m is less than TL_dc
-            elif mc[0] <= (transition[dc].wait_limit - 1):
-                lhs[mdc] = state.pw_mdc[mdc] - gamma * action.pw_p_mdc[(mdc[0]-1,mdc[1],mdc[2])]
+                    tr_out_k = 0
+                    if (k != indices['k'][-1]) & (mdkc[0]-1 >= tr_lim):
+                        tr_out_k = tr_rate_k * action.pw_p_mdkc[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )]
+                    
+                    lhs[mdkc] -= gamma * (tr_in_d - tr_out_d )
+                    lhs[mdkc] -= gamma * (tr_in_k - tr_out_k )
 
-            # All others
-            else:      
-                lhs[mdc] = state.pw_mdc[mdc] - gamma*(action.pw_p_mdc[(mdc[0]-1,mdc[1],mdc[2])])
-
-                transitioned_in = 0
-                if d != 0 & (mdc[0] >= transition[dc].wait_limit+1):
-                    transitioned_in = transition[dc].transition_rate * action.pw_p_mdc[( mdc[0]-1, indices['d'][d-1], mdc[2] )]
-                transitioned_out = 0
-                if d != indices['d'][-1]:
-                    transitioned_out = transition[dc].transition_rate * action.pw_p_mdc[( mdc[0]-1, mdc[1], mdc[2] )]
-                
-                lhs[mdc] -= gamma * (transitioned_in - transitioned_out )
-
-            rhs[mdc] = input_data.expected_state_values['pw'][mdc]
-            sign[mdc] = ">="
-            name[mdc] = f'b_pw_{str(mdc)[1:][:-1].replace(" ","_").replace(",","")}'
+                # Rest
+                rhs[mdkc] = input_data.expected_state_values['pw'][mdkc]
+                sign[mdkc] = ">="
+                name[mdkc] = f'b_pw_{str(mdkc)[1:][:-1].replace(" ","_").replace(",","")}'
         
     # Returns Data
     constr_data = constraint_parameter(lhs,rhs,sign,name)
@@ -212,55 +249,93 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
     sign = {}
     name = {}
     
+    # Creates Data
     for tmc in itertools.product(indices['t'], indices['m'], indices['c']):
         for d in range(len(indices['d'])):
-            tmdc = (tmc[0], tmc[1], indices['d'][d], tmc[2])
-            dc = (indices['d'][d], tmc[2])
+            for k in range(len(indices['k'])):
 
-            # When m is 0
-            if tmdc[1] == 0: 
-                lhs[tmdc] = state.ps_tmdc[tmdc]
+                # Left Hand Side
+                tmdkc = (tmc[0], tmc[1], indices['d'][d], indices['k'][k], tmc[2])
 
-            # When t is T
-            elif tmdc[0] == indices['t'][-1]:
-                lhs[tmdc] = state.ps_tmdc[tmdc]
+                # When m = 0
+                if tmdkc[1] == 0: 
+                    lhs[tmdkc] = state.ps_tmdkc[tmdkc]
 
-            # when m is M
-            elif tmdc[1] == indices['m'][-1]:
-                lhs[tmdc] = state.ps_tmdc[tmdc]
+                # When t = T
+                elif tmdkc[0] == indices['t'][-1]:
+                    lhs[tmdkc] = state.ps_tmdkc[tmdkc]
+                                    
+                # When m is less than TL_c
+                elif tmdkc[1] < (transition.wait_limit[tmdkc[4]]):
+                    lhs[tmdkc] = state.ps_tmdkc[tmdkc] - gamma*(action.ps_p_tmdkc[(tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4])])
+                
+                # When m = M
+                elif tmdkc[1] == indices['m'][-1]:
+                    lhs[tmdkc] = state.ps_tmdkc[tmdkc]
 
-                for mm in input_data.indices['m'][-2:]:
-                    lhs[tmdc] -= gamma * action.ps_p_tmdc[(tmdc[0] + 1, mm, tmdc[2], tmdc[3])]
-
-                    transitioned_in = 0
-                    if d != 0 & (mm >= transition[dc].wait_limit+1):
-                        transitioned_in = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, mm, indices['d'][d-1], tmdc[3] )]
-                    transitioned_out = 0
-                    if d != indices['d'][-1]:
-                        transitioned_out = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, mm, tmdc[2], tmdc[3] )]
+                    for mm in input_data.indices['m'][-2:]:
+                        lhs[tmdkc] -= gamma * action.ps_p_tmdkc[(tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4])]
                         
-                    lhs[tmdc] -= gamma * (transitioned_in - transitioned_out )
-                    
-            # When m is less than TL_dc
-            elif tmdc[1] <= (transition[dc].wait_limit - 1):
-                lhs[tmdc] = state.ps_tmdc[tmdc] - gamma*(action.ps_p_tmdc[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
-            
-            # Everything Else
-            else:
-                lhs[tmdc] = state.ps_tmdc[tmdc] - gamma*(action.ps_p_tmdc[(tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3])])
-                
-                transitioned_in = 0
-                if d != 0  & (tmdc[1] >= transition[dc].wait_limit+1):
-                    transitioned_in = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, tmdc[1]-1, indices['d'][d-1], tmdc[3] )]
-                transitioned_out = 0
-                if d != indices['d'][-1]:
-                    transitioned_out = transition[dc].transition_rate * action.ps_p_tmdc[( tmdc[0]+1, tmdc[1]-1, tmdc[2], tmdc[3] )]
+                        # Complexity Change
+                        tr_lim = input_data.transition.wait_limit[tmdkc[4]]
+                        tr_rate_d = transition.transition_rate_comp[(tmdkc[2], tmdkc[4])]
+                        
+                        tr_in_d = 0
+                        if (d != 0) & (mm >= tr_lim):
+                            tr_in_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, mm, indices['d'][d-1], tmdkc[3], tmdkc[4] )]
+                            
+                        tr_out_d = 0
+                        if (d != indices['d'][-1]) & (mm >= tr_lim):
+                            tr_out_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )]
 
-                lhs[tmdc] -= gamma * (transitioned_in - transitioned_out )
+                        # Priority Change
+                        tr_rate_k = transition.transition_rate_pri[(tmdkc[3], tmdkc[4])]
+                        
+                        tr_in_k = 0
+                        if (k != 0) & (mm >= tr_lim):
+                            tr_in_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, mm, tmdkc[2], indices['k'][k-1], tmdkc[4] )]
+
+                        tr_out_k = 0
+                        if (k != indices['k'][-1]) & (mm >= tr_lim):
+                            tr_out_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )]
+                        
+                        lhs[tmdkc] -= gamma * (tr_in_d - tr_out_d )
+                        lhs[tmdkc] -= gamma * (tr_in_k - tr_out_k )
+
+                # Everything Else
+                else:
+                    lhs[tmdkc] = state.ps_tmdkc[tmdkc] * action.ps_p_tmdkc[(tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4])]
+                    
+                    # Complexity Change
+                    tr_lim = input_data.transition.wait_limit[tmdkc[4]]
+                    tr_rate_d = transition.transition_rate_comp[(tmdkc[2], tmdkc[4])]
+                    
+                    tr_in_d = 0
+                    if (d != 0) & (tmdkc[1]-1 >= tr_lim):
+                        tr_in_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, indices['d'][d-1], tmdkc[3], tmdkc[4] )]
+                        
+                    tr_out_d = 0
+                    if (d != indices['d'][-1]) & (tmdkc[1]-1 >= tr_lim):
+                        tr_out_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )]
+
+                    # Priority Change
+                    tr_rate_k = transition.transition_rate_pri[(tmdkc[3], tmdkc[4])]
+                    
+                    tr_in_k = 0
+                    if (k != 0) & (tmdkc[1]-1 >= tr_lim):
+                        tr_in_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], indices['k'][k-1], tmdkc[4] )]
+
+                    tr_out_k = 0
+                    if (k != indices['k'][-1]) & (tmdkc[1]-1 >= tr_lim):
+                        tr_out_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )]
+                    
+                    lhs[tmdkc] -= gamma * (tr_in_d - tr_out_d )
+                    lhs[tmdkc] -= gamma * (tr_in_k - tr_out_k )
                 
-            rhs[tmdc] = input_data.expected_state_values['ps'][tmdc]
-            sign[tmdc] = ">="
-            name[tmdc] = f'b_ps_{str(tmdc)[1:][:-1].replace(" ","_").replace(",","")}'
+                # Rest
+                rhs[tmdkc] = input_data.expected_state_values['ps'][tmdkc]
+                sign[tmdkc] = ">="
+                name[tmdkc] = f'b_ps_{str(tmdkc)[1:][:-1].replace(" ","_").replace(",","")}'
 
     # Returns Data
     constr_data = constraint_parameter(lhs,rhs,sign,name)
@@ -284,17 +359,17 @@ def generate_constraint(
     for sa_pair in range(len(state_action_data)):
         params = generator_function(input_data, state_action_data[sa_pair][0], state_action_data[sa_pair][1])
         for index_iter in params.lhs_param.keys():
-            expr[index_iter].add(state_action_variable[sa_pair], params.lhs_param[index_iter])
+            expr[index_iter].add(state_action_variable[sa_pair], round(params.lhs_param[index_iter],10))
 
     # Saving
     results = {}
     for index_iter in init_iterables.lhs_param.keys():
         if init_iterables.sign[index_iter] == "=":
-            results[index_iter] = model.addConstr(expr[index_iter] == init_iterables.rhs_param[index_iter], name=init_iterables.name[index_iter])
+            results[index_iter] = model.addConstr(expr[index_iter] == round(init_iterables.rhs_param[index_iter],10), name=init_iterables.name[index_iter])
         elif init_iterables.sign[index_iter] == ">=":
-            results[index_iter] = model.addConstr(expr[index_iter] >= init_iterables.rhs_param[index_iter], name=init_iterables.name[index_iter])
+            results[index_iter] = model.addConstr(expr[index_iter] >= round(init_iterables.rhs_param[index_iter],10), name=init_iterables.name[index_iter])
         elif init_iterables.sign[index_iter] == "<=":
-            results[index_iter] = model.addConstr(expr[index_iter] <= init_iterables.rhs_param[index_iter], name=init_iterables.name[index_iter])
+            results[index_iter] = model.addConstr(expr[index_iter] <= round(init_iterables.rhs_param[index_iter],10), name=init_iterables.name[index_iter])
         else: 
             print('\terror')
     return results
@@ -335,16 +410,16 @@ def generate_phase1_master_model(input_data, model):
         mast_model.chgCoeff(ul_constr[p], gv_ul[p], 1)
         
     # Beta pw
-    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-        pw_constr[mdc] = mast_model.getConstrByName(f'b_pw_{str(mdc)[1:][:-1].replace(" ","_").replace(",","")}')
-        gv_pw[mdc] = mast_model.addVar(name=f'gv_b_pw_{mdc}', obj=1)
-        mast_model.chgCoeff(pw_constr[mdc], gv_pw[mdc], 1)
+    for mdkc in itertools.product(indices['m'], indices['d'], indices['k'], indices['c']):
+        pw_constr[mdkc] = mast_model.getConstrByName(f'b_pw_{str(mdkc)[1:][:-1].replace(" ","_").replace(",","")}')
+        gv_pw[mdkc] = mast_model.addVar(name=f'gv_b_pw_{mdkc}', obj=1)
+        mast_model.chgCoeff(pw_constr[mdkc], gv_pw[mdkc], 1)
     
     # Beta ps
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        ps_constr[tmdc] = mast_model.getConstrByName(f'b_ps_{str(tmdc)[1:][:-1].replace(" ","_").replace(",","")}')
-        gv_ps[tmdc] = mast_model.addVar(name=f'gv_b_ps_{tmdc}', obj=1)
-        mast_model.chgCoeff(ps_constr[tmdc], gv_ps[tmdc], 1)
+    for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        ps_constr[tmdkc] = mast_model.getConstrByName(f'b_ps_{str(tmdkc)[1:][:-1].replace(" ","_").replace(",","")}')
+        gv_ps[tmdkc] = mast_model.addVar(name=f'gv_b_ps_{tmdkc}', obj=1)
+        mast_model.chgCoeff(ps_constr[tmdkc], gv_ps[tmdkc], 1)
 
     # Saves constraints
     constraints = {
@@ -413,13 +488,13 @@ def update_master_model(input_data, master_model, master_variables, master_const
  
     # Beta pw
     pw_constraint_params = b_pw_constraint(input_data, new_state_action[0], new_state_action[1])
-    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-        master_model.chgCoeff(master_constraints['pw'][mdc], master_variables[-1], pw_constraint_params.lhs_param[mdc])
+    for mdkc in itertools.product(indices['m'], indices['d'], indices['k'], indices['c']):
+        master_model.chgCoeff(master_constraints['pw'][mdkc], master_variables[-1], pw_constraint_params.lhs_param[mdkc])
  
     # Beta ps
     ps_constraint_params = b_ps_constraint(input_data, new_state_action[0], new_state_action[1])
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        master_model.chgCoeff(master_constraints['ps'][tmdc], master_variables[-1], ps_constraint_params.lhs_param[tmdc])
+    for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        master_model.chgCoeff(master_constraints['ps'][tmdkc], master_variables[-1], ps_constraint_params.lhs_param[tmdkc])
  
     master_model.update()
     return master_model, master_variables, master_constraints
@@ -442,12 +517,12 @@ def generate_beta_values(input_data, constraints):
         b_ul_dual[p] = constraints['ul'][p].Pi
 
     # Beta pw
-    for mdc in itertools.product(indices['m'], indices['d'], indices['c']):
-        b_pw_dual[mdc] = constraints['pw'][mdc].Pi
+    for mdkc in itertools.product(indices['m'], indices['d'], indices['k'], indices['c']):
+        b_pw_dual[mdkc] = constraints['pw'][mdkc].Pi
 
     # Beta ps
-    for tmdc in itertools.product(indices['t'], indices['m'], indices['d'], indices['c']):
-        b_ps_dual[tmdc] = constraints['ps'][tmdc].Pi
+    for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
+        b_ps_dual[tmdkc] = constraints['ps'][tmdkc].Pi
 
     # Combines beta values
     betas = {

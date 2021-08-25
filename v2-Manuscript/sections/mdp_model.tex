@@ -24,21 +24,21 @@ Decisions are made at the beginning of each time period. There are 3 relevant ti
 
 \subsection{State Space}
 \subsubsection{Description}
-State is defined by carried over resources, deviation from expected resources,, patient waitlist/demand, and patients already scheduled
+State is defined by carried over resources, deviation from expected resources, patient waitlist/demand, and patients already scheduled
 \[  \vec{S}  = (\vec{ul}, \vec{pw}, \vec{ps}) \]
 \begin{itemize}
 	\item $\vec{ul} = ul_{p}$ - Units left over from previous period for resource $p$ plus deviation for that unit for period 1.
 	\item $\vec{pw} = pw_{mdkc}$ - Patients of complexity $d$, priority $k$, surgery type $c$, on a wait list for $m$ periods ($m$ of 0 - just arrived)
-	\item $\vec{ps} = ps_{tmdkc}$ - Patients of complexity $d$, priority $k$,  surgery type $c$, scheduled to period $t$, waiting for $m$ periods ($m$ of 0 - just arrived)
+	\item $\vec{ps} = ps_{tmdkc}$ - Patients of complexity $d$, priority $k$,  surgery type $c$, scheduled to period $t$, waiting for $m$ periods
 \end{itemize}
 
 \subsection{Action Sets}
 \subsubsection{Description}
-Decision consists of rescheduling currently scheduled patients, and scheduling patients on waitlist. There are also some goal and auxiliary variables
-\[  \vec{A} = (\vec{sc}, \vec{rsc}, \vec{uv}, \text{auxiliary variables}) \] 
+Actions consist of rescheduling currently scheduled patients, and scheduling patients on wait list. There are also some goal and auxiliary variables
+\[  \vec{A} = (\vec{sc}, \vec{rsc}, \text{auxiliary variables}) \] 
 \begin{itemize}
-	\item $\vec{sc} = sc_{tmdkc}$ - Patients of complexity $d$, priority $k$,  surgery type $c$, waiting for $m$ periods, to schedule in period $t$
-	\item $\vec{rsc} = rsc_{tt'mdkc}$ -Patients of complexity $d$, priority $k$, surgery type $c$, waiting for $m$ periods, to reschedule from $t$ to $t'$
+	\item $\vec{sc} = sc_{tmdkc}$ - Patients of complexity $d$, priority $k$,  surgery type $c$, waiting for $m$, to schedule in period $t$
+	\item $\vec{rsc} = rsc_{tt'mdkc}$ -Patients of complexity $d$, priority $k$, surgery type $c$, waiting for $m$, reschedule from $t$ to $t'$
 \end{itemize}
 
 \subsubsection{Auxiliary Variables}
@@ -222,19 +222,19 @@ In this section we will have the following:
 \begin{equation}\begin{alignedat}{10}
 		& C = c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) = 
 		&& 
-		\overbrace{ \sum_{mdc} cw_{k} (\hat{pw}_{mdkc}) }^\text{
+		\overbrace{ \sum_{mdkc} cw_{k} (\hat{pw}_{mdkc}) }^\text{
 			cost of waiting}  + 
 		\overbrace{
-			\sum_{tmdc} cs_{tk} (sc_{tmdkc})
+			\sum_{tmdkc} cs_{tk} (sc_{tmdkc})
 		}^\text{Prefer earlier appointments} \\ 
 		&	&&  +
 		\overbrace{
 			\sum_{
-				\substack{tt`mdc \\ t' > t}} 
+				\substack{tt`mdkc \\ t' > t}} 
 			(cs_{t'-t, k} + cc) * (rsc_{tt'mdc})}^\text{Bad Reschedule} - 
 		\overbrace{ 
 			\sum_{
-				\substack{tt`mdc \\ t' < t}}
+				\substack{tt`mdkc \\ t' < t}}
 			(cs_{t-t', k} - cc) * (rsc_{tt'mdc})}^\text{Good Reschedule} + 
 		M \sum_{tp} uv_{tp}
 \end{alignedat}\end{equation}

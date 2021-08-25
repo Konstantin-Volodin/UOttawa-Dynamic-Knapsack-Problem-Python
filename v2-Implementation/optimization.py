@@ -37,6 +37,7 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         p1_mast_model.Params.LogToConsole = 0
         p1_mast_model.Params.method = 2
         p1_mast_model.optimize()
+        p1_mast_model.write('p1_m.lp')
         betas = generate_beta_values(input_data, p1_mast_const)
             
         # Debugging
@@ -51,14 +52,12 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         # Trims
         if (count%100) == 0:
             state_action_list, p1_mast_model, p1_mast_const = trim_sa_list_p1(input_data, state_action_list, p1_mast_model)
-            # my_path = os.path.dirname(__file__)
-            # export_betas(betas, os.path.join(my_path, 'Data', f'Feasible-Betas-full-newcost-intermediate.xlsx'))
         
         # Generates and solves Subproblem 
         p1_sub_model, p1_sub_var = update_sub_model(input_data, p1_sub_model, p1_sub_var, betas, True)
         p1_sub_model.Params.LogToConsole = 0
-        p1_sub_model.Params.MIPGap = 1
         p1_sub_model.optimize()
+        p1_sub_model.write('p1_s.lp')
         
         # Update State-Actions
         state_action = generate_state_action(p1_sub_var)
@@ -66,9 +65,9 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         mast_model, mast_var, mast_const = update_master_model(input_data, mast_model, mast_var, mast_const, state_action, count)
         
         # Stops if necessary
-        if state_action_list[-1] == state_action_list[-2]:
-            print('Unable to find feasible set')
-            break
+        # if state_action_list[-1] == state_action_list[-2]:
+        #     print('Unable to find feasible set')
+        #     break
 
     return state_action_list
 
@@ -104,9 +103,6 @@ def generate_optimal_sa_list(input_data, init_state_actions, stabilization_param
         # Trims
         if (count%300) == 0:
             state_action_list, mast_model, mast_var, mast_const = trim_sa_list_p2(input_data, state_action_list, mast_var)
-            my_path = os.path.dirname(__file__)
-            export_betas(betas, os.path.join(my_path, 'Data', f'Intermediate-Betas.xlsx'))
-            # export_all_state_action(state_action_list, os.path.join(my_path, 'Data', f'Intermediate-States.xlsx'))
 
         if (count_same%100) == 0:
             count_same += 1

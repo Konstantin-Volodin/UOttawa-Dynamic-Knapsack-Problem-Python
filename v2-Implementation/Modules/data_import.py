@@ -76,37 +76,50 @@ def read_data(data_file_path):
     # Arrival Rates
     arrival_sheet = book.get_sheet_by_name('Patient Arrival')
     arrival = {}
-    for arr_row in arrival_sheet.iter_rows(min_row=2, min_col=1, max_col=3, values_only=True):
+    for arr_row in arrival_sheet.iter_rows(min_row=2, min_col=1, max_col=4, values_only=True):
         if arr_row[0] == None: break
 
         arrival[
-            (arr_row[1], arr_row[0])
-        ] = arr_row[2]
+            (arr_row[1], arr_row[2], arr_row[0])
+        ] = arr_row[3]
 
 
     # Patient Transitions
     transition_sheet = book.get_sheet_by_name('Patient Transitions')
-    transition = {}
-    for row in transition_sheet.iter_rows(min_row=2, min_col=1, max_col=4, values_only=True):
+    wait_limit = {}
+    transition_comp = {}
+    transition_pri = {}
+    for row in transition_sheet.iter_rows(min_row=2, min_col=1, max_col=2, values_only=True):
         if row[0] == None: break
-        transition[(row[1], row[0])] = transition_data_class(row[2], row[3])
-
+        wait_limit[row[0]] = row[1]
+    for row in transition_sheet.iter_rows(min_row=2, min_col=3, max_col=5, values_only=True):
+        if row[0] == None: break
+        transition_comp[(row[0], row[1])] = row[2]
+    for row in transition_sheet.iter_rows(min_row=2, min_col=6, max_col=8, values_only=True):
+        if row[0] == None: break
+        transition_pri[(row[0], row[1])] = row[2]
+    transition = transition_data_class(wait_limit, transition_comp, transition_pri)
 
     # Model Parameters
     model_param_sheet = book.get_sheet_by_name('Model Parameters')
-    model_param = model_param_class(
-        model_param_sheet.cell(row=2, column=1).value,
-        model_param_sheet.cell(row=2, column=2).value,
-        None, 
-        model_param_sheet.cell(row=2, column=3).value,
-        model_param_sheet.cell(row=2, column=4).value
-    )
+    cw = {}
+    cc = {}
+    cs = {}
+    for row in model_param_sheet.iter_rows(min_row=2, min_col=1, max_col=3, values_only=True):
+        if row[0] == None: break
+        cw[row[0]] = row[1]
+        cc[row[0]] = row[2]
+        cs[row[0]] = [0]
+    
+    M = model_param_sheet['D2'].value
+    gamma = model_param_sheet['E2'].value
 
-    cs_l = [0]
-    for time in t:
-        cs_l.append(cs_l[-1] + model_param.cw * (model_param.gamma**time) )
-
-    model_param.cs = cs_l
+    # Cost of Scheduling
+    for prior in k:
+        for time in t:
+            cs[prior].append(cs[prior][-1] + cw[prior] * (gamma**time) )
+    
+    model_param = model_param_class(cw, cc, cs, M, gamma)
 
     # Expected Data
     expected_vals_sheet = book.get_sheet_by_name('Expected State Values')
@@ -116,13 +129,13 @@ def read_data(data_file_path):
         if row[0] == None: break
         expected_vals['ul'][(row[0],)] = row[1]
     expected_vals['pw'] = {}
-    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=3, max_col=6, values_only=True):
+    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=3, max_col=7, values_only=True):
         if row[0] == None: break
-        expected_vals['pw'][(row[0], row[1], row[2])] = row[3]
+        expected_vals['pw'][(row[0], row[1], row[2], row[3])] = row[4]
     expected_vals['ps'] = {}
-    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=7, max_col=11, values_only=True):
+    for row in expected_vals_sheet.iter_rows(min_row=3, min_col=8, max_col=13, values_only=True):
         if row[0] == None: break
-        expected_vals['ps'][(row[0], row[1], row[2], row[3])] = row[4]
+        expected_vals['ps'][(row[0], row[1], row[2], row[3], row[4])] = row[5]
 
 
     # Returns data
