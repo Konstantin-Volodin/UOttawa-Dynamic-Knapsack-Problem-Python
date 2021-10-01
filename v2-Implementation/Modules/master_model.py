@@ -359,17 +359,17 @@ def generate_constraint(
     for sa_pair in range(len(state_action_data)):
         params = generator_function(input_data, state_action_data[sa_pair][0], state_action_data[sa_pair][1])
         for index_iter in params.lhs_param.keys():
-            expr[index_iter].add(state_action_variable[sa_pair], round(params.lhs_param[index_iter],10))
+            expr[index_iter].add(state_action_variable[sa_pair], params.lhs_param[index_iter])
 
     # Saving
     results = {}
     for index_iter in init_iterables.lhs_param.keys():
         if init_iterables.sign[index_iter] == "=":
-            results[index_iter] = model.addConstr(expr[index_iter] == round(init_iterables.rhs_param[index_iter],10), name=init_iterables.name[index_iter])
+            results[index_iter] = model.addConstr(expr[index_iter] == init_iterables.rhs_param[index_iter], name=init_iterables.name[index_iter])
         elif init_iterables.sign[index_iter] == ">=":
-            results[index_iter] = model.addConstr(expr[index_iter] >= round(init_iterables.rhs_param[index_iter],10), name=init_iterables.name[index_iter])
+            results[index_iter] = model.addConstr(expr[index_iter] >= init_iterables.rhs_param[index_iter], name=init_iterables.name[index_iter])
         elif init_iterables.sign[index_iter] == "<=":
-            results[index_iter] = model.addConstr(expr[index_iter] <= round(init_iterables.rhs_param[index_iter],10), name=init_iterables.name[index_iter])
+            results[index_iter] = model.addConstr(expr[index_iter] <= init_iterables.rhs_param[index_iter], name=init_iterables.name[index_iter])
         else: 
             print('\terror')
     return results

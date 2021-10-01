@@ -65,9 +65,9 @@ def generate_feasible_sa_list(input_data, init_state_actions):
         mast_model, mast_var, mast_const = update_master_model(input_data, mast_model, mast_var, mast_const, state_action, count)
         
         # Stops if necessary
-        # if state_action_list[-1] == state_action_list[-2]:
-        #     print('Unable to find feasible set')
-        #     break
+        if state_action_list[-1] == state_action_list[-2]:
+            print('Unable to find feasible set')
+            break
 
     return state_action_list
 

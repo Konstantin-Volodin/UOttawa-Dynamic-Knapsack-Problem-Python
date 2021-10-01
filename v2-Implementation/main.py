@@ -8,8 +8,10 @@ import sys
 from matplotlib import pyplot as plt
 
 # Read Data
-my_path = os.path.dirname(__file__)
-input_data = read_data(os.path.join(my_path, 'Data', 'Data-full-newcost.xlsx'))
+# my_path = os.path.dirname(__file__)
+my_path = os.getcwd()
+# print(my_path)
+input_data = read_data(os.path.join(my_path, 'Data', 'Data.xlsx'))
 # generate_optimal_sa_list = Modules.decorators.timer(generate_optimal_sa_list)
 
 # %% Optimization

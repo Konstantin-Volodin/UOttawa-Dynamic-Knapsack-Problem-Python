@@ -68,7 +68,7 @@ def b0_cost(input_data:input_data_class, var: variables, betas) -> gp.LinExpr:
 
     # Modification
     expr = gp.LinExpr()
-    expr.addConstant( round((1-model_param.gamma) * betas['b0']['b_0'],10) )
+    expr.addConstant( (1-model_param.gamma) * betas['b0']['b_0'] )
     return expr
 def b_ul_cost(input_data:input_data_class, var: variables, betas) -> gp.LinExpr:
     # Initialization
@@ -81,11 +81,11 @@ def b_ul_cost(input_data:input_data_class, var: variables, betas) -> gp.LinExpr:
     for p in itertools.product(indices['p']):   
 
         if ppe_data[p[0]].ppe_type == 'carry-over':
-            expr.addTerms( round(betas['ul'][p],10), var.s_ul[p] )
-            expr.addTerms(- round(betas['ul'][p] * gamma,10),  var.a_ul_p[p])  
+            expr.addTerms( betas['ul'][p], var.s_ul[p] )
+            expr.addTerms(- betas['ul'][p] * gamma,  var.a_ul_p[p])  
 
         elif ppe_data[p[0]].ppe_type == 'non-carry-over':
-            expr.addTerms( round(betas['ul'][p],10), var.s_ul[p])
+            expr.addTerms( betas['ul'][p], var.s_ul[p])
                 
     return expr
 def b_pw_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr:
@@ -108,65 +108,65 @@ def b_pw_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                     # print(mdkc)
                     # print(betas['pw'][mdkc])
                     # print(var.s_pw[mdkc])
-                    expr.addTerms( round(betas['pw'][mdkc],10), var.s_pw[mdkc] )
-                    expr.addConstant(- round(betas['pw'][mdkc] * gamma * arrival[(mdkc[1], mdkc[2], mdkc[3])],10) )
+                    expr.addTerms( betas['pw'][mdkc], var.s_pw[mdkc] )
+                    expr.addConstant(- betas['pw'][mdkc] * gamma * arrival[(mdkc[1], mdkc[2], mdkc[3])] )
 
                 # When m is less than TL_c
                 elif mdkc[0] < (transition.wait_limit[mdkc[3]]):
-                    expr.addTerms( round(betas['pw'][mdkc],10), var.s_pw[mdkc])
-                    expr.addTerms(- round((betas['pw'][mdkc] * gamma),10), var.a_pw_p[(mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3])] )
+                    expr.addTerms( betas['pw'][mdkc], var.s_pw[mdkc])
+                    expr.addTerms(- (betas['pw'][mdkc] * gamma) , var.a_pw_p[(mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3])] )
 
                 # When m = M
                 elif mdkc[0] == indices['m'][-1]:
-                    expr.addTerms( round(betas['pw'][mdkc],10), var.s_pw[mdkc])
+                    expr.addTerms( betas['pw'][mdkc], var.s_pw[mdkc])
 
                     for mm in input_data.indices['m'][-2:]:
-                        expr.addTerms(- round(betas['pw'][mdkc] * gamma,10), var.a_pw_p[(mm, mdkc[1], mdkc[2], mdkc[3])] )
+                        expr.addTerms(- betas['pw'][mdkc] * gamma, var.a_pw_p[(mm, mdkc[1], mdkc[2], mdkc[3])] )
         
                         # Complexity Change
                         tr_lim = input_data.transition.wait_limit[mdkc[3]]
                         tr_rate_d = transition.transition_rate_comp[(mdkc[1], mdkc[3])]
                         
                         if (d != 0) & (mm >= tr_lim):
-                            expr.addTerms(- round(betas['pw'][mdkc] * gamma * tr_rate_d,10), var.a_pw_p[( mm, indices['d'][d-1], mdkc[2], mdkc[3] )] )
+                            expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mm, indices['d'][d-1], mdkc[2], mdkc[3] )] )
                             
                         if (d != indices['d'][-1]) & (mm >= tr_lim):
-                            expr.addTerms( round(betas['pw'][mdkc] * gamma * tr_rate_d,10), var.a_pw_p[( mm, mdkc[1], mdkc[2], mdkc[3] )] )
+                            expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mm, mdkc[1], mdkc[2], mdkc[3] )] )
 
                         # Priority Change
                         tr_rate_k = transition.transition_rate_pri[(mdkc[2], mdkc[3])]
                         
                         if (k != 0) & (mm >= tr_lim):
-                            expr.addTerms(- round(betas['pw'][mdkc] * gamma * tr_rate_k,10), var.a_pw_p[( mm, mdkc[1], indices['k'][k-1], mdkc[3] )] )
+                            expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mm, mdkc[1], indices['k'][k-1], mdkc[3] )] )
 
                         
                         if (k != indices['k'][-1]) & (mm >= tr_lim):
-                            expr.addTerms( round(betas['pw'][mdkc] * gamma * tr_rate_k,10), var.a_pw_p[( mm, mdkc[1], mdkc[2], mdkc[3] )] )
+                            expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mm, mdkc[1], mdkc[2], mdkc[3] )] )
 
                 # Everything Else
                 else:          
-                    expr.addTerms( round(betas['pw'][mdkc],10), var.s_pw[mdkc] )
-                    expr.addTerms(- round(betas['pw'][mdkc] * gamma,10), var.a_pw_p[(mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3])] )
+                    expr.addTerms( betas['pw'][mdkc], var.s_pw[mdkc] )
+                    expr.addTerms(- betas['pw'][mdkc] * gamma, var.a_pw_p[(mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3])] )
         
                     # Complexity Change
                     tr_lim = input_data.transition.wait_limit[mdkc[3]]
                     tr_rate_d = transition.transition_rate_comp[(mdkc[1], mdkc[3])]
                     
                     if (d != 0) & (mdkc[0]-1 >= tr_lim):
-                        expr.addTerms(- round(betas['pw'][mdkc] * gamma * tr_rate_d,10), var.a_pw_p[( mdkc[0]-1, indices['d'][d-1], mdkc[2], mdkc[3] )] )
+                        expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mdkc[0]-1, indices['d'][d-1], mdkc[2], mdkc[3] )] )
                         
                     if (d != indices['d'][-1]) & (mdkc[0]-1 >= tr_lim):
-                        expr.addTerms( round(betas['pw'][mdkc] * gamma * tr_rate_d,10), var.a_pw_p[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )] )
+                        expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )] )
 
                     # Priority Change
                     tr_rate_k = transition.transition_rate_pri[(mdkc[2], mdkc[3])]
                     
                     if (k != 0) & (mdkc[0]-1 >= tr_lim):
-                        expr.addTerms(- round(betas['pw'][mdkc] * gamma * tr_rate_k,10), var.a_pw_p[( mdkc[0]-1, mdkc[1], indices['k'][k-1], mdkc[3] )] )
+                        expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mdkc[0]-1, mdkc[1], indices['k'][k-1], mdkc[3] )] )
 
                     
                     if (k != indices['k'][-1]) & (mdkc[0]-1 >= tr_lim):
-                        expr.addTerms( round(betas['pw'][mdkc] * gamma * tr_rate_k,10), var.a_pw_p[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )] )
+                        expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )] )
 
     return expr
 def b_ps_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr:
@@ -185,68 +185,68 @@ def b_ps_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
 
                 # When m = 0
                 if tmdkc[0] == 0: 
-                    expr.addTerms( round(betas['ps'][tmdkc],10), var.s_ps[tmdkc] )
+                    expr.addTerms( betas['ps'][tmdkc], var.s_ps[tmdkc] )
 
                 # When t = T
                 elif tmdkc[0] == indices['t'][-1]:
-                    expr.addTerms( round(betas['ps'][tmdkc],10), var.s_ps[tmdkc] )
+                    expr.addTerms( betas['ps'][tmdkc], var.s_ps[tmdkc] )
 
                 # When m is less than TL_c
                 elif tmdkc[1] < (transition.wait_limit[tmdkc[4]]):
-                    expr.addTerms( round(betas['ps'][tmdkc],10), var.s_ps[tmdkc] )
-                    expr.addTerms(- round(betas['ps'][tmdkc] * gamma,10), var.s_ps[tmdkc] )
+                    expr.addTerms( betas['ps'][tmdkc], var.s_ps[tmdkc] )
+                    expr.addTerms(- betas['ps'][tmdkc] * gamma, var.s_ps[tmdkc] )
 
                 # When m = M
                 elif tmdkc[1] == indices['m'][-1]:
-                    expr.addTerms( round(betas['ps'][tmdkc],10), var.s_ps[tmdkc] )
+                    expr.addTerms( betas['ps'][tmdkc], var.s_ps[tmdkc] )
 
                     for mm in input_data.indices['m'][-2:]:
-                        expr.addTerms(- round(betas['ps'][tmdkc] * gamma,10), var.s_ps[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )] )
+                        expr.addTerms(- betas['ps'][tmdkc] * gamma, var.s_ps[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )] )
         
                         # Complexity Change
                         tr_lim = input_data.transition.wait_limit[tmdkc[4]]
                         tr_rate_d = transition.transition_rate_comp[(tmdkc[2], tmdkc[4])]
                         
                         if (d != 0) & (mm >= tr_lim):
-                            expr.addTerms(- round(betas['ps'][tmdkc] * gamma * tr_rate_d,10), var.a_ps_p[( tmdkc[0]+1, mm, indices['d'][d-1], tmdkc[3], tmdkc[4] )] )
+                            expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[( tmdkc[0]+1, mm, indices['d'][d-1], tmdkc[3], tmdkc[4] )] )
                             
                         if (d != indices['d'][-1]) & (mm >= tr_lim):
-                            expr.addTerms( round(betas['ps'][tmdkc] * gamma * tr_rate_d,10), var.a_ps_p[ (tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4]) ] )
+                            expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[ (tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4]) ] )
 
                         # Priority Change
                         tr_rate_k = transition.transition_rate_pri[(tmdkc[3], tmdkc[4])]
                         
                         if (k != 0) & (mm >= tr_lim):
-                            expr.addTerms(- round(betas['ps'][tmdkc] * gamma * tr_rate_k,10), var.a_ps_p[( tmdkc[0]+1, mm, tmdkc[2], indices['k'][k-1], tmdkc[4] )] )
+                            expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, mm, tmdkc[2], indices['k'][k-1], tmdkc[4] )] )
 
                         
                         if (k != indices['k'][-1]) & (mm >= tr_lim):
-                            expr.addTerms( round(betas['ps'][tmdkc] * gamma * tr_rate_k,10), var.a_ps_p[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )] )
+                            expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )] )
 
                 # Everything Else
                 else:
-                    expr.addTerms( round(betas['ps'][tmdkc],10), var.s_ps[tmdkc] )
-                    expr.addTerms(- round(betas['ps'][tmdkc] * gamma,10), var.s_ps[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )] )
+                    expr.addTerms( betas['ps'][tmdkc], var.s_ps[tmdkc] )
+                    expr.addTerms(- betas['ps'][tmdkc] * gamma, var.s_ps[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )] )
     
                     # Complexity Change
                     tr_lim = input_data.transition.wait_limit[tmdkc[4]]
                     tr_rate_d = transition.transition_rate_comp[(tmdkc[2], tmdkc[4])]
                     
                     if (d != 0) & (tmdkc[1]-1 >= tr_lim):
-                        expr.addTerms(- round(betas['ps'][tmdkc] * gamma * tr_rate_d,10), var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, indices['d'][d-1], tmdkc[3], tmdkc[4] )] )
+                        expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, indices['d'][d-1], tmdkc[3], tmdkc[4] )] )
                         
                     if (d != indices['d'][-1]) & (tmdkc[1]-1 >= tr_lim):
-                        expr.addTerms( round(betas['ps'][tmdkc] * gamma * tr_rate_d,10), var.a_ps_p[ (tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4]) ] )
+                        expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[ (tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4]) ] )
 
                     # Priority Change
                     tr_rate_k = transition.transition_rate_pri[(tmdkc[3], tmdkc[4])]
                     
                     if (k != 0) & (tmdkc[1]-1 >= tr_lim):
-                        expr.addTerms(- round(betas['ps'][tmdkc] * gamma * tr_rate_k,10), var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], indices['k'][k-1], tmdkc[4] )] )
+                        expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], indices['k'][k-1], tmdkc[4] )] )
 
                     
                     if (k != indices['k'][-1]) & (tmdkc[1]-1 >= tr_lim):
-                        expr.addTerms( round(betas['ps'][tmdkc] * gamma * tr_rate_k,10), var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )] )     
+                        expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )] )     
 
     return expr
   
