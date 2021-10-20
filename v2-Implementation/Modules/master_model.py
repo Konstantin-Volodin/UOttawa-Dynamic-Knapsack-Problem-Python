@@ -304,7 +304,8 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
 
                 # Everything Else
                 else:
-                    lhs[tmdkc] = state.ps_tmdkc[tmdkc] * action.ps_p_tmdkc[(tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4])]
+                    lhs[tmdkc] = state.ps_tmdkc[tmdkc] 
+                    lhs[tmdkc] -= gamma * action.ps_p_tmdkc[(tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4])]
                     
                     # Complexity Change
                     tr_lim = input_data.transition.wait_limit[tmdkc[4]]
