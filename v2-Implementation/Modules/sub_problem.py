@@ -130,7 +130,7 @@ def b_pw_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                         if (d != 0) & (mm >= tr_lim):
                             expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mm, indices['d'][d-1], mdkc[2], mdkc[3] )] )
                             
-                        if (d != indices['d'][-1]) & (mm >= tr_lim):
+                        if (d != (len(indices['d']) - 1) ) & (mm >= tr_lim):
                             expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mm, mdkc[1], mdkc[2], mdkc[3] )] )
 
                         # Priority Change
@@ -140,7 +140,7 @@ def b_pw_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                             expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mm, mdkc[1], indices['k'][k-1], mdkc[3] )] )
 
                         
-                        if (k != indices['k'][-1]) & (mm >= tr_lim):
+                        if (k != (len(indices['k']) - 1)) & (mm >= tr_lim):
                             expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mm, mdkc[1], mdkc[2], mdkc[3] )] )
 
                 # Everything Else
@@ -155,7 +155,7 @@ def b_pw_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                     if (d != 0) & (mdkc[0]-1 >= tr_lim):
                         expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mdkc[0]-1, indices['d'][d-1], mdkc[2], mdkc[3] )] )
                         
-                    if (d != indices['d'][-1]) & (mdkc[0]-1 >= tr_lim):
+                    if (d != (len(indices['d']) - 1)) & (mdkc[0]-1 >= tr_lim):
                         expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_d, var.a_pw_p[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )] )
 
                     # Priority Change
@@ -165,7 +165,7 @@ def b_pw_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                         expr.addTerms(- betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mdkc[0]-1, mdkc[1], indices['k'][k-1], mdkc[3] )] )
 
                     
-                    if (k != indices['k'][-1]) & (mdkc[0]-1 >= tr_lim):
+                    if (k != (len(indices['k']) - 1)) & (mdkc[0]-1 >= tr_lim):
                         expr.addTerms( betas['pw'][mdkc] * gamma * tr_rate_k, var.a_pw_p[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )] )
 
     return expr
@@ -210,7 +210,7 @@ def b_ps_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                         if (d != 0) & (mm >= tr_lim):
                             expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[( tmdkc[0]+1, mm, indices['d'][d-1], tmdkc[3], tmdkc[4] )] )
                             
-                        if (d != indices['d'][-1]) & (mm >= tr_lim):
+                        if (d != (len(indices['d']) - 1)) & (mm >= tr_lim):
                             expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[ (tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4]) ] )
 
                         # Priority Change
@@ -220,7 +220,7 @@ def b_ps_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                             expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, mm, tmdkc[2], indices['k'][k-1], tmdkc[4] )] )
 
                         
-                        if (k != indices['k'][-1]) & (mm >= tr_lim):
+                        if (k != (len(indices['k']) - 1)) & (mm >= tr_lim):
                             expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )] )
 
                 # Everything Else
@@ -235,7 +235,7 @@ def b_ps_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                     if (d != 0) & (tmdkc[1]-1 >= tr_lim):
                         expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, indices['d'][d-1], tmdkc[3], tmdkc[4] )] )
                         
-                    if (d != indices['d'][-1]) & (tmdkc[1]-1 >= tr_lim):
+                    if (d != (len(indices['d']) - 1)) & (tmdkc[1]-1 >= tr_lim):
                         expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_d, var.a_ps_p[ (tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4]) ] )
 
                     # Priority Change
@@ -245,14 +245,14 @@ def b_ps_costs(input_data:input_data_class, var: variables, betas) -> gp.LinExpr
                         expr.addTerms(- betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], indices['k'][k-1], tmdkc[4] )] )
 
                     
-                    if (k != indices['k'][-1]) & (tmdkc[1]-1 >= tr_lim):
+                    if (k != (len(indices['k']) - 1)) & (tmdkc[1]-1 >= tr_lim):
                         expr.addTerms( betas['ps'][tmdkc] * gamma * tr_rate_k, var.a_ps_p[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )] )     
 
     return expr
   
 
 # Generate sub problem model
-def generate_sub_model(input_data, betas, phase1 = False):
+def subproblem(input_data, betas, phase1 = False):
     indices = input_data.indices
     arrival = input_data.arrival
     ppe_data = input_data.ppe_data
@@ -434,7 +434,7 @@ def generate_sub_model(input_data, betas, phase1 = False):
     return sub_model, sub_vars
 
 # Updates sub problem model
-def update_sub_model(input_data, model, variables, betas, phase1 = False):
+def update_sub(input_data, model, variables, betas, phase1 = False):
     sub_model = model
     sub_vars = variables
 
@@ -461,7 +461,7 @@ def update_sub_model(input_data, model, variables, betas, phase1 = False):
     return sub_model, sub_vars
 
 # Reads variables results and returns them
-def generate_state_action(var: variables) -> Tuple[state, action]:
+def get_sa(var: variables) -> Tuple[state, action]:
     
     # Extracts
     s_ul = {}

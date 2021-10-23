@@ -1,11 +1,15 @@
 \ Model SubmodelKnapsack
 \ LP format - for model browsing. Use MPS format to capture full model detail.
 Minimize
-  - s_pw_(0,_'C1',_'P1',_'CPU1') - s_ps_(1,_2,_'C1',_'P1',_'CPU1')
-   + 0.99 s_ps_(2,_1,_'C1',_'P1',_'CPU1')
-   + 0.99 s_ps_(2,_2,_'C1',_'P1',_'CPU1')
-   - 0.198 a_ps_p_(2,_1,_'C1',_'P1',_'CPU1')
-   - 0.198 a_ps_p_(2,_2,_'C1',_'P1',_'CPU1') + 9.89 Constant
+  - 0.00101010101010101 s_pw_(0,_'C1',_'P1',_'CPU1')
+   - 0.00298405661181687 s_pw_(1,_'C1',_'P1',_'CPU1')
+   - 0.00193554609958396 s_pw_(2,_'C1',_'P1',_'CPU1')
+   - 0.00171378720274619 s_ps_(1,_2,_'C1',_'P1',_'CPU1')
+   + 0.00169664933071873 s_ps_(2,_1,_'C1',_'P1',_'CPU1')
+   + 0.00169664933071873 s_ps_(2,_2,_'C1',_'P1',_'CPU1')
+   + 0.0029542160456987 a_pw_p_(0,_'C1',_'P1',_'CPU1')
+   + 0.00191619063858812 a_pw_p_(1,_'C1',_'P1',_'CPU1')
+   + 0.00191619063858812 a_pw_p_(2,_'C1',_'P1',_'CPU1')
 Subject To
  uu_hat_(1,_'PPE1'): a_uu_p_(1,_'PPE1')
    - 3 a_ps_p_(1,_0,_'C1',_'P1',_'CPU1')
@@ -108,7 +112,6 @@ Bounds
  s_ps_(2,_0,_'C1',_'P1',_'CPU1') <= 10
  s_ps_(2,_1,_'C1',_'P1',_'CPU1') <= 10
  s_ps_(2,_2,_'C1',_'P1',_'CPU1') <= 10
- Constant = 1
 Binaries
  a_uvb_(1,_'PPE1') a_uvb_(2,_'PPE1')
 Generals

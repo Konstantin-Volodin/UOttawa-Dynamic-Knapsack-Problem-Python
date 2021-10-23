@@ -10,8 +10,9 @@ from gurobipy import GRB
 import Modules.decorators
 import time
 
+
 # Initialization 
-def generate_initial_state_action(input_data):
+def initial_sa(input_data):
     # Input Data
     indices = input_data.indices
     arrival = input_data.arrival
@@ -65,6 +66,7 @@ def generate_initial_state_action(input_data):
     test_state = state(ul, pw, ps)
     test_action = action(sc, rsc, uv, uvb, ul_p, ulb, uu_p, pw_p, ps_p)
     return test_state, test_action
+
 
 # Misc Functions to generate constrain parameters
 # Cost Function
@@ -181,7 +183,7 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
                             tr_in_d = tr_rate_d * action.pw_p_mdkc[( mm, indices['d'][d-1], mdkc[2], mdkc[3] )]
                             
                         tr_out_d = 0
-                        if (d != indices['d'][-1]) & (mm >= tr_lim):
+                        if ( d != (len(indices['d']) - 1) ) & (mm >= tr_lim):
                             tr_out_d = tr_rate_d * action.pw_p_mdkc[( mm, mdkc[1], mdkc[2], mdkc[3] )]
 
                         # Priority Change
@@ -192,7 +194,7 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
                             tr_in_k = tr_rate_k * action.pw_p_mdkc[( mm, mdkc[1], indices['k'][k-1], mdkc[3] )]
 
                         tr_out_k = 0
-                        if (k != indices['k'][-1]) & (mm >= tr_lim):
+                        if (k != (len(indices['k']) - 1) ) & (mm >= tr_lim):
                             tr_out_k = tr_rate_k * action.pw_p_mdkc[( mm, mdkc[1], mdkc[2], mdkc[3] )]
                         
                         lhs[mdkc] -= gamma * (tr_in_d - tr_out_d )
@@ -212,7 +214,7 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
                         tr_in_d = tr_rate_d * action.pw_p_mdkc[( mdkc[0]-1, indices['d'][d-1], mdkc[2], mdkc[3] )]
                             
                     tr_out_d = 0
-                    if (d != indices['d'][-1]) & (mdkc[0]-1 >= tr_lim):
+                    if ( d != (len(indices['d']) - 1) ) & (mdkc[0]-1 >= tr_lim):
                         tr_out_d = tr_rate_d * action.pw_p_mdkc[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )]
 
                     # Priority Change
@@ -223,7 +225,7 @@ def b_pw_constraint(input_data: input_data_class, state: state, action: action) 
                         tr_in_k = tr_rate_k * action.pw_p_mdkc[( mdkc[0]-1, mdkc[1], indices['k'][k-1], mdkc[3] )]
 
                     tr_out_k = 0
-                    if (k != indices['k'][-1]) & (mdkc[0]-1 >= tr_lim):
+                    if ( k != (len(indices['k']) - 1) ) & (mdkc[0]-1 >= tr_lim):
                         tr_out_k = tr_rate_k * action.pw_p_mdkc[( mdkc[0]-1, mdkc[1], mdkc[2], mdkc[3] )]
                     
                     lhs[mdkc] -= gamma * (tr_in_d - tr_out_d )
@@ -285,7 +287,7 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
                             tr_in_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, mm, indices['d'][d-1], tmdkc[3], tmdkc[4] )]
                             
                         tr_out_d = 0
-                        if (d != indices['d'][-1]) & (mm >= tr_lim):
+                        if (d != (len(indices['d']) - 1) ) & (mm >= tr_lim):
                             tr_out_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )]
 
                         # Priority Change
@@ -296,7 +298,7 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
                             tr_in_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, mm, tmdkc[2], indices['k'][k-1], tmdkc[4] )]
 
                         tr_out_k = 0
-                        if (k != indices['k'][-1]) & (mm >= tr_lim):
+                        if (k != (len(indices['k']) - 1) ) & (mm >= tr_lim):
                             tr_out_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, mm, tmdkc[2], tmdkc[3], tmdkc[4] )]
                         
                         lhs[tmdkc] -= gamma * (tr_in_d - tr_out_d )
@@ -304,8 +306,7 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
 
                 # Everything Else
                 else:
-                    lhs[tmdkc] = state.ps_tmdkc[tmdkc] 
-                    lhs[tmdkc] -= gamma * action.ps_p_tmdkc[(tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4])]
+                    lhs[tmdkc] = state.ps_tmdkc[tmdkc] - (gamma * action.ps_p_tmdkc[(tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4])])
                     
                     # Complexity Change
                     tr_lim = input_data.transition.wait_limit[tmdkc[4]]
@@ -316,7 +317,7 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
                         tr_in_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, indices['d'][d-1], tmdkc[3], tmdkc[4] )]
                         
                     tr_out_d = 0
-                    if (d != indices['d'][-1]) & (tmdkc[1]-1 >= tr_lim):
+                    if (d != (len(indices['d']) - 1) ) & (tmdkc[1]-1 >= tr_lim):
                         tr_out_d = tr_rate_d * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )]
 
                     # Priority Change
@@ -327,7 +328,7 @@ def b_ps_constraint(input_data: input_data_class, state: state, action: action) 
                         tr_in_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], indices['k'][k-1], tmdkc[4] )]
 
                     tr_out_k = 0
-                    if (k != indices['k'][-1]) & (tmdkc[1]-1 >= tr_lim):
+                    if (k != (len(indices['k']) - 1) ) & (tmdkc[1]-1 >= tr_lim):
                         tr_out_k = tr_rate_k * action.ps_p_tmdkc[( tmdkc[0]+1, tmdkc[1]-1, tmdkc[2], tmdkc[3], tmdkc[4] )]
                     
                     lhs[tmdkc] -= gamma * (tr_in_d - tr_out_d )
@@ -374,10 +375,10 @@ def generate_constraint(
         else: 
             print('\terror')
     return results
-    
+
 
 # Generate Phase 1 Master Model (finding initial feasible solution)
-def generate_phase1_master_model(input_data, model):
+def master_p1(input_data, model):
     indices = input_data.indices    
 
     mast_model = model.copy()
@@ -433,7 +434,7 @@ def generate_phase1_master_model(input_data, model):
     mast_model.update()
     return mast_model, constraints
 # Generates Master model (finding optimal solution)
-def generate_master_model(input_data, state_action_data):
+def master_p2(input_data, state_action_data):
 
     # Model
     mast_model = gp.Model('MasterKnapsack')
@@ -467,7 +468,7 @@ def generate_master_model(input_data, state_action_data):
     # Returns model
     return mast_model, w_sa_var, constraints
 # Updates master problem
-def update_master_model(input_data, master_model, master_variables, master_constraints, new_state_action, sa_index):
+def update_master(input_data, master_model, master_variables, master_constraints, new_state_action, sa_index):
     
     indices = input_data.indices
 
@@ -500,8 +501,9 @@ def update_master_model(input_data, master_model, master_variables, master_const
     master_model.update()
     return master_model, master_variables, master_constraints
 
+
 # Generates Beta Parameters
-def generate_beta_values(input_data, constraints):
+def get_betas(input_data, constraints):
     indices = input_data.indices
 
     # Beta Values
