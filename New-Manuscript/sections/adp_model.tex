@@ -1,0 +1,203 @@
+
+
+\section{Aproximate Dynamic Programming Model}
+\subsection{Expectation ADP Model}
+Let's convert it into ADP. We do that by changing $v(\vec{S})$ to an approximation as follows:
+\begin{equation}\begin{alignedat}{10}
+		& v(\vec{ul}, \vec{pw}, \vec{ps}) 
+		&& =  \beta^0 + \sum_{p} \beta_{p}^{ul} ul_{p} +
+		\sum_{mdkc} \beta_{mdkc}^{pw} pw_{mdkc}  + 
+		\sum_{tmdkc} \beta_{tmdkc}^{ps} ps_{tmdkc}
+\end{alignedat} \end{equation}
+
+Next we need to convert a part of equation \ref{full-adp-equation} into expectation. \\ 
+(To make it easier later, we will format is as $v(\vec{S}) - E[v(\vec{S}')]$)
+
+\begin{itemize}
+	\item $E[p\_ued_p] = 0$
+	\item $E[pwt_{mdkc}] = ptp\_d_{dc} * \hat{pw}_{mdkc}$ 
+	\item $E[pst_{tmdkc}] = ptp\_k_{kc} * \hat{ps}_{tmdkc}$ 
+\end{itemize}
+
+\begin{fleqn}[\parindent]
+	\begin{equation}
+		\beta^{0}: \qquad (1-\gamma) \beta^{0}
+	\end{equation}
+\end{fleqn}
+
+\begin{fleqn}[\parindent]
+	\begin{equation}
+		\beta^{ul}_{p}: \qquad 
+		\sum_{p \in \text{p\_co}} \beta_{p}^{ul} \Big( ul_{p} - \gamma ( \hat{ul}_{p}) \Big) + 
+		\sum_{p \in \text{p\_nco}} \beta_{p}^{ul} ( ul_{p}) 
+	\end{equation}
+\end{fleqn}
+
+\begin{fleqn}[\parindent]
+	\begin{equation}\begin{alignedat}{10}
+			& \beta^{pw}_{mdkc}: \qquad 
+				&& 	\sum_{dkc} \beta_{0dkc}^{pw} \Big( pw_{0dkc} - \gamma (pea_{dkc}) \Big) +
+					\sum_{m=1dkc}^{TL_{c}-1} \beta_{mdkc}^{pw} 
+					\Big( pw_{mdkc} - \gamma 
+					(\hat{pw}_{m-1dkc}) \Big) + \\
+			& 
+				&& \sum_{m=TL_{c}dkc}^{M-1} \beta_{mdkc}^{pw} 
+					\Big( pw_{mdkc} - \gamma 
+					(\hat{pw}_{m-1dkc} + E[pwt\_d_{m-1d-1c}] - E[pwt\_d_{d}] + E[pwt\_k_{k-1}] - E[pwt\_k_{k}]) \Big) + \\
+			& 
+				&& \sum_{dc} \beta_{Mdkc}^{pw} 
+					\Big( pw_{Mdkc} - \gamma \sum_{M-1}^{M}
+					(\hat{pw}_{mdkc} + E[pwt\_d_{md-1c}] - E[pwt\_d_{d}] + E[pwt\_k_{k-1}] - E[pwt\_k_{k}]) \Big)
+	\end{alignedat} \end{equation}
+\end{fleqn}
+
+\begin{fleqn}[\parindent]
+	\begin{equation}\begin{alignedat}{10}
+			& \beta^{ps}_{tmdkc}: \qquad 
+				&& \sum_{tdkc} \beta_{t0dkc}^{ps} \Big( ps_{t0dkc}) \Big) + 
+					\sum_{mdkc} \beta_{Tmdkc}^{ps} \Big( ps_{Tmdkc}) \Big) + 
+					\sum_{t=1m=1dkc}^{T-1, TL_{c}-1} \beta_{tmdkc}^{ps} 
+					\Big( ps_{tmdkc} - \gamma 
+					(\hat{ps}_{t+1m-1dkc}) \Big) + \\
+			&	
+				&& 
+					\sum_{t=1m=TL_{c}dkc}^{T-1,M-1} \beta_{tmdkc}^{ps} 
+					\Big( ps_{tmdkc} - \gamma 
+					(\hat{ps}_{t+1m-1dkc} + E[pst\_d_{t+1m-1d-1c}] - E[pst\_d_{d}]  + E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big) + \\
+			&	
+				&& 
+					\sum_{t=1dkc}^{T-1} \beta_{tMdkc}^{ps} 
+					\Big( ps_{tMdkc} - \gamma \sum_{M-1}^{M}
+					(\hat{ps}_{t+1mdkc} + E[pst\_d_{t+1md-1c}] - E[pst\_d_{d}] + E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big)
+	\end{alignedat} \end{equation}
+\end{fleqn}
+
+Using the numbers above we rearrange the original equation as follows:
+\begin{equation}
+	\max_{\vec{\beta}} \Big( \sum \beta^{0} + \sum \beta^{ut} E[ut] + \sum \beta^{pw} E[pw] + \sum \beta^{ps} E[ps] \Big)
+\end{equation}
+Subject to:
+\begin{equation}
+	v(\vec{S}) - E[v(\vec{S}')] \le c(\vec{S}, \vec{A}) \quad \forall \vec{S} \vec{A} 
+\end{equation}
+
+
+\subsection{ADP Master Problem}
+\label{Dual of ADP LP}
+The equation above has a reasonable amount of decision variables, but an uncountable amount of constraints. Let's use column generation to solve it. First converting to dual
+\begin{equation}
+	\min_{w} \sum_{\vec{S} \vec{A}} w(\vec{S} \vec{A}) c(\vec{S} \vec{A})
+\end{equation}
+Subject To:
+
+\begin{alignat}{10}
+	& \beta^{0}: 
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} (1 - \gamma) = 1 \\
+	& \beta^{ul}: 
+		&& 	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ul_{p} - 
+		\gamma (\hat{ul}_{p}) \Big) \ge E[ul_{p}] 
+		&&	\forall p \in p\_co \\ 
+	&	
+		&& 	\sum_{\vec{S}\vec{A}}\vec{w} ( ul_{p}) \ge E[ul_{p}]
+		&&	\forall p \in p\_nco \\
+	&	\beta^{pw}: 
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{0dkc} - 
+		\gamma (pea_{dkc}) \Big) \ge E[ps_{0dkc}]
+		&&	\forall dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdkc} - 
+		\gamma (\hat{pw}_{m-1dkc}) \Big) \ge E[pw_{mdkc}]
+		&&	\forall m \in \{1...TL_{c}-1\} dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{mdkc} - 
+		\gamma (\hat{pw}_{m-1dkc}  + E[pwt\_d_{m-1d-1c}] - E[pwt\_d_{d}] +\\ 
+		& && \qquad + E[pwt\_k_{k-1}] - E[pwt\_k_{k}]) \Big) \ge E[pw_{mdkc}]
+		&&	\forall m \in \{TL_{c}...M-1\} dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(pw_{Mdkc} - \gamma 
+		\sum_{M-1}^{M} (\hat{pw}_{mdkc} + E[pwt\_d_{md-1c}] - E[pwt\_d_{d}] + \\
+		&	&& \qquad  + E[pwt\_k_{k-1k}] - E[pwt\_k_{k}] )  \Big) \ge E[pw_{Mdkc}]
+		&&	\forall dkc \\ 
+	&	\beta^{ps}: 
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{t0dkc} \Big) \ge E[ps_{t0dkc}]
+		&&	\forall tdkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{Tmdkc} \Big) \ge E[ps_{Tmdkc}]
+		&&	\forall mdkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdkc} - \gamma 
+				(\hat{ps}_{t+1m-1dkc}) \Big) \ge E[ps_{tmdkc}] \;
+		&&	\forall \{1...T-1\} \{1...TL_{c}-1\}dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tmdkc} - \gamma 
+				(\hat{ps}_{t+1m-1dc} + E[pst\_d_{t+1m-1d-1c}] - E[pst\_d_{d}] + \\
+		& &&	+ E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big) \ge E[ps_{tmdkc}] 
+		&&	\forall \{1...T-1\} \{TL_{c}...M-1\}dkc \\
+	&	
+		&&	\sum_{\vec{S}\vec{A}}\vec{w} \Big(ps_{tMdkc} - \gamma \sum_{M-1}^{M}
+				(\hat{ps}_{t+1mdkc} + E[pst\_d_{t+1md-1c}] - E[pst\_d_{d}] + \\
+		& &&	+ E[pst\_k_{k-1}] - E[pst\_k_{k}]) \Big) \ge E[ps_{tMdkc}]
+		&&	\forall \{1...T-1\} dkc
+\end{alignat}
+
+\begin{equation}
+	\text{State Action Bounds:} \qquad w \ge 0 \qquad \forall w
+\end{equation}
+
+
+\subsection{ADP Pricing Problem}
+\label{Pricing Problem}
+\begin{equation}
+	\min_{(\vec{ue}, \vec{uu}, \vec{pw}, \vec{pe}, \vec{ps}) \in S,  (\vec{sc}, \vec{rsc}) \in A } c(\vec{pw},\vec{sc},\vec{rsc},\vec{uv}) - \Big(v(\vec{S}) - E[v(\vec{S}')] \Big)
+\end{equation}
+Subject to:
+constraints in sections "\nameref{state-action constraints}" and "\nameref{auxiliary constraints}"
+
+\section{Solution Explanation}
+\subsection{Algorithm for solving}
+To get $\vec{\beta}$ values, which will be used to generate an action follow steps below:
+\begin{enumerate}
+	\item Perform a monte-carlo simulation (following some arbitrary policy) to get $E[ul], E[pw] E[pw]$
+	\item Create an initial feasible set of state-action pairs - $\vec{w}$
+	\item Solve model in section "\nameref{Dual of ADP LP}" where each state-action pairs in $\vec{w}$ corresponds to a variable and parameters for all the constraints for a specific action.
+	\item Solve model in section "\nameref{Pricing Problem}", where duals from problem in step 3  correspond to $\vec{\beta}$ values. 
+	\begin{itemize}
+		\item If objective function is less than 0, add solution as a single state-action pair to $\vec{w}$ and go to step 3
+		\item If objective function is greater than 0, continue to next step
+	\end{itemize}
+	\item Duals from problem in step 3 correspond to final $\vec{\beta}$ values
+\end{enumerate}
+
+\subsection{Generating an Action}
+Once $\vec{\beta}$ values have been approximated, you may use the model below to generate a recommended action for a specific state.
+\begin{equation*}
+	\min_{\vec{A}} c(\vec{S}, \vec{A}) + \gamma v(S')
+\end{equation*}	
+
+\begin{equation}\begin{alignedat}{10}
+		&	v(S') = \Bigg( 
+		&& 	\beta^0 + 
+		\bigg( \sum_{p \in p\_co} \beta_{p}^{ul} (\hat{ul_{p}}) \bigg) +
+			\bigg( \sum_{dc} \beta_{0dkc}^{pw} pea_{dkc} \bigg) +
+			\bigg( \sum_{m=1,dkc}^{TL_{c}-1} \beta_{mdkc}^{pw} 
+				(\hat{pw}_{m-1dkc} \bigg) + \\
+		&	&&	\qquad \qquad \bigg( \sum_{m=TL_{c}dkc}^{M-1} \beta_{mdkc}^{pw} 
+		(	\hat{pw}_{m-1dkc} + E[pwt\_d_{m-1d-1c}] - E[pwt\_d_{d}] 
+			+ E[pwt\_k_{k-1}] - E[pwt\_k_{k}])\bigg) + \\
+		&	&&	\qquad \qquad \bigg( \sum_{dkc} \beta_{Mdkc}^{pw} 
+		\sum_{M-1}^{M} ( \hat{pw}_{mdkc} + E[pwt\_d_{md-1c}] - E[pwt\_d_{d}] 
+			+ E[pwt\_k_{k-1}] - E[pwt\_k_{k}])\bigg) + \\
+		& 	&&	\bigg( \sum_{t=1m=1dkc}^{T-1, TL_{c}-1} \beta_{tmdkc}^{ps} 
+				(\hat{ps}_{t+1m-1dkc}) \bigg) + \\
+		&	&&	\qquad \bigg( \sum_{t=1m=TL_{c}dkc}^{T-1M-1} \beta_{tmdkc}^{ps} 
+				(\hat{ps}_{t+1m-1dkc} + E[pst\_d_{t+1m-1d-1c}] - 
+				E[pst\_d_{d}] + E[pst\_k_{k-1}] - E[pst\_k_{k}]) \bigg)  + \\
+		&	&&	\qquad \bigg( \sum_{t=1dkc}^{T-1} \beta_{tmdkc}^{ps} \sum_{M-1}^{M}
+				(\hat{ps}_{t+1mdkc} + E[pst\_d_{t+1md-1c}] - 
+				E[pst\_d_{d}] + E[pst\_k_{k-1}] - E[pst\_k_{k}]) \bigg) 
+		\Bigg)
+	\end{alignedat}
+\end{equation}
+
+Subject to:
+constraints in section "\nameref{state-action constraints}"
