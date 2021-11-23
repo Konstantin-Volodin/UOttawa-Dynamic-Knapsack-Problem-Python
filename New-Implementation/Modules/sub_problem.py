@@ -6,6 +6,7 @@ import itertools
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
+import math
 
 
     # Objective Function
@@ -280,13 +281,13 @@ def subproblem(input_data, betas, phase1 = False):
     # States / Upper Bounds
     # UL
     for p in itertools.product(indices['p']):
-        var_ul[p] = sub_model.addVar(name=f's_ul_{p}', ub=2*ppe_data[p[0]].expected_units, vtype=GRB.CONTINUOUS)
+        var_ul[p] = sub_model.addVar(name=f's_ul_{p}', ub=math.ceil(2*ppe_data[p[0]].expected_units), vtype=GRB.CONTINUOUS)
     # PW
     for mdkc in itertools.product(indices['m'], indices['d'], indices['k'], indices['c']):
-        var_pw[mdkc] = sub_model.addVar(name=f's_pw_{mdkc}', ub=3*arrival[(mdkc[1],mdkc[2],mdkc[3])], vtype=GRB.INTEGER)
+        var_pw[mdkc] = sub_model.addVar(name=f's_pw_{mdkc}', ub=math.ceil(10*arrival[(mdkc[1],mdkc[2],mdkc[3])]), vtype=GRB.INTEGER)
     # PS
     for tmdkc in itertools.product(indices['t'], indices['m'], indices['d'], indices['k'], indices['c']):
-        var_ps[tmdkc] = sub_model.addVar(name=f's_ps_{tmdkc}', ub=3*arrival[(tmdkc[2],tmdkc[3], tmdkc[4])], vtype=GRB.INTEGER)
+        var_ps[tmdkc] = sub_model.addVar(name=f's_ps_{tmdkc}', ub=math.ceil(5*arrival[(tmdkc[2],tmdkc[3], tmdkc[4])]), vtype=GRB.INTEGER)
 
     # Actions
     # SC
@@ -352,13 +353,13 @@ def subproblem(input_data, betas, phase1 = False):
         sub_model.addConstr(expr == 0, name=f'ps_hat_{tmdkc}')
         # UV Maximum function
     for tp in itertools.product(indices['t'], indices['p']):
-        sub_model.addConstr(var_uv[tp] <= M * var_uvb[tp])
+        sub_model.addConstr(var_uv[tp] <= 100000 * var_uvb[tp])
         
         expr = gp.LinExpr()
         expr.addTerms(1, var_uu_p[tp])
         expr.addConstant(-input_data.ppe_data[tp[1]].expected_units)
-        expr.addConstant(M)
-        expr.addTerms(-M, var_uvb[tp])
+        expr.addConstant(100000)
+        expr.addTerms(-100000, var_uvb[tp])
         if tp[0] == 1:
             expr.addTerms(-1, var_ul[(tp[1],)])
         sub_model.addConstr(var_uv[tp] <= expr)
@@ -367,8 +368,8 @@ def subproblem(input_data, betas, phase1 = False):
         if input_data.ppe_data[p[0]].ppe_type == 'carry-over':
             sub_model.addConstr(var_ul_p[p] >= 0)
             sub_model.addConstr(var_ul_p[p] >= input_data.ppe_data[p[0]].expected_units + var_ul[p] - var_uu_p[(1, p[0])])
-            sub_model.addConstr(var_ul_p[p] <= M * var_ulb[p])
-            sub_model.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + var_ul[p] - var_uu_p[(1, p[0])] + (M * (1-var_ulb[p])))
+            sub_model.addConstr(var_ul_p[p] <= 100000 * var_ulb[p])
+            sub_model.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + var_ul[p] - var_uu_p[(1, p[0])] + (100000 * (1-var_ulb[p])))
 
     # Constraints
     # 1) Resource Usage Constraint

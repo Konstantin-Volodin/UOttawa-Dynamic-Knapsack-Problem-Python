@@ -33,9 +33,8 @@ def p1_algo(input_data, init_state_actions):
         # Generates and Solves Master
         p1_mast_model, p1_mast_const = master_model.master_p1(input_data, mast_model)
         p1_mast_model.Params.LogToConsole = 0
-        p1_mast_model.write('p1_m.lp')
+        # p1_mast_model.write('p1_m.lp')
         p1_mast_model.optimize()
-        # p1_mast_model.write('m_p1.lp')
         betas = master_model.get_betas(input_data, p1_mast_const)
             
         # Debugging
@@ -49,16 +48,15 @@ def p1_algo(input_data, init_state_actions):
             print('Found Feasible Set')
             break
 
-        # Trims
-        if (count%100) == 0:
-            state_action_list, p1_mast_model, p1_mast_const = trim_sa_list_p1(input_data, state_action_list, p1_mast_model)
+        # # Trims
+        # if (count%100) == 0:
+        #     state_action_list, p1_mast_model, p1_mast_const = trim_sa_list_p1(input_data, state_action_list, p1_mast_model)
         
         # Generates and solves Subproblem 
         p1_sub_model, p1_sub_var = sub_problem.update_sub(input_data, p1_sub_model, p1_sub_var, betas, True)
         p1_sub_model.Params.LogToConsole = 0
-        p1_sub_model.write('p1_s.lp')
-        p1_sub_model.optimize()
         # p1_sub_model.write('p1_s.lp')
+        p1_sub_model.optimize()
         
         # Update State-Actions
         state_action = sub_problem.get_sa(p1_sub_var)
@@ -95,7 +93,7 @@ def p2_algo(input_data, init_state_actions, stabilization_parameter):
 
         # Generates and Solves Master
         mast_model.Params.LogToConsole = 0
-        # mast_model.write('p2_m.lp')
+        mast_model.write('p2_m.lp')
         mast_model.optimize()
         betas = master_model.get_betas(input_data, mast_const)
 
@@ -112,7 +110,7 @@ def p2_algo(input_data, init_state_actions, stabilization_parameter):
 
         # Generates and solves Subproblem
         sub_model, sub_var = sub_problem.update_sub(input_data, sub_model, sub_var, beta_avg)
-        # sub_model.write('p2_s.lp')
+        sub_model.write('p2_s.lp')
         sub_model.Params.LogToConsole = 0
         sub_model.Params.Method = 0
         sub_model.Params.BranchDir = -1

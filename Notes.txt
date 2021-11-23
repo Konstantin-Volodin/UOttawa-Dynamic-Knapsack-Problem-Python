@@ -1,7 +1,4 @@
-- See if there are any analytical solution to our problem
-	- play with different model types	
-
-- Finish up simulation - make sure there are no bugs
-
-
--try an m of 10
+- try an m of 10
+- try a cheap rescheduling (maybe that could change the behaviour)
+- make it so complexity and priority change in different periods
+	- in order to assess impact of each 
