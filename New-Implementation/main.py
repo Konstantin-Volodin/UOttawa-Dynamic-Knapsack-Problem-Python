@@ -14,7 +14,7 @@ import contextlib
 # my_path = os.path.dirname(__file__)
 my_path = os.getcwd()
 # print(my_path)
-input_data = data_import.read_data(os.path.join(my_path, 'Data', 'complex-data.xlsx'))
+input_data = data_import.read_data(os.path.join(my_path, 'Data', 'simple-data.xlsx'))
 # generate_optimal_sa_list = Modules.decorators.timer(generate_optimal_sa_list)
 
 
@@ -132,25 +132,26 @@ input_data = data_import.read_data(os.path.join(my_path, 'Data', 'complex-data.x
 init_state, init_action = master_model.initial_sa(input_data)
 state_action_list = [(init_state, init_action)]
 feasible_list, betas = optimization.p1_algo(input_data, state_action_list)
-data_export.export_betas(betas, os.path.join(my_path, 'Data', f'complex-feasible.xlsx'))
-with open(os.path.join(my_path, 'Data', f'complex-feasible.pkl'), 'wb') as outp:
+data_export.export_betas(betas, os.path.join(my_path, 'Data', f'simple-feasible.xlsx'))
+with open(os.path.join(my_path, 'Data', f'simple-feasible.pkl'), 'wb') as outp:
     pickle.dump(feasible_list, outp, pickle.HIGHEST_PROTOCOL)
 
 # Phase 2
-stabilization_parameter = 0.99
+stabilization_parameter = 0.9
 optimal_list, betas = optimization.p2_algo(input_data, feasible_list,stabilization_parameter)
-data_export.export_betas(betas, os.path.join(my_path, 'Data', f'complex-optimal.xlsx'))
-with open(os.path.join(my_path, 'Data', f'complex-optimal.pkl'), 'wb') as outp:
+data_export.export_betas(betas, os.path.join(my_path, 'Data', f'simple-optimal.xlsx'))
+with open(os.path.join(my_path, 'Data', f'simple-optimal.pkl'), 'wb') as outp:
     pickle.dump(optimal_list, outp, pickle.HIGHEST_PROTOCOL)
 # %% Compare Policies
 # Import betas
 fig, axes = plt.subplots(1, 1)
-betas = data_import.read_betas(os.path.join(my_path, 'Data', f'complex-optimal.xlsx'))
-main_sim.compare_policies(input_data, betas, 3, 5000, 2000, axes)
-fig.savefig(os.path.join(my_path, 'Data', f'complex-optimal.pdf'))
+betas = data_import.read_betas(os.path.join(my_path, 'Data', f'simple-optimal.xlsx'))
+main_sim.compare_policies(input_data, betas, 2, 2000, 1000, axes)
+fig.savefig(os.path.join(my_path, 'Data', f'simple-optimal.pdf'))
 
 # %% Test out policies
 # input_data.arrival[('C1', 'P1', 'CPU1')] = 20
-# betas = data_import.read_betas(os.path.join(my_path, 'Data', f'complex-optimal.xlsx'))
+betas = data_import.read_betas(os.path.join(my_path, 'Data', f'simple-optimal.xlsx'))
 # main_sim.test_out_policy(input_data, 100, simulation.mdp_policy, "MDP", betas)
 # main_sim.test_out_policy(input_data, 10, simulation.myopic_policy, "Myopic")
+# %%

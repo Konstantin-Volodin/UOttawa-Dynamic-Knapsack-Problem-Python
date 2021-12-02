@@ -34,8 +34,8 @@ def compare_policies(input_data, betas, repls, days, warm_up, axes):
     cost_frame = pd.concat([myopic_cost_avg, mdp_cost_avg], axis=1)
     cost_frame['Day'] = cost_frame.index
 
-    sns.lineplot(data=cost_frame, x="Day", y="Myopic", label='Myopic', ax=axes)
-    sns.lineplot(data=cost_frame, x="Day", y="MDP", label='MDP', ax=axes)
+    sns.lineplot(data=cost_frame, x="Day", y="Myopic", label='Myopic', ax=axes, linewidth = 0.3)
+    sns.lineplot(data=cost_frame, x="Day", y="MDP", label='MDP', ax=axes, linewidth = 0.3)
 
     print(f"Myopic Discounted Cost - {np.average(myopic_disc_c)}")
     print(f"MDP Discounted Cost - {np.average(mdp_disc_c)}")

@@ -1,0 +1,2 @@
+Myopic Discounted Cost - 478.0784692415655
+MDP Discounted Cost - 547.9627510371633

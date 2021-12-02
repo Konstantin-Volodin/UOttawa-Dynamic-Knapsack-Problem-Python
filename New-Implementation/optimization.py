@@ -33,7 +33,7 @@ def p1_algo(input_data, init_state_actions):
         # Generates and Solves Master
         p1_mast_model, p1_mast_const = master_model.master_p1(input_data, mast_model)
         p1_mast_model.Params.LogToConsole = 0
-        # p1_mast_model.write('p1_m.lp')
+        p1_mast_model.write('p1_m.lp')
         p1_mast_model.optimize()
         betas = master_model.get_betas(input_data, p1_mast_const)
             
@@ -55,7 +55,7 @@ def p1_algo(input_data, init_state_actions):
         # Generates and solves Subproblem 
         p1_sub_model, p1_sub_var = sub_problem.update_sub(input_data, p1_sub_model, p1_sub_var, betas, True)
         p1_sub_model.Params.LogToConsole = 0
-        # p1_sub_model.write('p1_s.lp')
+        p1_sub_model.write('p1_s.lp')
         p1_sub_model.optimize()
         
         # Update State-Actions

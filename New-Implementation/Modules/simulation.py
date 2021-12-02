@@ -329,13 +329,13 @@ def myopic_policy(input_data, state) -> action:
         myopic.addConstr(expr == 0, name=f'ps_hat_{tmdkc}')
         # UV Maximum function
     for tp in itertools.product(indices['t'], indices['p']):
-        myopic.addConstr(var_uv[tp] <= 100000 * var_uvb[tp], name=f'uv_max_1_{tp}')
+        myopic.addConstr(var_uv[tp] <= 10000 * var_uvb[tp], name=f'uv_max_1_{tp}')
         
         expr = gp.LinExpr()
         expr.addTerms(1, var_uu_p[tp])
         expr.addConstant(-input_data.ppe_data[tp[1]].expected_units)
-        expr.addConstant(100000)
-        expr.addTerms(-100000, var_uvb[tp])
+        expr.addConstant(10000)
+        expr.addTerms(-10000, var_uvb[tp])
         if tp[0] == 1:
             expr.addConstant(-state.ul_p[(tp[1],)])
         myopic.addConstr(var_uv[tp] <= expr, name=f'uv_max_2_{tp}')
@@ -343,8 +343,8 @@ def myopic_policy(input_data, state) -> action:
     for p in itertools.product(indices['p']):
         myopic.addConstr(var_ul_p[p] >= 0, name=f'ul_hat_1_{tp}')
         myopic.addConstr(var_ul_p[p] >= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])], name=f'ul_hat_2_{tp}')
-        myopic.addConstr(var_ul_p[p] <= 100000 * var_ulb[p], name=f'ul_max_1_{tp}')
-        myopic.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])] + (100000 * (1-var_ulb[p])), name=f'ul_hat_2_{tp}')
+        myopic.addConstr(var_ul_p[p] <= 10000 * var_ulb[p], name=f'ul_max_1_{tp}')
+        myopic.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])] + (10000 * (1-var_ulb[p])), name=f'ul_hat_2_{tp}')
 
     # Constraints
     # 1) Resource Usage Constraint
@@ -564,13 +564,13 @@ def mdp_policy(input_data, state, betas) -> action:
         MDP.addConstr(expr == 0, name=f'ps_hat_{tmdkc}')
         # UV Maximum function
     for tp in itertools.product(indices['t'], indices['p']):
-        MDP.addConstr(var_uv[tp] <= 100000 * var_uvb[tp], name=f'uv_max_1_{tp}')
+        MDP.addConstr(var_uv[tp] <= 10000 * var_uvb[tp], name=f'uv_max_1_{tp}')
         
         expr = gp.LinExpr()
         expr.addTerms(1, var_uu_p[tp])
         expr.addConstant(-input_data.ppe_data[tp[1]].expected_units)
-        expr.addConstant(100000)
-        expr.addTerms(-100000, var_uvb[tp])
+        expr.addConstant(10000)
+        expr.addTerms(-10000, var_uvb[tp])
         if tp[0] == 1:
             expr.addConstant(-state.ul_p[(tp[1],)])
         MDP.addConstr(var_uv[tp] <= expr, name=f'uv_max_2_{tp}')
@@ -578,8 +578,8 @@ def mdp_policy(input_data, state, betas) -> action:
     for p in itertools.product(indices['p']):
         MDP.addConstr(var_ul_p[p] >= 0, name=f'ul_hat_1_{tp}')
         MDP.addConstr(var_ul_p[p] >= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])], name=f'ul_hat_2_{tp}')
-        MDP.addConstr(var_ul_p[p] <= 100000 * var_ulb[p], name=f'ul_max_1_{tp}')
-        MDP.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])] + (100000 * (1-var_ulb[p])), name=f'ul_hat_2_{tp}')
+        MDP.addConstr(var_ul_p[p] <= 10000 * var_ulb[p], name=f'ul_max_1_{tp}')
+        MDP.addConstr(var_ul_p[p] <= input_data.ppe_data[p[0]].expected_units + state.ul_p[p] - var_uu_p[(1, p[0])] + (10000 * (1-var_ulb[p])), name=f'ul_hat_2_{tp}')
 
     # Constraints
     # 1) Resource Usage Constraint
