@@ -50,33 +50,64 @@ Actions consist of rescheduling currently scheduled patients, and scheduling pat
 	\item $\hat{uu}_{tp}$ - post-decision units used
 	\item $\hat{pw}_{mdkc}$ - post-decision patients waiting
 	\item $\hat{ps}_{tmdkc}$ - post-decision patients scheduled
+	\item $pwt\_d_{mdkc}$ - patients waiting transitioned in complexity
+	\item $pwt\_k_{mdkc}$ - patients waiting transitioned in priority
+	\item $pst\_d_{tmdkc}$ - patients scheduled transitioned in complexity
+	\item $pst\_k_{tmdkc}$ - patients scheduled transitioned in priority
 \end{itemize}
 \subsubsection{Auxiliary Variable Definition}
 \label{auxiliary constraints}
 \begin{alignat}{10}
 	& \hat{uu}_{tp} 
-	&& =  \sum_{mdkc} U_{pdc} \hat{ps}_{tmdkc} \quad
-	&& \forall tp \\ 
+		&& =  \sum_{mdkc} U_{pdc} \hat{ps}_{tmdkc} \quad
+		&& \forall tp \\ 
 	& \hat{pw}_{mdkc} 
-	&& = pw_{mdkc} - \sum_{t} sc_{tmdkc} \quad 
-	&& \forall mdkc \\ 
+		&& = pw_{mdkc} - \sum_{t} sc_{tmdkc} \quad 
+		&& \forall mdkc \\ 
 	& \hat{ps}_{tmdkc} 
-	&& = ps_{tmdkc} + sc_{tmdkc} + 
-	\sum_{t} rsc_{tt'mdkc} - \sum_{t'} rsc_{tt'mdkc} \quad 
-	&& \forall tmdkc
+		&& = ps_{tmdkc} + sc_{tmdkc} + 
+		\sum_{t} rsc_{tt'mdkc} - \sum_{t'} rsc_{tt'mdkc} \quad 
+		&& \forall tmdkc \\
+	& pwt\_d_{mdkc} 
+		&& = ptp\_{dc} * \hat{pw}_{mdkc} \quad
+		&& \forall mdkc \\
+	& pwt\_k_{mdkc} 
+		&& = ptp\_{kc} * \hat{pw}_{mdkc} \quad
+		&& \forall mdkc \\
+	& pst\_d_{tmdkc} 
+		&& = ptp\_{dc} * \hat{ps}_{tmdkc} \quad
+		&& \forall tmdkc \\
+	& pst\_k_{tmdkc} 
+		&& = ptp\_{kc} * \hat{ps}_{tmdkc} \quad
+		&& \forall tmdkc
 \end{alignat}
 
 \begin{itemize}
 	
 	\item Define Resource Violation Variable
 	\begin{alignat}{10}
-		& \hat{uv}_{tp} 
-		&& \le  M(uvb_{tp}) \quad
-		&& \forall tp \\
-		& \hat{uv}_{1p} 
+		& uv_{tp} 
+			&& = max\{0 , \hat{uu}_{1p} - p\_{ue}_{1p} - ul_{p}\} \quad 
+			&& \forall p \\ 
+		& uv_{tp} 
+			&& = max\{0 , \hat{uu}_{tp} - p\_{ue}_{tp}\} \quad
+			&& \forall t \in \{2..T\} p \\ \\
+		& uv_{tp} 
+			&&\ge 0 \quad
+			&& \forall tp \\
+		& uv_{tp} 
+			&& \le  M(uvb_{tp}) \quad
+			&& \forall tp \\
+		& uv_{1p} 
+			&&\ge \hat{uu}_{1p} - p\_ue_{1p} - ul_{p} \quad
+			&& \forall p \\
+		& uv_{1p} 
 		&& \le  (\hat{uu}_{1p} - p\_ue_{1p} - ul_{p}) + M(1-uvb_{tp}) \quad
 		&& \forall p \\
-		& \hat{uv}_{tp} 
+		& uv_{tp} 
+			&&\ge \hat{uu}_{tp} - p\_ue_{tp} \quad
+			&& \forall t \in \{2..T \} p \\
+		& uv_{tp} 
 		&& \le  (\hat{uu}_{tp} - p\_ue_{tp}) + M(1-uvb_{tp}) \quad
 		&& \forall t \in \{ 2..T \} p \\
 	\end{alignat}
@@ -84,17 +115,20 @@ Actions consist of rescheduling currently scheduled patients, and scheduling pat
 	\item Define Units Left Over Variable
 	\begin{alignat}{10}
 		& \hat{ul}_{p} 
-		&& \ge 0 \quad 
-		&& \forall p  \in p\_co \\
+			&& = max \{0, p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \}
+			&& \forall p \in \{p_co\} \\ \\
 		& \hat{ul}_{p} 
-		&& \ge p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \quad 
-		&& \forall p  \in p\_co\\
+			&& \ge 0 \quad 
+			&& \forall p  \in p\_co \\
 		& \hat{ul}_{p} 
-		&& \le M (ulb_{p}) \quad 
-		&& \forall p  \in p\_co\\
+			&& \le M (ulb_{p}) \quad 
+			&& \forall p  \in p\_co\\
 		& \hat{ul}_{p} 
-		&& \le (p\_ue_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad 
-		&& \forall p  \in p\_co
+			&& \ge p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \quad 
+			&& \forall p  \in p\_co\\
+		& \hat{ul}_{p} 
+			&& \le (p\_ue_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad 
+			&& \forall p  \in p\_co
 	\end{alignat}
 \end{itemize}
 
@@ -106,10 +140,7 @@ Actions consist of rescheduling currently scheduled patients, and scheduling pat
 	\begin{alignat}{10}
 		& \hat{uu}_{1p} 
 			&& \le p\_ue_{1p} + ul_{p} + uv_{1p} \quad 
-			&& \forall p \in p\_co \\
-		& \hat{uu}_{1p} 
-			&& \le p\_ue_{1p} + uv_{1p} \quad 
-			&& \forall p \in p\_nco \\
+			&& \forall p \\
 		& \hat{uu}_{tp} 
 			&& \le p\_ue_{tp} + uv_{tp} \quad
 			&& \forall t \in \{ 2..T \}p 

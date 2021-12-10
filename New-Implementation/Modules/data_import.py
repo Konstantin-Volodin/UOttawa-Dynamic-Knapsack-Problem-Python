@@ -111,7 +111,7 @@ def read_data(data_file_path):
         cc[row[0]] = row[2]
         cs[row[0]] = [0]
     
-    M = model_param_sheet['D2'].value
+    cv = model_param_sheet['D2'].value
     gamma = model_param_sheet['E2'].value
 
     # Cost of Scheduling
@@ -119,7 +119,7 @@ def read_data(data_file_path):
         for time in t:
             cs[prior].append(cs[prior][-1] + cw[prior] * (gamma**time) )
     
-    model_param = model_param_class(cw, cc, cs, M, gamma)
+    model_param = model_param_class(cw, cc, cs, cv, gamma)
 
     # Expected Data
     expected_vals_sheet = book.get_sheet_by_name('Expected State Values')
@@ -127,7 +127,7 @@ def read_data(data_file_path):
     expected_vals['ul'] = {}
     for row in expected_vals_sheet.iter_rows(min_row=3, min_col=1, max_col=2, values_only=True):
         if row[0] == None: break
-        expected_vals['ul'][(row[0],)] = row[1]
+        expected_vals['ul'][row[0]] = row[1]
     expected_vals['pw'] = {}
     for row in expected_vals_sheet.iter_rows(min_row=3, min_col=3, max_col=7, values_only=True):
         if row[0] == None: break

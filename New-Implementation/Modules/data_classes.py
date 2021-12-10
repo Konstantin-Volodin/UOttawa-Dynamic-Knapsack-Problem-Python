@@ -14,7 +14,7 @@ class model_param_class:
     cw: Dict[ str, float ]
     cc: Dict[ str, float ]
     cs: Dict[ str, List[float] ]
-    M: float
+    cv: float
     gamma: float
 @dataclass()
 class transition_data_class:
