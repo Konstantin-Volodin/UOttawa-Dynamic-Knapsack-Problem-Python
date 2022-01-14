@@ -1,22 +1,35 @@
-##### Initialization #####
+##### Initialization & Changeable Parameters ######
+#%%
 #region
-from os import linesep
+from os import close, linesep
 from Modules import data_import
 
 from gurobipy import *
 import itertools
 import os.path
+import pickle
+import time
+
+# Changeable Parameters
+iter_lims = 10000
+beta_fun = [
+    (0,0.75),
+    (10,0.8),
+    (100,0.9),
+    (500,0.95),
+    (1000,0.95)
+]
+beta_alp = beta_fun[0][1]
 #endregion
 
 ##### Read Data #####
 #region
 my_path = os.getcwd()
-input_data = data_import.read_data(os.path.join(my_path, 'Data', 'simple-data.xlsx'))
+input_data = data_import.read_data(os.path.join(my_path, 'Data', 'complex-data.xlsx'))
 
 # Quick Assess to Various Parameters
 TL = input_data.transition.wait_limit
 BM = 10000
-max_lims = 10000
 U = input_data.usage
 p_dat = input_data.ppe_data
 pea = input_data.arrival
@@ -54,10 +67,11 @@ E_PW = input_data.expected_state_values['pw']
 E_PS = input_data.expected_state_values['ps']
 #endregion
 
-##### Master Phase 1 #####
+##### Master Model #####
 #region
 master = Model("Master problem")
 master.params.LogToConsole = 0
+master.params.Method = 1
 
 # Goal Variables
 mv_b0 = master.addVar(vtype = GRB.CONTINUOUS, lb=0, name='var_beta_0')
@@ -115,6 +129,8 @@ master.setObjective( (mv_b0) + (mo_bul_co + mo_bul_nco) + (mo_bpw_0 + mo_bpw_1TL
 #region
 sub_prob = Model('Sub problem')
 sub_prob.params.LogToConsole = 0
+sub_prob.params.DegenMoves = 2
+sub_prob.params.MIPGap = 0.05
 
 # State Action & Auxiliary Variables
 sv_st_ul = sub_prob.addVars(P, vtype=GRB.CONTINUOUS, lb = 0, name='var_state_ul')
@@ -157,9 +173,16 @@ sc_aux_ulp_p = sub_prob.addConstrs((sv_aux_ulp[p] >= (p_dat[p].expected_units + 
 sc_aux_ulp_pM = sub_prob.addConstrs((sv_aux_ulp[p] <= (p_dat[p].expected_units + sv_st_ul[p] - sv_aux_uup[(1,p)]) + BM * (1-sv_aux_ulb[p]) for p in PCO), name='con_auxiliary_ulp_pM')
 
 sc_aux_pwt_d = sub_prob.addConstrs((sv_aux_pwt_d[(m,d,k,c)] == ptp_d[(d,c)] * sv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp_d')
-sc_aux_pwt_k = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * sv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp_k')
+sc_aux_pwt_k_0 = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] + sv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
+sc_aux_pwt_k_i = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] + sv_aux_pwt_d[(m,D[D.index(d)-1],k,c)] - sv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
+sc_aux_pwt_k_D = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] - sv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+sc_aux_pwt_k = {**sc_aux_pwt_k_0, **sc_aux_pwt_k_i, **sc_aux_pwt_k_D}
+
 sc_aux_pst_d = sub_prob.addConstrs((sv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * sv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_d')
-sc_aux_pst_k = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * sv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_k')
+sc_aux_pst_k_0 = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
+sc_aux_pst_k_i = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - sv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
+sc_aux_pst_k_D = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] - sv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+sc_aux_pst_k = {**sc_aux_pst_k_0, **sc_aux_pst_k_i, **sc_aux_pst_k_D}
 
 # State Action Constraints
 sc_usage_1 = sub_prob.addConstrs((sv_aux_uup[(1,p)] <= p_dat[p].expected_units + sv_st_ul[p] + sv_aux_uv[(1,p)] for p in P), name='con_usage_1')
@@ -177,8 +200,10 @@ sc_ps_bd = sub_prob.addConstrs((sv_st_ps[(t,m,d,k,c)] <= max(10, 5*pea[(d,k,c)])
 
 #endregion
 
+#%%
 ##### Phase 1 #####
 #region
+startP1 = time.time()
 
 mo_p2 = LinExpr()
 
@@ -187,7 +212,6 @@ iter = 0
 while True:
 
     # Solve Master
-    # master.write(f'p1m{iter}.lp')
     master.optimize()
     print(f"PHASE 1 Master Iter {iter}:\t\t{master.ObjVal}")
 
@@ -258,7 +282,6 @@ while True:
 
 
     # Solve Subproblem
-    # sub_prob.write(f'p1s{iter}.lp')
     sub_prob.optimize()
 
 
@@ -293,10 +316,12 @@ while True:
         break
 
     iter += 1
+endP1 = time.time()
 #endregion    
 
 ##### Phase 2 #####
 #region
+startP2 = time.time()
 
 # Update Master Model
 master.remove(mv_b0)
@@ -313,16 +338,44 @@ master.remove(mv_bps_M)
 master.remove(mv_bps_T)
 master.setObjective(mo_p2, GRB.MINIMIZE)
 
+# Initiate Beta Approximation
+beta_approx = {'b0': 0, 'bul': {}, 'bpw': {}, 'bps': {}}
+for i in P: beta_approx['bul'][i] = 0
+for i in itertools.product(M,D,K,C): beta_approx['bpw'][i] = 0
+for i in itertools.product(T,M,D,K,C): beta_approx['bps'][i] = 0
+
 # Solve Phase 2
 iter += 1
+close_count = 0
+count_same = 0
 objs = []
 while True:
 
+    # Update beta in the algoritm
+    for point in range(len(beta_fun)):
+        if iter >= beta_fun[point][0]: beta_alp = beta_fun[point][1]
+
     # Solve Master
-    # master.write(f'p2m{iter}.lp')
-    master.write(f'p2m.lp')
+    if iter%500 == 0: master.write(f'p2m.lp')
     master.optimize()
-    # print(f"PHASE 2 Master Iter {iter}:\t\t{master.ObjVal}")
+
+
+    # Update beta approximation
+    beta_approx['b0'] = (beta_alp)*beta_approx['b0'] + (1-beta_alp) * mc_b0.Pi
+
+    for i in mc_bul_co: beta_approx['bul'][i] = (beta_alp)*beta_approx['bul'][i] + (1-beta_alp) * mc_bul_co[i].Pi
+    for i in mc_bul_nco: beta_approx['bul'][i] = (beta_alp)*beta_approx['bul'][i] + (1-beta_alp) * mc_bul_nco[i].Pi
+
+    for i in mc_bpw_0: beta_approx['bpw'][i] = (beta_alp)*beta_approx['bpw'][i] + (1-beta_alp) * mc_bpw_0[i].Pi
+    for i in mc_bpw_1TL: beta_approx['bpw'][i] = (beta_alp)*beta_approx['bpw'][i] + (1-beta_alp) * mc_bpw_1TL[i].Pi
+    for i in mc_bpw_TLM: beta_approx['bpw'][i] = (beta_alp)*beta_approx['bpw'][i] + (1-beta_alp) * mc_bpw_TLM[i].Pi
+    for i in mc_bpw_M: beta_approx['bpw'][i] = (beta_alp)*beta_approx['bpw'][i] + (1-beta_alp) * mc_bpw_M[i].Pi
+    
+    for i in mc_bps_0: beta_approx['bps'][i] = (beta_alp)*beta_approx['bps'][i] + (1-beta_alp) * mc_bps_0[i].Pi
+    for i in mc_bps_1TL: beta_approx['bps'][i] = (beta_alp)*beta_approx['bps'][i] + (1-beta_alp) * mc_bps_1TL[i].Pi
+    for i in mc_bps_TLM: beta_approx['bps'][i] = (beta_alp)*beta_approx['bps'][i] + (1-beta_alp) * mc_bps_TLM[i].Pi
+    for i in mc_bps_M: beta_approx['bps'][i] = (beta_alp)*beta_approx['bps'][i] + (1-beta_alp) * mc_bps_M[i].Pi
+    for i in mc_bps_T: beta_approx['bps'][i] = (beta_alp)*beta_approx['bps'][i] + (1-beta_alp) * mc_bps_T[i].Pi
     
 
     # Generate Value Equations
@@ -368,18 +421,18 @@ while True:
 
 
     # Update Subproblem
-    so_val =   ((   mc_b0.Pi * val_b0                                                       ) +
-                (   quicksum(mc_bul_co[i].Pi*val_bul_co[i]      for i in mc_bul_co)     + 
-                    quicksum(mc_bul_nco[i].Pi*val_bul_nco[i]    for i in mc_bul_nco)        ) + 
-                (   quicksum(mc_bpw_0[i].Pi*val_bpw_0[i]        for i in mc_bpw_0)      + 
-                    quicksum(mc_bpw_1TL[i].Pi*val_bpw_1TL[i]    for i in mc_bpw_1TL)    + 
-                    quicksum(mc_bpw_TLM[i].Pi*val_bpw_TLM[i]    for i in mc_bpw_TLM)    +  
-                    quicksum(mc_bpw_M[i].Pi*val_bpw_M[i]        for i in mc_bpw_M)          ) +
-                (   quicksum(mc_bps_0[i].Pi*val_bps_0[i]        for i in mc_bps_0)      + 
-                    quicksum(mc_bps_1TL[i].Pi*val_bps_1TL[i]    for i in mc_bps_1TL)    + 
-                    quicksum(mc_bps_TLM[i].Pi*val_bps_TLM[i]    for i in mc_bps_TLM)    +  
-                    quicksum(mc_bps_M[i].Pi*val_bps_M[i]        for i in mc_bps_M)      + 
-                    quicksum(mc_bps_T[i].Pi*val_bps_T[i]        for i in mc_bps_T)          ))
+    so_val =   ((   beta_approx['b0'] * val_b0                                                       ) +
+                (   quicksum(beta_approx['bul'][i]*val_bul_co[i]        for i in mc_bul_co)     + 
+                    quicksum(beta_approx['bul'][i]*val_bul_nco[i]       for i in mc_bul_nco)        ) + 
+                (   quicksum(beta_approx['bpw'][i]*val_bpw_0[i]         for i in mc_bpw_0)      + 
+                    quicksum(beta_approx['bpw'][i]*val_bpw_1TL[i]       for i in mc_bpw_1TL)    + 
+                    quicksum(beta_approx['bpw'][i]*val_bpw_TLM[i]       for i in mc_bpw_TLM)    +  
+                    quicksum(beta_approx['bpw'][i]*val_bpw_M[i]         for i in mc_bpw_M)          ) +
+                (   quicksum(beta_approx['bps'][i]*val_bps_0[i]         for i in mc_bps_0)      + 
+                    quicksum(beta_approx['bps'][i]*val_bps_1TL[i]       for i in mc_bps_1TL)    + 
+                    quicksum(beta_approx['bps'][i]*val_bps_TLM[i]       for i in mc_bps_TLM)    +  
+                    quicksum(beta_approx['bps'][i]*val_bps_M[i]         for i in mc_bps_M)      + 
+                    quicksum(beta_approx['bps'][i]*val_bps_T[i]         for i in mc_bps_T)          ))
     so_cw =     quicksum( cw[k] * sv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C )
     so_cs =     quicksum( cs[k][t] * sv_ac_sc[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C)
     so_brsc =   quicksum( (cs[k][tp-t]+cc[k]) * sv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp > t)
@@ -391,8 +444,7 @@ while True:
 
 
     # Solve Subproblem
-    # sub_prob.write(f'p2s{iter}.lp')
-    sub_prob.write(f'p2s.lp')
+    if iter%500 == 0: sub_prob.write(f'p2s.lp')
     sub_prob.optimize()
     print(f"PHASE 2 Sub Iter {iter}:\t\t{sub_prob.ObjVal}")
 
@@ -411,53 +463,68 @@ while True:
     [sa.addTerms(val_bps_TLM[i].getValue(),     mc_bps_TLM[i])  for i in mc_bps_TLM    ]    
     [sa.addTerms(val_bps_M[i].getValue(),       mc_bps_M[i])    for i in mc_bps_M      ]
     [sa.addTerms(val_bps_T[i].getValue(),       mc_bps_T[i])    for i in mc_bps_T      ]  
-
     sa_var = master.addVar(vtype = GRB.CONTINUOUS, name= f"sa_{iter}", column = sa, obj=so_cost.getValue())
 
 
     # End Conditions
     if sub_prob.ObjVal >= 0:
+        close_count += 1
+    else:
+        close_count = 0
+    if close_count >= 1000:
         master.optimize()
         break
-    if iter >= max_lims:
+    if iter >= iter_lims:
+        master.optimize()
+        break
+    if count_same >= 1000:
+        master.optimize()
         break
 
     # Trims
     objs.append(sub_prob.ObjVal)
     objs = objs[-2:]
     if len(objs) >= 2 and objs[-1] == objs[-2]:
-        # print('trim')
+        count_same += 1
         for i in master.getVars(): 
             if i.X == 0: master.remove(i)
+    else: count_same = 0
+    # if iter%100 == 0:
+    #     init_len = len(master.getVars())
+    #     for i in master.getVars(): 
+    #         if i.X == 0: master.remove(i)
+    #     final_len = len(master.getVars())
+
+    #     print(f'Trimmed \t{init_len - final_len}')
+
 
     iter += 1
+endP2 = time.time()
 #endregion
+
+##### TIMING #####
+print(f"AutoTune 5%\t\t Phase 1 {endP1 - startP1} \t Phase 2 {endP2 - startP2}")
 
 ##### Save Data #####
 #region
 
-betas = {}
-betas['b0'] = mc_b0.Pi
+betas = {'b0': mc_b0.Pi, 'bul': {}, 'bpw': {}, 'bps': {}}
 
-betas['bul'] = {}
-print(f'\tBeta 0: {mc_b0.Pi}')
+for p in PCO: betas['bul'][p] = mc_bul_co[p].Pi 
+for p in PNCO: betas['bul'][p] = mc_bul_nco[p].Pi 
 
-for p in PCO: print(f'\tBeta UL - {p}: {mc_bul_co[p].Pi}')
-for p in PNCO: print(f'\tBeta UL - {p}: {mc_bul_nco[p].Pi}')
+for i in itertools.product(M[0:1], D, K, C): betas['bpw'][i] = mc_bpw_0[i].Pi
+for i in mTLdkc: betas['bpw'][i] = mc_bpw_1TL[i].Pi
+for i in TLMdkc: betas['bpw'][i] = mc_bpw_TLM[i].Pi
+for i in itertools.product(M[-1:], D, K, C): betas['bpw'][i] = mc_bpw_M[i].Pi
 
-for i in itertools.product(M[0:1], D, K, C): print(f'\tBeta PW - {i}: {mc_bpw_0[i].Pi}')
-for i in mTLdkc: print(f'\tBeta PW - {i}: {mc_bpw_1TL[i].Pi}')
-for i in TLMdkc: print(f'\tBeta PW - {i}: {mc_bpw_TLM[i].Pi}')
-for i in itertools.product(M[-1:], D, K, C): print(f'\tBeta PW - {i}: {mc_bpw_M[i].Pi}')
+for i in itertools.product(T[:-1], M[0:1], D, K, C): betas['bps'][i] = mc_bps_0[i].Pi
+for i in tmTLdkc: betas['bps'][i] = mc_bps_1TL[i].Pi
+for i in tTLMdkc: betas['bps'][i] = mc_bps_TLM[i].Pi
+for i in itertools.product(T[:-1], M[-1:], D, K, C): betas['bps'][i] = mc_bps_M[i].Pi
+for i in itertools.product(T[-1:], M, D, K, C): betas['bps'][i] = mc_bps_T[i].Pi
 
-for i in itertools.product(T[:-1], M[0:1], D, K, C): print(f'\tBeta PS - {i}: {mc_bps_0[i].Pi}')
-for i in tmTLdkc: print(f'\tBeta PS - {i}: {mc_bps_1TL[i].Pi}')
-for i in tTLMdkc: print(f'\tBeta PS - {i}: {mc_bps_TLM[i].Pi}')
-for i in itertools.product(T[:-1], M[-1:], D, K, C): print(f'\tBeta PS - {i}: {mc_bps_M[i].Pi}')
-for i in itertools.product(T[-1:], M, D, K, C): print(f'\tBeta PS - {i}: {mc_bps_T[i].Pi}')
+with open(os.path.join(my_path, 'Data', 'complex-optimal.pkl'), 'wb') as outp:
+    pickle.dump(betas, outp, pickle.HIGHEST_PROTOCOL)
 #endregion
-
-    
-
-
 # %%

@@ -72,13 +72,13 @@ Actions consist of rescheduling currently scheduled patients, and scheduling pat
 		&& = ptp\_{dc} * \hat{pw}_{mdkc} \quad
 		&& \forall mdkc \\
 	& pwt\_k_{mdkc} 
-		&& = ptp\_{kc} * \hat{pw}_{mdkc} \quad
+		&& = ptp\_{kc} * ( \hat{pw}_{mdkc} + pwt\_d_{md-1kc} - pwt\_d_{mdkc} )  \quad
 		&& \forall mdkc \\
 	& pst\_d_{tmdkc} 
 		&& = ptp\_{dc} * \hat{ps}_{tmdkc} \quad
 		&& \forall tmdkc \\
 	& pst\_k_{tmdkc} 
-		&& = ptp\_{kc} * \hat{ps}_{tmdkc} \quad
+		&& = ptp\_{kc} * ( \hat{ps}_{tmdkc} + pst\_d_{tmd-1kc} - pst\_d_{tmdkc} )  \quad
 		&& \forall tmdkc
 \end{alignat}
 

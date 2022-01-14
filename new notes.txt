@@ -1,0 +1,16 @@
+try interior points - barrier algorithm
+try feasible solution only
+consider a gap in the sub problem 
+
+
+maybe compute canada as well
+
+there is a person teaching tutorials regarding compute canada at uottawa
+
+1) try parameters
+	- interior point
+	- relax feasibility in subproblem
+2) 
+3) try simulation to generate ~10000 - ~20000 using myopic  
+4) compute canada
+5) try JPs 
