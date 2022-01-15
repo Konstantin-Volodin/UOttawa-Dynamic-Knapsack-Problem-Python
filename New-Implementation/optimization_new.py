@@ -172,16 +172,16 @@ sc_aux_ulp_0M = sub_prob.addConstrs((sv_aux_ulp[p] <= BM * sv_aux_ulb[p] for p i
 sc_aux_ulp_p = sub_prob.addConstrs((sv_aux_ulp[p] >= (p_dat[p].expected_units + sv_st_ul[p] - sv_aux_uup[(1,p)]) for p in PCO), name='con_auxiliary_ulp_p')
 sc_aux_ulp_pM = sub_prob.addConstrs((sv_aux_ulp[p] <= (p_dat[p].expected_units + sv_st_ul[p] - sv_aux_uup[(1,p)]) + BM * (1-sv_aux_ulb[p]) for p in PCO), name='con_auxiliary_ulp_pM')
 
-sc_aux_pwt_d = sub_prob.addConstrs((sv_aux_pwt_d[(m,d,k,c)] == ptp_d[(d,c)] * sv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp_d')
-sc_aux_pwt_k_0 = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] + sv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
-sc_aux_pwt_k_i = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] + sv_aux_pwt_d[(m,D[D.index(d)-1],k,c)] - sv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
-sc_aux_pwt_k_D = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] - sv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+sc_aux_pwt_d = sub_prob.addConstrs((sv_aux_pwt_d[(m,d,k,c)] == ptp_d[(d,c)] * sv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_auxiliary_pwt_d')
+sc_aux_pwt_k_0 = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] - sv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d == D[0]), name='con_auxiliary_pwt_k_0')
+sc_aux_pwt_k_i = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] + sv_aux_pwt_d[(m,D[D.index(d)-1],k,c)] - sv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwt_k')
+sc_aux_pwt_k_D = sub_prob.addConstrs((sv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_pwp[(m,d,k,c)] + sv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pwt_k_D')
 sc_aux_pwt_k = {**sc_aux_pwt_k_0, **sc_aux_pwt_k_i, **sc_aux_pwt_k_D}
 
-sc_aux_pst_d = sub_prob.addConstrs((sv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * sv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_d')
-sc_aux_pst_k_0 = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
-sc_aux_pst_k_i = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - sv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
-sc_aux_pst_k_D = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] - sv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+sc_aux_pst_d = sub_prob.addConstrs((sv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * sv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_pst_d')
+sc_aux_pst_k_0 = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] - sv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[0]), name='con_auxiliary_pwt_k_0')
+sc_aux_pst_k_i = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - sv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwt_k')
+sc_aux_pst_k_D = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pwt_k_D')
 sc_aux_pst_k = {**sc_aux_pst_k_0, **sc_aux_pst_k_i, **sc_aux_pst_k_D}
 
 # State Action Constraints

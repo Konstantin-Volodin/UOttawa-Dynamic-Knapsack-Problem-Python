@@ -182,18 +182,16 @@ myc_aux_ulp_p = myopic.addConstrs((myv_aux_ulp[p] >= (p_dat[p].expected_units + 
 myc_aux_ulp_pM = myopic.addConstrs((myv_aux_ulp[p] <= (p_dat[p].expected_units + myv_st_ul[p] - myv_aux_uup[(1,p)]) + BM * (1-myv_aux_ulb[p]) for p in PCO), name='con_auxiliary_ulp_pM')
 
 myc_aux_pwt_d = myopic.addConstrs((myv_aux_pwt_d[(m,d,k,c)] == ptp_d[(d,c)] * myv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp_d')
-myc_aux_pwt_k_0 = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] + myv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
-myc_aux_pwt_k_i = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] + myv_aux_pwt_d[(m,D[D.index(d)-1],k,c)] - myv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
-myc_aux_pwt_k_D = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] - myv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+myc_aux_pwt_k_0 = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] - myv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d == D[0]), name='con_auxiliary_pwt_k_0')
+myc_aux_pwt_k_i = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] + myv_aux_pwt_d[(m,D[D.index(d)-1],k,c)] - myv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwt_k')
+myc_aux_pwt_k_D = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] + myv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pwt_k_D')
 myc_aux_pwt_k = {**myc_aux_pwt_k_0, **myc_aux_pwt_k_i, **myc_aux_pwt_k_D}
 
-myc_aux_pst_d = myopic.addConstrs((myv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * myv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_d')
-myc_aux_pst_k_0 = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] + myv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
-myc_aux_pst_k_i = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] + myv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
-myc_aux_pst_k_D = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+myc_aux_pst_d = myopic.addConstrs((myv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * myv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_pst_d')
+myc_aux_pst_k_0 = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwt_k_0')
+myc_aux_pst_k_i = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] + myv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwt_k')
+myc_aux_pst_k_D = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] + myv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwt_k_D')
 myc_aux_pst_k = {**myc_aux_pst_k_0, **myc_aux_pst_k_i, **myc_aux_pst_k_D}
-
-myc_aux_pst_k = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * myv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_k')
 
 # State Action Constraints
 myc_usage_1 = myopic.addConstrs((myv_aux_uup[(1,p)] <= p_dat[p].expected_units + myv_st_ul[p] + myv_aux_uv[(1,p)] for p in P), name='con_usage_1')
@@ -265,16 +263,16 @@ mdc_aux_pwt_k = MDP.addConstrs((mdv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * mdv_a
 mdc_aux_pst_d = MDP.addConstrs((mdv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * mdv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_d')
 mdc_aux_pst_k = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * mdv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_k')
 
-mdc_aux_pwt_d = MDP.addConstrs((mdv_aux_pwt_d[(m,d,k,c)] == ptp_d[(d,c)] * mdv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp_d')
-mdc_aux_pwt_k_0 = MDP.addConstrs((mdv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_pwp[(m,d,k,c)] + mdv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
-mdc_aux_pwt_k_i = MDP.addConstrs((mdv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_pwp[(m,d,k,c)] + mdv_aux_pwt_d[(m,D[D.index(d)-1],k,c)] - mdv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
-mdc_aux_pwt_k_D = MDP.addConstrs((mdv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_pwp[(m,d,k,c)] - mdv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+mdc_aux_pwt_d = MDP.addConstrs((mdv_aux_pwt_d[(m,d,k,c)] == ptp_d[(d,c)] * mdv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_auxiliary_pwt_d')
+mdc_aux_pwt_k_0 = MDP.addConstrs((mdv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_pwp[(m,d,k,c)] + mdv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwt_k_0')
+mdc_aux_pwt_k_i = MDP.addConstrs((mdv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_pwp[(m,d,k,c)] + mdv_aux_pwt_d[(m,D[D.index(d)-1],k,c)] - mdv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwt_k')
+mdc_aux_pwt_k_D = MDP.addConstrs((mdv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_pwp[(m,d,k,c)] - mdv_aux_pwt_d[(m,d,k,c)]) for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwt_k_D')
 mdc_aux_pwt_k = {**mdc_aux_pwt_k_0, **mdc_aux_pwt_k_i, **mdc_aux_pwt_k_D}
 
-mdc_aux_pst_d = MDP.addConstrs((mdv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * mdv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_psp_d')
-mdc_aux_pst_k_0 = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_psp[(t,m,d,k,c)] + mdv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0]), name='con_auxiliary_pwp_k_0')
-mdc_aux_pst_k_i = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_psp[(t,m,d,k,c)] + mdv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - mdv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwp_k')
-mdc_aux_pst_k_D = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_psp[(t,m,d,k,c)] - mdv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[-1]), name='con_auxiliary_pwp_k_D')
+mdc_aux_pst_d = MDP.addConstrs((mdv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * mdv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_pst_d')
+mdc_aux_pst_k_0 = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_psp[(t,m,d,k,c)] - mdv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[0]), name='con_auxiliary_pwt_k_0')
+mdc_aux_pst_k_i = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_psp[(t,m,d,k,c)] + mdv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - mdv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwt_k')
+mdc_aux_pst_k_D = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_psp[(t,m,d,k,c)] + mdv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pwt_k_D')
 mdc_aux_pst_k = {**mdc_aux_pst_k_0, **mdc_aux_pst_k_i, **mdc_aux_pst_k_D}
 
 # State Action Constraints
