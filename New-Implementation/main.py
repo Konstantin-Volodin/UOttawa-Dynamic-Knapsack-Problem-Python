@@ -1,157 +1,39 @@
-# %%
-import optimization 
-import simulation as main_sim
-from Modules import master_model, data_import, data_export, decorators, simulation
+import optimization_new
+import simulation_new
+import time
 
-import pandas as pd
-import pickle
-import os.path
-import sys
-from matplotlib import pyplot as plt
-import contextlib
+# Test Type
+test_modifier = "cw1-cc1-cv10-gam95-"
+data_type = "complex"
 
-# Read Data
-# my_path = os.path.dirname(__file__)
-my_path = os.getcwd()
-# print(my_path)
-input_data = data_import.read_data(os.path.join(my_path, 'Data', 'simple-data.xlsx'))
-# generate_optimal_sa_list = Modules.decorators.timer(generate_optimal_sa_list)
+# Optimization Paramers
+iter_lims = 1000000
+beta_fun = [
+    (0,0.75),
+    (1000,0.95)
+    # (10,0.8),
+    # (100,0.9),
+    # (500,0.95),
+    # (10000,0.99)
+]
+sub_mip_gap = 0.001
+import_data_opt = f"sens-data\{data_type}\{test_modifier}{data_type}-data.xlsx"
+export_data_opt = f"sens-data\\betas\{data_type}\{test_modifier}{data_type}-optimal.pkl"
 
+# Simulation Parameters
+replications = 3
+warm_up = 1000
+duration = 3000
+show_policy = False
+import_data_sim = import_data_opt
+import_betas_sim = export_data_opt
+export_txt_sim = f"sens-res\{data_type}\{test_modifier}{data_type}-optimal-res.txt"
+export_pic_sim = f"sens-res\{data_type}\{test_modifier}{data_type}-optimal-res.html"
 
-# # %% Sensitivity Analysis
-# cw = [1,5,9]
-# cc = [1,5,9]
-# M = [10, 15, 20]
-# gamma = [0.99, 0.95]
-# t = [5,6]
-# m = [5,6]
-
-# data = {
-#     't': [],
-#     'm': [],
-#     'cw': [],
-#     'cc': [],
-#     'M': [],
-#     'g': [],
-#     'b0': [],
-#     'bul': [],
-#     'pw0':[],
-#     'pw1':[],
-#     'pw2':[],
-#     'pw3':[],
-#     'pw4':[],
-#     'pw5':[],
-#     'pw6':[],
-#     'ps10':[],
-#     'ps11':[],
-#     'ps20':[],
-#     'ps21':[],
-#     'ps30':[],
-#     'ps31':[],
-#     'ps40':[],
-#     'ps41':[],
-#     'ps50':[],
-#     'ps51':[],
-#     'ps60':[],
-#     'ps61':[]
-# }
-
-# for ti in t:
-#     for mi in m:
-#         for cwi in cw:
-#             for cci in cc:
-#                 for Mi in M:
-#                     for gammai in gamma:
-
-#                         input_data.indices['t'] = [i+1 for i in range(ti)]
-#                         input_data.indices['m'] = [i for i in range(mi+1)]
-#                         input_data.model_param.cw['P1'] = cwi
-#                         input_data.model_param.cc['P1'] = cci
-#                         input_data.model_param.M = Mi
-#                         input_data.model_param.gamma = gammai
-
-#                         for i in input_data.indices['t']:
-#                             input_data.model_param.cs['P1'][i] = input_data.model_param.cs['P1'][i-1] + input_data.model_param.cw['P1'] * (input_data.model_param.gamma**i)
-
-#                         # Phase 1
-#                         with contextlib.redirect_stdout(None):
-#                             init_state, init_action = master_model.initial_sa(input_data)
-#                             state_action_list = [(init_state, init_action)]
-#                             feasible_list, betas = optimization.p1_algo(input_data, state_action_list)
-
-#                         # Phase 2
-#                         with contextlib.redirect_stdout(None):
-#                             stabilization_parameter = 0.3
-#                             optimal_list, betas = optimization.p2_algo(input_data, feasible_list,stabilization_parameter)
-
-#                         data['t'].append(ti)
-#                         data['m'].append(mi)
-#                         data['cw'].append(cwi)
-#                         data['cc'].append(cci)
-#                         data['M'].append(Mi)
-#                         data['g'].append(gammai)
-#                         data['b0'].append(betas['b0']['b_0'])
-#                         data['bul'].append(betas['ul'][('PPE1',)])
-#                         data['pw0'].append(betas['pw'][(0, 'C1', 'P1','CPU1')])
-#                         data['pw1'].append(betas['pw'][(1, 'C1', 'P1','CPU1')])
-#                         data['pw2'].append(betas['pw'][(2, 'C1', 'P1','CPU1')])
-#                         data['pw3'].append(betas['pw'][(3, 'C1', 'P1','CPU1')])
-#                         data['pw4'].append(betas['pw'][(4, 'C1', 'P1','CPU1')])
-#                         data['pw5'].append(betas['pw'][(5, 'C1', 'P1','CPU1')])
-#                         if mi == 6:
-#                             data['pw6'].append(betas['pw'][(6, 'C1', 'P1','CPU1')])
-#                         else:
-#                             data['pw6'].append(None)
-#                         data['ps10'].append(betas['ps'][(1, 0, 'C1', 'P1','CPU1')])
-#                         data['ps11'].append(betas['ps'][(1, 1, 'C1', 'P1','CPU1')])
-#                         data['ps20'].append(betas['ps'][(2, 0, 'C1', 'P1','CPU1')])
-#                         data['ps21'].append(betas['ps'][(2, 1, 'C1', 'P1','CPU1')])
-#                         data['ps30'].append(betas['ps'][(3, 0, 'C1', 'P1','CPU1')])
-#                         data['ps31'].append(betas['ps'][(3, 1, 'C1', 'P1','CPU1')]) 
-#                         data['ps40'].append(betas['ps'][(4, 0, 'C1', 'P1','CPU1')])
-#                         data['ps41'].append(betas['ps'][(4, 1, 'C1', 'P1','CPU1')])
-#                         data['ps50'].append(betas['ps'][(5, 0, 'C1', 'P1','CPU1')])
-#                         data['ps51'].append(betas['ps'][(5, 1, 'C1', 'P1','CPU1')])
-#                         if ti == 6:
-#                             data['ps60'].append(betas['ps'][(6, 0, 'C1', 'P1','CPU1')])
-#                             data['ps61'].append(betas['ps'][(6, 1, 'C1', 'P1','CPU1')])
-#                         else:
-#                             data['ps60'].append(None)
-#                             data['ps61'].append(None)
-
-#                         print('Done')
-
-# df = pd.DataFrame(data)
-# with open(os.path.join(my_path, 'Data', 'sensitivity analysis', f'model_param.pkl'), 'wb') as outp:
-#     pickle.dump(df, outp, pickle.HIGHEST_PROTOCOL)
-
-# df = pd.read_pickle(os.path.join(my_path, 'Data', 'sensitivity analysis', f'model_param.pkl'))
-
-# %% Optimization
-# Phase 1
-init_state, init_action = master_model.initial_sa(input_data)
-state_action_list = [(init_state, init_action)]
-feasible_list, betas = optimization.p1_algo(input_data, state_action_list)
-data_export.export_betas(betas, os.path.join(my_path, 'Data', f'simple-feasible.xlsx'))
-with open(os.path.join(my_path, 'Data', f'simple-feasible.pkl'), 'wb') as outp:
-    pickle.dump(feasible_list, outp, pickle.HIGHEST_PROTOCOL)
-
-# Phase 2
-stabilization_parameter = 0.9
-optimal_list, betas = optimization.p2_algo(input_data, feasible_list,stabilization_parameter)
-data_export.export_betas(betas, os.path.join(my_path, 'Data', f'simple-optimal.xlsx'))
-with open(os.path.join(my_path, 'Data', f'simple-optimal.pkl'), 'wb') as outp:
-    pickle.dump(optimal_list, outp, pickle.HIGHEST_PROTOCOL)
-# %% Compare Policies
-# Import betas
-fig, axes = plt.subplots(1, 1)
-betas = data_import.read_betas(os.path.join(my_path, 'Data', f'simple-optimal.xlsx'))
-main_sim.compare_policies(input_data, betas, 2, 2000, 1000, axes)
-fig.savefig(os.path.join(my_path, 'Data', f'simple-optimal.pdf'))
-
-# %% Test out policies
-# input_data.arrival[('C1', 'P1', 'CPU1')] = 20
-betas = data_import.read_betas(os.path.join(my_path, 'Data', f'simple-optimal.xlsx'))
-# main_sim.test_out_policy(input_data, 100, simulation.mdp_policy, "MDP", betas)
-# main_sim.test_out_policy(input_data, 10, simulation.myopic_policy, "Myopic")
-# %%
+# Execute
+start_time_opt = time.time()
+optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt)
+end_time_opt = time.time()
+simulation_new.main_func(replications, warm_up, duration, show_policy, import_data_sim, import_betas_sim, export_txt_sim, export_pic_sim)
+end_time_sim = time.time()
+print(f'{test_modifier}{data_type}\tOptimization: {end_time_opt-start_time_opt} sec \tSimulation: {end_time_sim-end_time_opt} sec')

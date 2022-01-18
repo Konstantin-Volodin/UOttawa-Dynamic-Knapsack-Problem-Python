@@ -1,0 +1,2 @@
+Myopic: 	 Discounted Cost 247.51 	 Average Cost 30.17 	 Warm Up Cost 20.17
+MDP: 		 Discounted Cost 248.23 	 Average Cost 26.46 	 Warm Up Cost 20.17

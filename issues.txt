@@ -1,7 +1,0 @@
-Potential Issues:
-	- Cost of state-action is not calculated correctly in master problem? - no
-	- Constraint Parameter is calculated incorrectly for state-action in master problem? 
-
-Not Issues:
-
-Fixed:
