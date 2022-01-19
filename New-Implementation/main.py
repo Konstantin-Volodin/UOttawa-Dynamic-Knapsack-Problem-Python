@@ -3,14 +3,29 @@ import simulation_new
 import time
 
 # Test Type
+test_modifier_list = [
+    'cw1-cc1-cv10-gam95-',
+    'cw1-cc1-cv10-gam99-',
+    'cw1-cc1-cv10-gam999-',
+    'cw1-cc1-cv100-gam95-',
+    'cw1-cc5-cv10-gam95-',
+    'cw1-cc5-cv100-gam95-',
+    'cw1-cc10-cv10-gam95-',
+    'cw1-cc10-cv100-gam95-',
+]
+
+# for i in test_modifier_list:
+#     test_modifier = i
+
 test_modifier = "cw1-cc1-cv10-gam95-"
-data_type = "simple"
+data_type = "complex"
 
 # Optimization Paramers
-iter_lims = 100000
+iter_lims = 50000
 beta_fun = [
-    (0,0.75),
-    (1000,0.95)
+    (0,0.75)
+    # (5000,0.99),
+    # (50000,0.999)
     # (10,0.8),
     # (100,0.9),
     # (500,0.95),
