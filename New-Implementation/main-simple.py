@@ -5,13 +5,13 @@ import time
 # Test Type
 test_modifier_list = [
     'cw1-cc1-cv10-gam95-',
-    # 'cw1-cc1-cv100-gam95-',
-    # 'cw1-cc5-cv10-gam95-',
-    # 'cw1-cc5-cv100-gam95-',
-    # 'cw1-cc10-cv10-gam95-',
-    # 'cw1-cc10-cv100-gam95-'
-    # 'cw1-cc1-cv10-gam99-',
-    # 'cw1-cc1-cv10-gam999-',
+    'cw1-cc1-cv100-gam95-',
+    'cw1-cc5-cv10-gam95-',
+    'cw1-cc5-cv100-gam95-',
+    'cw1-cc10-cv10-gam95-',
+    'cw1-cc10-cv100-gam95-'
+    'cw1-cc1-cv10-gam99-',
+    'cw1-cc1-cv10-gam999-',
     'exp-full-cw1-cc1-cv10-gam95-',
     'exp-zero-cw1-cc1-cv10-gam95-'
 ]
