@@ -3,7 +3,7 @@ import simulation_new
 import time
 
 # Test Type
-test_modifier = "ex-full-cw1-cc1-cv10-gam95-"
+test_modifier = "exp-full-cw1-cc1-cv10-gam95-"
 data_type = "full"
 
 # Optimization Paramers
