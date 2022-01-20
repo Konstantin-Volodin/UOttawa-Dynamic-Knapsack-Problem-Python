@@ -19,15 +19,15 @@ test_modifier_list = [
 #     data_type = 'simple'
     
 
-test_modifier = "cw1-cc1-cv10-gam95-"
+test_modifier = "cw1-cc5-cv10-gam95-"
 data_type = "complex"
 
 # Optimization Paramers
 iter_lims = 50000
 beta_fun = [
     (0,0.9)
+    # (500,0.9),
     # (5000,0.95),
-    # (10000,0.99),
     # (20000,0.95)
     # (50000,0.999)
     # (10,0.8),
