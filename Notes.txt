@@ -26,3 +26,9 @@ there is a person teaching tutorials regarding compute canada at uottawa
 DIFFERENT COSTS PARAMETERS LEAD TO DIFFERENT MODEL PERFORMANCE
 	- higher cost of rescheduling and unit violation - results in MDP performing worse
 	- lower cost - MDP performs better - does that even make sense??
+
+p c
+h h
+h l
+l h
+l l 

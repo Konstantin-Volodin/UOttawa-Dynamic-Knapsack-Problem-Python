@@ -1,2 +1,2 @@
 Myopic: 	 Discounted Cost 2093598.77 	 Average Cost 1470.04 	 Warm Up Cost 20.28
-MDP: 		 Discounted Cost 20583.33 	 Average Cost 25.07 	 Warm Up Cost 20.28
+MDP: 		 Discounted Cost 21153.23 	 Average Cost 25.85 	 Warm Up Cost 20.28

@@ -12,7 +12,7 @@ import time
 #endregion
 
 
-def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
+def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export_model, import_model=False):
 
     ##### Read Data #####
     #region
@@ -122,7 +122,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
     sub_prob = Model('Sub problem')
     sub_prob.params.LogToConsole = 0
     # sub_prob.params.DegenMoves = 2
-    # sub_prob.params.MIPGap = sub_mip_gap
+    sub_prob.params.MIPGap = sub_mip_gap
 
     # State Action & Auxiliary Variables
     sv_st_ul = sub_prob.addVars(P, vtype=GRB.CONTINUOUS, lb = 0, name='var_state_ul')
@@ -201,7 +201,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
 
     # Solve Phase 1
     iter = 0
-    while True:
+    while True and import_model == False:
 
         # Solve Master
         master.optimize()
@@ -336,6 +336,18 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
     for i in itertools.product(M,D,K,C): beta_approx['bpw'][i] = 0
     for i in itertools.product(T,M,D,K,C): beta_approx['bps'][i] = 0
 
+    # Start up model
+    if import_model:
+        # print('imported')
+        # time.sleep(1)
+        model_to_import = read(import_model)
+        vars_to_import = model_to_import.getVars()
+        for var in vars_to_import:
+            col_to_import = model_to_import.getCol(var)
+            sa_var = master.addVar(vtype = GRB.CONTINUOUS, name= f"sa_{iter}", column = col_to_import, obj=var.obj)
+            iter += 1
+
+
     # Solve Phase 2
     iter += 1
     close_count = 0
@@ -348,7 +360,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
             if iter >= beta_fun[point][0]: beta_alp = beta_fun[point][1]
 
         # Solve Master
-        if iter%500 == 0: master.write(f'p2m.lp')
+        if iter%500 == 0: master.write(f'{export_model}')
         master.optimize()
 
 
@@ -436,7 +448,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
 
 
         # Solve Subproblem
-        if iter%500 == 0: sub_prob.write(f'p2s.lp')
+        # if iter%500 == 0: sub_prob.write(f'p2s.lp')
         sub_prob.optimize()
         print(f"PHASE 2 Sub Iter {iter}:\t\t{sub_prob.ObjVal}")
 
@@ -465,12 +477,15 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
             close_count = 0
         if close_count >= 1000:
             master.optimize()
+            master.write(f'{export_model}')
             break
         if iter >= iter_lims:
             master.optimize()
+            master.write(f'{export_model}')
             break
         if count_same >= 1000:
             master.optimize()
+            master.write(f'{export_model}')
             break
 
         # Trims
@@ -495,7 +510,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
     #endregion
 
     ##### TIMING #####
-    print(f"AutoTune 5%\t\t Phase 1 {endP1 - startP1} \t Phase 2 {endP2 - startP2}")
+    # print(f"AutoTune 5%\t\t Phase 1 {endP1 - startP1} \t Phase 2 {endP2 - startP2}")
 
     ##### Save Data #####
     #region
@@ -519,3 +534,5 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data):
     with open(os.path.join(my_path, 'Data', export_data), 'wb') as outp:
         pickle.dump(betas, outp, pickle.HIGHEST_PROTOCOL)
     #endregion
+
+# %%
