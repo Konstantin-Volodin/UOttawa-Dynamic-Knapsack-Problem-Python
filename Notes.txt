@@ -14,10 +14,11 @@ there is a person teaching tutorials regarding compute canada at uottawa
 	- relax feasibility in subproblem
 		speeds up iterations, but improves bound slower
 		- need to compare how long to reach ceraint bound for 2 methods
+	- added warm - up and saving optimization progress
 3) try simulation to generate ~10000 - ~20000 using myopic  
 	- todo
 4) compute canada
-	- waiting on account
+	- done
 5) try MET servers
 	- done
 

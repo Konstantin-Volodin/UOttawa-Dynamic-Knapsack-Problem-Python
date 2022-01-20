@@ -337,18 +337,22 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
     for i in itertools.product(T,M,D,K,C): beta_approx['bps'][i] = 0
 
     # Start up model
+    to_import_betas = True
     if import_model:
         # print('imported')
         # time.sleep(1)
         model_to_import = read(import_model)
+        model_to_import.optimize()
         vars_to_import = model_to_import.getVars()
         for var in vars_to_import:
-            col_to_import = model_to_import.getCol(var)
-            sa_var = master.addVar(vtype = GRB.CONTINUOUS, name= f"sa_{iter}", column = col_to_import, obj=var.obj)
-            iter += 1
+            if var.X != 0:
+                col_to_import = model_to_import.getCol(var)
+                sa_var = master.addVar(vtype = GRB.CONTINUOUS, name= f"sa_{iter}", column = col_to_import, obj=var.obj)
+                iter += 1
 
 
     # Solve Phase 2
+
     iter += 1
     close_count = 0
     count_same = 0
@@ -358,6 +362,13 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
         # Update beta in the algoritm
         for point in range(len(beta_fun)):
             if iter >= beta_fun[point][0]: beta_alp = beta_fun[point][1]
+
+        # If model is imported generates initial betas completely
+        if import_model and to_import_betas:
+            beta_alp = 0
+            to_import_betas = False
+        
+
 
         # Solve Master
         if iter%500 == 0: master.write(f'{export_model}')
