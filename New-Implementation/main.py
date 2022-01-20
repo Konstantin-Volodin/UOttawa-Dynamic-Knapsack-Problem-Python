@@ -25,7 +25,7 @@ data_type = "complex"
 # Optimization Paramers
 iter_lims = 50000
 beta_fun = [
-    (0,0.9)
+    (0,0.75)
     # (500,0.9),
     # (5000,0.95),
     # (20000,0.95)
