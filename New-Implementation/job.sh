@@ -1,5 +1,6 @@
 #!/bin/bash
-#SBATCH --time=00:01:00
+#SBATCH --time=01-00
+#SBATCH --mem-per-cpu=8G
 #SBATCH --job-name=optimization
-#SBATCH --output=testingSBATCH.out
+#SBATCH --output=optim.out
 python3 main.py

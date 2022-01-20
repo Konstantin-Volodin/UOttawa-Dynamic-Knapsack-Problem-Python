@@ -8,7 +8,7 @@ Minimize
    + 28.5 sa_16 - 6.795 sa_17 + 25.65 sa_18 + 28.5 sa_19
    - 51.29624999999999 sa_20 - 22.22775 sa_21 - 4.14 sa_22
    - 51.29624999999999 sa_23 - 25.575 sa_24 - 25.575 sa_25 - 20.46 sa_26
-   - 51.29624999999999 sa_27 + 25.65 sa_28 - 51.29624999999999 sa_35
+   + 25.65 sa_27 - 51.29624999999999 sa_28 - 51.29624999999999 sa_35
    - 51.29624999999999 sa_36 - 51.29624999999999 sa_37
    - 51.29624999999999 sa_38 - 51.29624999999999 sa_39
    - 51.29624999999999 sa_40 - 51.29624999999999 sa_41
@@ -142,14 +142,14 @@ Subject To
    - 8.55 sa_135 - 8.55 sa_136 >= 10
  con_beta_pw_0dkc[0,C2,P1,CPU1]: >= 0
  con_beta_pw_1TLdkc[1,C1,P1,CPU1]: 6 sa_5 + 18 sa_8 + 18 sa_18 + 30 sa_19
-   + 18 sa_28 >= 5
+   + 18 sa_27 >= 5
  con_beta_pw_1TLdkc[1,C2,P1,CPU1]: >= 0
  con_beta_pw_TLMdkc[2,C1,P1,CPU1]: 30 sa_2 + 18 sa_9 + 30 sa_10 + 30 sa_11
    >= 2.5
  con_beta_pw_TLMdkc[2,C2,P1,CPU1]: >= 0
  con_beta_pw_TLMdkc[3,C1,P1,CPU1]: 30 sa_1 >= 1.25
  con_beta_pw_TLMdkc[3,C2,P1,CPU1]: 9 sa_17 + 9 sa_18 + 9 sa_21 + 10 sa_22
-   + 9 sa_28 >= 1.25
+   + 9 sa_27 >= 1.25
  con_beta_pw_Mdkc[4,C1,P1,CPU1]: 18 sa_15 + 30 sa_16 >= 0.625
  con_beta_pw_Mdkc[4,C2,P1,CPU1]: 9 sa_8 >= 0.625
  con_beta_ps_t0dkc[1,0,C1,P1,CPU1]: 14 sa_13 + 30 sa_32 >= 5
@@ -192,7 +192,7 @@ Subject To
  con_beta_ps_tMdkc[2,4,C2,P1,CPU1]: 7 sa_12 + 7 sa_14 >= 0.15625
  con_beta_ps_tMdkc[3,4,C1,P1,CPU1]: 30 sa_25 + 14 sa_26 >= 0.078125
  con_beta_ps_tMdkc[3,4,C2,P1,CPU1]: 2 sa_22 >= 0.078125
- con_beta_ps_Tmdkc[4,0,C1,P1,CPU1]: 18 sa_12 + 30 sa_14 + 30 sa_27
+ con_beta_ps_Tmdkc[4,0,C1,P1,CPU1]: 18 sa_12 + 30 sa_14 + 30 sa_28
    + 30 sa_35 + 30 sa_36 + 30 sa_37 + 30 sa_38 + 30 sa_39 + 30 sa_40
    + 30 sa_41 + 30 sa_42 + 30 sa_43 + 30 sa_44 + 30 sa_45 + 30 sa_46
    + 30 sa_47 + 30 sa_48 + 30 sa_49 + 30 sa_50 + 30 sa_51 + 30 sa_52

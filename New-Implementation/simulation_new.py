@@ -346,7 +346,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         state = deepcopy(init_state)
 
         # Single Replication
-        for day in trange(duration, desc='Replication'):
+        for day in range(duration, desc='Replication'):
 
             # Save State Data
             if show_policy: rp_st.append(deepcopy(state))
@@ -450,7 +450,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         rp_disc = 0
         state = deepcopy(init_state)
 
-        for day in trange(duration, desc='Replication'):
+        for day in range(duration, desc='Replication'):
 
             # Save State Data
             if show_policy: rp_st.append(deepcopy(state))
