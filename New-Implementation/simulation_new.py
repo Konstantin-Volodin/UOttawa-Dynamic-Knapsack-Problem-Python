@@ -23,7 +23,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     ##### Read Data #####
     #region
     my_path = os.getcwd()
-    input_data = data_import.read_data(os.path.join(my_path, 'Data', import_data))
+    input_data = data_import.read_data(os.path.join(my_path, import_data))
 
     # Quick Assess to Various Parameters
     TL = input_data.transition.wait_limit
@@ -72,7 +72,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = init_state_strm.poisson(E_PS[i])
 
     # Betas
-    with open(os.path.join(my_path, 'Data', import_beta), 'rb') as handle:
+    with open(os.path.join(my_path, import_beta), 'rb') as handle:
         betas = pickle.load(handle)
     #endregion
 
@@ -346,7 +346,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         state = deepcopy(init_state)
 
         # Single Replication
-        for day in range(duration, desc='Replication'):
+        for day in range(duration):
 
             # Save State Data
             if show_policy: rp_st.append(deepcopy(state))
@@ -450,7 +450,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         rp_disc = 0
         state = deepcopy(init_state)
 
-        for day in range(duration, desc='Replication'):
+        for day in range(duration):
 
             # Save State Data
             if show_policy: rp_st.append(deepcopy(state))
@@ -595,11 +595,11 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     fig = make_subplots(rows=1, cols=2, subplot_titles=('Myopic', 'MDP'))
     fig.add_trace( go.Line(x=x_dat, y=my_avg_cost), row=1, col=1 )
     fig.add_trace( go.Line(x=x_dat, y=md_avg_cost), row=1, col=2 )
-    fig.write_html(os.path.join(my_path, 'Data', export_pic))
+    fig.write_html(os.path.join(my_path, export_pic))
     # fig.show()
 
     # Print Cost
-    with open(os.path.join(my_path, 'Data', export_txt), "w") as text_file:
+    with open(os.path.join(my_path, export_txt), "w") as text_file:
         print(f'Myopic: \t Discounted Cost {np.average(my_sim_disc):.2f} \t Average Cost {np.average(my_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(my_avg_cost[:warm_up]):.2f}', file=text_file)
         print(f'MDP: \t\t Discounted Cost {np.average(md_sim_disc):.2f} \t Average Cost {np.average(md_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(md_avg_cost[:warm_up]):.2f}', file=text_file)
     #endregion

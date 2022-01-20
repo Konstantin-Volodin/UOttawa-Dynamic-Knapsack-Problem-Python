@@ -17,7 +17,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
     ##### Read Data #####
     #region
     my_path = os.getcwd()
-    input_data = data_import.read_data(os.path.join(my_path, 'Data', import_data))
+    input_data = data_import.read_data(os.path.join(my_path, import_data))
 
     # Quick Assess to Various Parameters
     TL = input_data.transition.wait_limit
@@ -541,7 +541,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
     for i in itertools.product(T[:-1], M[-1:], D, K, C): betas['bps'][i] = mc_bps_M[i].Pi
     for i in itertools.product(T[-1:], M, D, K, C): betas['bps'][i] = mc_bps_T[i].Pi
 
-    with open(os.path.join(my_path, 'Data', export_data), 'wb') as outp:
+    with open(os.path.join(my_path, export_data), 'wb') as outp:
         pickle.dump(betas, outp, pickle.HIGHEST_PROTOCOL)
     #endregion
 
