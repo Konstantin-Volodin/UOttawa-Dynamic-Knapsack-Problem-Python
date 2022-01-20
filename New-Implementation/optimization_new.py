@@ -483,19 +483,18 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
             master.optimize()
             master.write(f'{export_model}')
             break
-        if count_same >= 1000:
+        if count_same >= 100:
             master.optimize()
             master.write(f'{export_model}')
             break
-
-        # Trims
+        
         objs.append(sub_prob.ObjVal)
         objs = objs[-2:]
-        if len(objs) >= 2 and objs[-1] == objs[-2]:
-            count_same += 1
-            for i in master.getVars(): 
-                if i.X == 0: master.remove(i)
+        if len(objs) >= 2 and objs[-1] == objs[-2]: count_same += 1
         else: count_same = 0
+
+        #     for i in master.getVars(): 
+        #         if i.X == 0: master.remove(i)
         # if iter%100 == 0:
         #     init_len = len(master.getVars())
         #     for i in master.getVars(): 
