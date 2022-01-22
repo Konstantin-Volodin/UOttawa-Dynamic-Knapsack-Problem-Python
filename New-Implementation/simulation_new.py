@@ -22,6 +22,16 @@ import plotly.graph_objects as go
 def main_func(replications, warm_up, duration, show_policy, import_data, import_beta, export_txt, export_pic):
     ##### Read Data #####
     #region
+
+    # replications = 3
+    # warm_up = 1000
+    # duration = 3000
+    # show_policy =  False
+    # import_data = "Data/sens-data/simple/cw1-cc1-cv100-gam95-simple-data.xlsx"
+    # import_beta = "Data/sens-data/simple/betas/cw1-cc1-cv100-gam95-simple-optimal.pkl"
+    # export_txt = "Data/sens-res/simple/cw1-cc1-cv100-gam95-simple-optimal-res.txt"
+    # export_pic = "Data/sens-res/simple/cw1-cc1-cv100-gam95-simple-optimal-res.html"
+
     my_path = os.getcwd()
     input_data = data_import.read_data(os.path.join(my_path, import_data))
 
@@ -132,6 +142,18 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myopic = Model('Myopic')
     myopic.params.LogToConsole = 0
 
+    # Cost Params
+    myv_cost_cw = myopic.addVars(K, vtype=GRB.CONTINUOUS, name='var_cost_cw')
+    myv_cost_cs = myopic.addVars(K,M, vtype=GRB.CONTINUOUS, name='var_cost_cs')
+    myv_cost_cc = myopic.addVars(K, vtype=GRB.CONTINUOUS, name='var_cost_cc')
+    myv_cost_cv = myopic.addVar(vtype=GRB.CONTINUOUS, name='var_cost_cv')
+
+    # Fix Costs
+    for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
+    for m,k in itertools.product(M, K): myv_cost_cs[(k,m)].UB = cs[k][m]; myv_cost_cs[(k,m)].LB = cs[k][m];
+    for k in K: myv_cost_cc[k].UB = cc[k]; myv_cost_cc[k].LB = cc[k];
+    for k in K: myv_cost_cv.UB = cv; myv_cost_cv.LB = cv;
+
 
     # State Action & Auxiliary Variables
     myv_st_ul = myopic.addVars(P, vtype=GRB.CONTINUOUS, lb = 0, name='var_state_ul')
@@ -179,6 +201,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myc_aux_pwt_k_D = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] + myv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pwt_k_D')
     myc_aux_pwt_k = {**myc_aux_pwt_k_0, **myc_aux_pwt_k_i, **myc_aux_pwt_k_D}
 
+
     myc_aux_pst_d = myopic.addConstrs((myv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * myv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_pst_d')
     myc_aux_pst_k_0 = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[0]), name='con_auxiliary_pst_k_0')
     myc_aux_pst_k_i = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] + myv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pst_k')
@@ -196,11 +219,11 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myc_sched = myopic.addConstrs((quicksum(myv_ac_sc[(t,m,d,k,c)] for t in T) <= myv_st_pw[(m,d,k,c)] for m in M for d in D for k in K for c in C), name='con_sched')
 
     # Objective Value
-    myo_cw =     quicksum( cw[k] * myv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C )
-    myo_cs =     quicksum( cs[k][t] * myv_ac_sc[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C)
-    myo_brsc =   quicksum( (cs[k][tp-t]+cc[k]) * myv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp > t)
-    myo_grsc =   quicksum( (cs[k][t-tp]-cc[k]) * myv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
-    myo_cv =     quicksum( cv * myv_aux_uv[(t,p)] for  t in T for p in P)
+    myo_cw =     quicksum( myv_cost_cw[k] * myv_aux_pwp[(m,d,k,c)] for m in M for d in D for k in K for c in C )
+    myo_cs =     quicksum( myv_cost_cs[(k,t)] * myv_ac_sc[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C)
+    myo_brsc =   quicksum( (myv_cost_cs[(k,tp-t)]+myv_cost_cc[k]) * myv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp > t)
+    myo_grsc =   quicksum( (myv_cost_cs[(k,t-tp)]-myv_cost_cc[k]) * myv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
+    myo_cv =     quicksum( myv_cost_cv * myv_aux_uv[(t,p)] for  t in T for p in P)
     myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv)
     myopic.setObjective( myo_cost, GRB.MINIMIZE )
     #endregion
@@ -351,13 +374,23 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             # Save State Data
             if show_policy: rp_st.append(deepcopy(state))
 
-            # Generate Action
+            # Generate Action (With slightly different logic)
+            for k in K: myv_cost_cw[k].UB = cv-1; myv_cost_cw[k].LB = cv-1;
             for p in P: myv_st_ul[p].UB = state['ul'][p]; myv_st_ul[p].LB = state['ul'][p]
             for m,d,k,c in itertools.product(M, D, K, C): myv_st_pw[(m,d,k,c)].UB = state['pw'][(m,d,k,c)]; myv_st_pw[(m,d,k,c)].LB = state['pw'][(m,d,k,c)]
             for t,m,d,k,c in itertools.product(T, M, D, K, C): myv_st_ps[(t,m,d,k,c)].UB = state['ps'][(t,m,d,k,c)]; myv_st_ps[(t,m,d,k,c)].LB = state['ps'][(t,m,d,k,c)]
             myopic.optimize()
 
-            # Save Cost
+            # Save Cost (with normal logic)
+            for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
+            for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = myv_ac_sc[(t,m,d,k,c)].X; myv_ac_sc[(t,m,d,k,c)].LB = myv_ac_sc[(t,m,d,k,c)].X
+            for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = myv_ac_rsc[(t,tp,m,d,k,c)].X; myv_ac_rsc[(t,tp,m,d,k,c)].LB = myv_ac_rsc[(t,tp,m,d,k,c)].X
+            myopic.optimize()
+
+            # Reset Myopic
+            for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = GRB.INFINITY; myv_ac_sc[(t,m,d,k,c)].LB = 0
+            for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = GRB.INFINITY; myv_ac_rsc[(t,tp,m,d,k,c)].LB = 0
+
             rp_cost.append(myo_cost.getValue())
             if day >= warm_up:
                 rp_disc = myo_cost.getValue() + gam*rp_disc
@@ -462,6 +495,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 for t,m,d,k,c in itertools.product(T, M, D, K, C): mdv_st_ps[(t,m,d,k,c)].UB = state['ps'][(t,m,d,k,c)]; mdv_st_ps[(t,m,d,k,c)].LB = state['ps'][(t,m,d,k,c)]
                 MDP.optimize()
             else:
+
+                for k in K: myv_cost_cw[k].UB = cv-1; myv_cost_cw[k].LB = cv-1;
                 for p in P: myv_st_ul[p].UB = state['ul'][p]; myv_st_ul[p].LB = state['ul'][p]
                 for m,d,k,c in itertools.product(M, D, K, C): myv_st_pw[(m,d,k,c)].UB = state['pw'][(m,d,k,c)]; myv_st_pw[(m,d,k,c)].LB = state['pw'][(m,d,k,c)]
                 for t,m,d,k,c in itertools.product(T, M, D, K, C): myv_st_ps[(t,m,d,k,c)].UB = state['ps'][(t,m,d,k,c)]; myv_st_ps[(t,m,d,k,c)].LB = state['ps'][(t,m,d,k,c)]
@@ -472,6 +507,10 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 rp_cost.append(mdo_cost.getValue())
                 rp_disc = mdo_cost.getValue() + gam*rp_disc
             else:
+                for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
+                for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = myv_ac_sc[(t,m,d,k,c)].X; myv_ac_sc[(t,m,d,k,c)].LB = myv_ac_sc[(t,m,d,k,c)].X
+                for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = myv_ac_rsc[(t,tp,m,d,k,c)].X; myv_ac_rsc[(t,tp,m,d,k,c)].LB = myv_ac_rsc[(t,tp,m,d,k,c)].X
+                myopic.optimize()
                 rp_cost.append(myo_cost.getValue())
 
             # Save Action
@@ -486,6 +525,9 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 for i in itertools.product(T,M,D,K,C): action['psp'][i] = mdv_aux_psp[i].X
                 if show_policy: rp_ac.append(action)
             else:
+                
+                for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = GRB.INFINITY; myv_ac_sc[(t,m,d,k,c)].LB = 0
+                for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = GRB.INFINITY; myv_ac_rsc[(t,tp,m,d,k,c)].LB = 0
                 action = {'sc':{}, 'rsc':{}, 'uv': {}, 'ulp': {}, 'uup': {}, 'pwp':{}, 'psp': {}}
                 for i in itertools.product(T,M,D,K,C): action['sc'][i] = myv_ac_sc[i].X 
                 for i in itertools.product(T,T,M,D,K,C): action['rsc'][i] = myv_ac_rsc[i].X
@@ -602,6 +644,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     with open(os.path.join(my_path, export_txt), "w") as text_file:
         print(f'Myopic: \t Discounted Cost {np.average(my_sim_disc):.2f} \t Average Cost {np.average(my_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(my_avg_cost[:warm_up]):.2f}', file=text_file)
         print(f'MDP: \t\t Discounted Cost {np.average(md_sim_disc):.2f} \t Average Cost {np.average(md_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(md_avg_cost[:warm_up]):.2f}', file=text_file)
+    # print(f'Myopic: \t Discounted Cost {np.average(my_sim_disc):.2f} \t Average Cost {np.average(my_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(my_avg_cost[:warm_up]):.2f}')
+    # print(f'MDP: \t\t Discounted Cost {np.average(md_sim_disc):.2f} \t Average Cost {np.average(md_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(md_avg_cost[:warm_up]):.2f}')
     #endregion
 
     ##### Expected State Values #####
@@ -628,6 +672,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             print(f'Day {i+1}')
             non_zero_state(my_sim_st[0][i])
             non_zero_action(my_sim_ac[0][i])
+            print(f'\tCost: {my_sim_cost[0][i]}')
         print()
         
         print('MDP POLICY')
@@ -635,5 +680,6 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             print(f'Day {i+1}')
             non_zero_state(md_sim_st[0][i])
             non_zero_action(md_sim_ac[0][i])
-    #endregion
-    # %%
+            print(f'\tCost: {md_sim_cost[0][i]}')
+        #endregion
+        # %%
