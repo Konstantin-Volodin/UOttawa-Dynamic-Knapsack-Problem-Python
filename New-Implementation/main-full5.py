@@ -4,7 +4,7 @@ import time
 
 # Test Type
 test_modifier = "exp-zero-cw1-cc5-cv100-gam95-"
-data_type = "complex"
+data_type = "full"
 
 # Optimization Paramers
 iter_lims = 50000
