@@ -1,0 +1,91 @@
+Set parameter TokenServer to value "license1.computecanada.ca"
+Read LP format model from file Data/sens-data/complex/full-model/cw1-cc5-cv100-gam95-complex-p2.lp
+Reading time = 0.59 seconds
+: 971 rows, 10999 columns, 795554 nonzeros
+Gurobi Optimizer version 9.5.0 build v9.5.0rc5 (linux64)
+Thread count: 64 physical cores, 64 logical processors, using up to 32 threads
+Optimize a model with 971 rows, 10999 columns and 795554 nonzeros
+Model fingerprint: 0x1eb718b2
+Coefficient statistics:
+  Matrix range     [5e-03, 9e+01]
+  Objective range  [2e+02, 7e+02]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e-06, 2e+00]
+
+Concurrent LP optimizer: primal simplex, dual simplex, and barrier
+Showing barrier log only...
+
+Presolve removed 147 rows and 3472 columns
+Presolve time: 0.34s
+Presolved: 824 rows, 7527 columns, 383834 nonzeros
+
+Ordering time: 0.00s
+
+Barrier statistics:
+ AA' NZ     : 2.708e+05
+ Factor NZ  : 3.056e+05 (roughly 6 MB of memory)
+ Factor Ops : 1.547e+08 (less than 1 second per iteration)
+ Threads    : 30
+
+                  Objective                Residual
+Iter       Primal          Dual         Primal    Dual     Compl     Time
+   0  -2.25520263e+06 -1.32461559e+04  3.60e+03 3.36e+01  8.54e+02     1s
+   1  -9.22353602e+05 -2.00477739e+04  1.46e+03 8.88e+01  3.59e+02     2s
+   2  -2.43803909e+05 -2.82682396e+04  3.71e+02 0.00e+00  9.90e+01     3s
+   3  -7.24569133e+04 -2.32007139e+04  9.57e+01 0.00e+00  2.64e+01     3s
+   4  -4.60886387e+04 -1.91948342e+04  5.33e+01 0.00e+00  1.49e+01     4s
+   5  -2.49614312e+04 -1.77689125e+04  1.91e+01 0.00e+00  5.64e+00     5s
+   6  -1.88257236e+04 -1.61673324e+04  9.22e+00 0.00e+00  2.82e+00     6s
+   7  -1.53657945e+04 -1.49429271e+04  3.62e+00 0.00e+00  1.18e+00     6s
+   8  -1.38874761e+04 -1.41094830e+04  1.22e+00 0.00e+00  4.55e-01     7s
+   9  -1.33596293e+04 -1.37459842e+04  3.59e-01 0.00e+00  1.71e-01     7s
+  10  -1.32255667e+04 -1.34977588e+04  1.41e-01 0.00e+00  7.75e-02     8s
+  11  -1.31703600e+04 -1.33490056e+04  4.99e-02 0.00e+00  3.43e-02    14s
+  12  -1.31457832e+04 -1.32348768e+04  6.68e-03 0.00e+00  1.19e-02    14s
+  13  -1.31451348e+04 -1.31769367e+04  1.38e-03 0.00e+00  3.99e-03    15s
+  14  -1.31464846e+04 -1.31636189e+04  6.65e-04 0.00e+00  2.13e-03    16s
+  15  -1.31471371e+04 -1.31591653e+04  4.44e-04 0.00e+00  1.49e-03    17s
+  16  -1.31479170e+04 -1.31552513e+04  2.64e-04 0.00e+00  9.05e-04    17s
+  17  -1.31488659e+04 -1.31530606e+04  1.48e-04 0.00e+00  5.17e-04    18s
+  18  -1.31493456e+04 -1.31522593e+04  1.05e-04 0.00e+00  3.59e-04    18s
+  19  -1.31498809e+04 -1.31514902e+04  5.93e-05 0.00e+00  1.98e-04    19s
+  20  -1.31503019e+04 -1.31512279e+04  2.79e-05 0.00e+00  1.14e-04    20s
+  21  -1.31504995e+04 -1.31510505e+04  1.65e-05 0.00e+00  6.75e-05    21s
+  22  -1.31506057e+04 -1.31509682e+04  1.09e-05 0.00e+00  4.44e-05    22s
+  23  -1.31506935e+04 -1.31509203e+04  6.52e-06 0.00e+00  2.78e-05    22s
+  24  -1.31507599e+04 -1.31508780e+04  3.03e-06 0.00e+00  1.44e-05    23s
+  25  -1.31507881e+04 -1.31508592e+04  1.81e-06 0.00e+00  8.68e-06    24s
+  26  -1.31508095e+04 -1.31508487e+04  9.62e-07 0.00e+00  4.78e-06    24s
+  27  -1.31508172e+04 -1.31508434e+04  6.56e-07 0.00e+00  3.20e-06    25s
+  28  -1.31508243e+04 -1.31508405e+04  3.53e-07 0.00e+00  1.97e-06    26s
+  29  -1.31508280e+04 -1.31508382e+04  2.19e-07 0.00e+00  1.24e-06    26s
+  30  -1.31508309e+04 -1.31508368e+04  1.21e-07 0.00e+00  7.19e-07    27s
+  31  -1.31508331e+04 -1.31508357e+04  4.78e-08 0.00e+00  3.18e-07    28s
+  32  -1.31508340e+04 -1.31508352e+04  1.30e-08 0.00e+00  1.46e-07    28s
+  33  -1.31508343e+04 -1.31508351e+04  8.66e-09 0.00e+00  1.00e-07    29s
+  34  -1.31508346e+04 -1.31508350e+04  5.93e-09 0.00e+00  4.50e-08    30s
+  35  -1.31508348e+04 -1.31508349e+04  1.68e-09 0.00e+00  1.07e-08    31s
+  36  -1.31508348e+04 -1.31508348e+04  4.73e-09 0.00e+00  8.53e-10    31s
+
+Barrier solved model in 36 iterations and 31.47 seconds (0.57 work units)
+Optimal objective -1.31508348e+04
+
+Crossover log...
+
+     163 DPushes remaining with DInf 0.0000000e+00                31s
+       0 DPushes remaining with DInf 0.0000000e+00                34s
+
+       3 PPushes remaining with PInf 5.5219002e-06                34s
+       0 PPushes remaining with PInf 0.0000000e+00                34s
+
+  Push phase complete: Pinf 0.0000000e+00, Dinf 6.2945653e-04     34s
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+     165   -1.3150835e+04   0.000000e+00   6.294564e-04     34s
+     166   -1.3150835e+04   1.553133e-06   4.437774e+09     35s
+Extra simplex iterations after uncrush: 16
+     182   -1.3150835e+04   0.000000e+00   0.000000e+00     35s
+
+Solved with barrier
+Solved in 182 iterations and 35.80 seconds (0.78 work units)
+Optimal objective -1.315083482e+04

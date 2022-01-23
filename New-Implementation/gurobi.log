@@ -1,0 +1,42 @@
+
+Gurobi 9.1.2 (linux64, gurobi_cl) logging started Tue Jan 18 19:43:09 2022
+
+
+Gurobi 9.5.0 (linux64, gurobi_cl) logging started Tue Jan 18 19:52:36 2022
+
+Set parameter TokenServer to value "license1.computecanada.ca"
+Set parameter LogFile to value "gurobi.log"
+
+Gurobi 9.5.0 (linux64, gurobi_cl) logging started Wed Jan 19 22:50:34 2022
+
+Set parameter TokenServer to value "license1.computecanada.ca"
+Set parameter LogFile to value "gurobi.log"
+
+Gurobi 9.5.0 (linux64, gurobi_cl) logging started Wed Jan 19 22:50:37 2022
+
+Set parameter TokenServer to value "license1.computecanada.ca"
+Set parameter LogFile to value "gurobi.log"
+
+Gurobi 9.5.0 (linux64, gurobi_cl) logging started Wed Jan 19 22:50:48 2022
+
+Set parameter TokenServer to value "license1.computecanada.ca"
+Set parameter LogFile to value "gurobi.log"
+
+Gurobi 9.1.2 (linux64, gurobi_cl) logging started Wed Jan 19 22:50:59 2022
+
+
+Gurobi 9.1.0 (linux64, gurobi_cl) logging started Wed Jan 19 22:51:07 2022
+
+Using license file /cvmfs/restricted.computecanada.ca/config/licenses/gurobi/clusters/narval.lic
+Set parameter TokenServer to value license1.computecanada.ca
+Set parameter LogFile to value gurobi.log
+
+Gurobi 9.5.0 (linux64, gurobi_cl) logging started Wed Jan 19 22:51:48 2022
+
+Set parameter TokenServer to value "license1.computecanada.ca"
+Set parameter LogFile to value "gurobi.log"
+
+Gurobi 9.5.0 (linux64, gurobi_cl) logging started Wed Jan 19 22:51:50 2022
+
+Set parameter TokenServer to value "license1.computecanada.ca"
+Set parameter LogFile to value "gurobi.log"

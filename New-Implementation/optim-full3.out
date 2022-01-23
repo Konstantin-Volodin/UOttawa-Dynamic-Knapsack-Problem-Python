@@ -1,0 +1,32 @@
+Set parameter TokenServer to value "license1.computecanada.ca"
+Read LP format model from file Data/sens-data/full/full-model/exp-zero-cw1-cc1-cv10-gam95-full-p2.lp
+Reading time = 3.79 seconds
+: 4203 rows, 37000 columns, 10352180 nonzeros
+Gurobi Optimizer version 9.5.0 build v9.5.0rc5 (linux64)
+Thread count: 64 physical cores, 64 logical processors, using up to 32 threads
+Optimize a model with 4203 rows, 37000 columns and 10352180 nonzeros
+Model fingerprint: 0xd8fab380
+Coefficient statistics:
+  Matrix range     [3e-13, 6e+01]
+  Objective range  [1e+01, 2e+06]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+00, 1e+00]
+
+Concurrent LP optimizer: primal simplex, dual simplex, and barrier
+Showing barrier log only...
+
+Presolve removed 817 rows and 0 columns (presolve time = 7s) ...
+Presolve removed 821 rows and 1 columns (presolve time = 10s) ...
+Presolve removed 821 rows and 1 columns
+Presolve time: 11.34s
+Presolved: 3382 rows, 36999 columns, 9074737 nonzeros
+
+Ordering time: 0.28s
+
+Barrier performed 0 iterations in 25.49 seconds (10.20 work units)
+Barrier solve interrupted - model solved by another algorithm
+
+
+Solved with dual simplex
+Solved in 1774 iterations and 25.49 seconds (13.51 work units)
+Optimal objective -2.319650429e+03
