@@ -27,10 +27,10 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     # warm_up = 1000
     # duration = 3000
     # show_policy =  False
-    # import_data = "Data/sens-data/simple/cw1-cc1-cv100-gam95-simple-data.xlsx"
-    # import_beta = "Data/sens-data/simple/betas/cw1-cc1-cv100-gam95-simple-optimal.pkl"
-    # export_txt = "Data/sens-res/simple/cw1-cc1-cv100-gam95-simple-optimal-res.txt"
-    # export_pic = "Data/sens-res/simple/cw1-cc1-cv100-gam95-simple-optimal-res.html"
+    # import_data = "Data/sens-data/simple/cw1-cc10-cv100-gam95-simple-data.xlsx"
+    # import_beta = "Data/sens-data/simple/betas/cw1-cc10-cv100-gam95-simple-optimal.pkl"
+    # export_txt = "Data/sens-res/simple/cw1-cc10-cv100-gam95-simple-optimal-res.txt"
+    # export_pic = "Data/sens-res/simple/cw1-cc10-cv100-gam95-simple-optimal-res.html"
 
     my_path = os.getcwd()
     input_data = data_import.read_data(os.path.join(my_path, import_data))
@@ -377,14 +377,14 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             # Generate Action (With slightly different logic)
             for k in K: myv_cost_cw[k].UB = cv-1; myv_cost_cw[k].LB = cv-1;
             for p in P: myv_st_ul[p].UB = state['ul'][p]; myv_st_ul[p].LB = state['ul'][p]
-            for m,d,k,c in itertools.product(M, D, K, C): myv_st_pw[(m,d,k,c)].UB = state['pw'][(m,d,k,c)]; myv_st_pw[(m,d,k,c)].LB = state['pw'][(m,d,k,c)]
-            for t,m,d,k,c in itertools.product(T, M, D, K, C): myv_st_ps[(t,m,d,k,c)].UB = state['ps'][(t,m,d,k,c)]; myv_st_ps[(t,m,d,k,c)].LB = state['ps'][(t,m,d,k,c)]
+            for m,d,k,c in itertools.product(M, D, K, C): myv_st_pw[(m,d,k,c)].UB = round(state['pw'][(m,d,k,c)],0); myv_st_pw[(m,d,k,c)].LB = round(state['pw'][(m,d,k,c)],0)
+            for t,m,d,k,c in itertools.product(T, M, D, K, C): myv_st_ps[(t,m,d,k,c)].UB = round(state['ps'][(t,m,d,k,c)],0); myv_st_ps[(t,m,d,k,c)].LB = round(state['ps'][(t,m,d,k,c)],0)
             myopic.optimize()
 
             # Save Cost (with normal logic)
             for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
-            for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = myv_ac_sc[(t,m,d,k,c)].X; myv_ac_sc[(t,m,d,k,c)].LB = myv_ac_sc[(t,m,d,k,c)].X
-            for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = myv_ac_rsc[(t,tp,m,d,k,c)].X; myv_ac_rsc[(t,tp,m,d,k,c)].LB = myv_ac_rsc[(t,tp,m,d,k,c)].X
+            for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = round(myv_ac_sc[(t,m,d,k,c)].X,0); myv_ac_sc[(t,m,d,k,c)].LB = round(myv_ac_sc[(t,m,d,k,c)].X,0)
+            for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0); myv_ac_rsc[(t,tp,m,d,k,c)].LB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0)
             myopic.optimize()
 
             # Reset Myopic
@@ -498,8 +498,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
 
                 for k in K: myv_cost_cw[k].UB = cv-1; myv_cost_cw[k].LB = cv-1;
                 for p in P: myv_st_ul[p].UB = state['ul'][p]; myv_st_ul[p].LB = state['ul'][p]
-                for m,d,k,c in itertools.product(M, D, K, C): myv_st_pw[(m,d,k,c)].UB = state['pw'][(m,d,k,c)]; myv_st_pw[(m,d,k,c)].LB = state['pw'][(m,d,k,c)]
-                for t,m,d,k,c in itertools.product(T, M, D, K, C): myv_st_ps[(t,m,d,k,c)].UB = state['ps'][(t,m,d,k,c)]; myv_st_ps[(t,m,d,k,c)].LB = state['ps'][(t,m,d,k,c)]
+                for m,d,k,c in itertools.product(M, D, K, C): myv_st_pw[(m,d,k,c)].UB = round(state['pw'][(m,d,k,c)],0); myv_st_pw[(m,d,k,c)].LB = round(state['pw'][(m,d,k,c)],0)
+                for t,m,d,k,c in itertools.product(T, M, D, K, C): myv_st_ps[(t,m,d,k,c)].UB = round(state['ps'][(t,m,d,k,c)],0); myv_st_ps[(t,m,d,k,c)].LB = round(state['ps'][(t,m,d,k,c)],0)
                 myopic.optimize()
 
             # Save Cost
@@ -508,8 +508,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 rp_disc = mdo_cost.getValue() + gam*rp_disc
             else:
                 for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
-                for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = myv_ac_sc[(t,m,d,k,c)].X; myv_ac_sc[(t,m,d,k,c)].LB = myv_ac_sc[(t,m,d,k,c)].X
-                for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = myv_ac_rsc[(t,tp,m,d,k,c)].X; myv_ac_rsc[(t,tp,m,d,k,c)].LB = myv_ac_rsc[(t,tp,m,d,k,c)].X
+                for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = round(myv_ac_sc[(t,m,d,k,c)].X,0); myv_ac_sc[(t,m,d,k,c)].LB = round(myv_ac_sc[(t,m,d,k,c)].X,0)
+                for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0); myv_ac_rsc[(t,tp,m,d,k,c)].LB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0)
                 myopic.optimize()
                 rp_cost.append(myo_cost.getValue())
 
