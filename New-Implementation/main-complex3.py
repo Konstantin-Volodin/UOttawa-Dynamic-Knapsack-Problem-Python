@@ -3,7 +3,7 @@ import simulation_new
 import time
 
 # Test Type
-test_modifier = "cw1-cc5-cv10-gam95-"
+test_modifier = "cw1-cc5-cv100-gam999-"
 data_type = "complex"
 
 # Optimization Paramers
