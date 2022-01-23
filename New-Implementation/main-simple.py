@@ -6,7 +6,9 @@ import time
 test_modifier_list = [
     'cw1-cc5-cv100-gam95-',
     'cw1-cc5-cv100-gam99-',
-    'cw1-cc5-cv100-gam999-'
+    'cw1-cc5-cv100-gam999-',
+    'exp-full-cw1-cc1-cv10-gam95-',
+    'exp-zero-cw1-cc1-cv10-gam95-'
 ]
 
 for i in test_modifier_list:
