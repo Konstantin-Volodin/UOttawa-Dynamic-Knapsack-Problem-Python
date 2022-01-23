@@ -4,16 +4,9 @@ import time
 
 # Test Type
 test_modifier_list = [
-    'cw1-cc1-cv10-gam95-',
-    'cw1-cc1-cv100-gam95-',
-    'cw1-cc5-cv10-gam95-',
     'cw1-cc5-cv100-gam95-',
-    'cw1-cc10-cv10-gam95-',
-    'cw1-cc10-cv100-gam95-',
-    'cw1-cc1-cv10-gam99-',
-    'cw1-cc1-cv10-gam999-',
-    'exp-full-cw1-cc1-cv10-gam95-',
-    'exp-zero-cw1-cc1-cv10-gam95-'
+    'cw1-cc5-cv100-gam99-',
+    'cw1-cc5-cv100-gam999-'
 ]
 
 for i in test_modifier_list:
@@ -36,13 +29,13 @@ for i in test_modifier_list:
     sub_mip_gap = 0.001
     import_data_opt = f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
     export_data_opt = f"Data/sens-data/{data_type}/betas/{test_modifier}{data_type}-optimal.pkl"
-    export_data_p2 = f"Data/sens-data/{data_type}/full-model/{test_modifier}{data_type}-p2.lp"
+    export_data_p2 = f"Data/sens-data/{data_type}/full-model/{test_modifier}{data_type}-p2.mps"
     import_data_p2 = export_data_p2
 
     # Simulation Parameters
     replications = 3
-    warm_up = 1000
-    duration = 3000
+    warm_up = 0
+    duration = 100
     show_policy = False
     import_data_sim = import_data_opt
     import_betas_sim = export_data_opt
@@ -51,7 +44,7 @@ for i in test_modifier_list:
 
     # Execute
     start_time_opt = time.time()
-    optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2)
+    optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2, import_data_p2)
     end_time_opt = time.time()
     simulation_new.main_func(replications, warm_up, duration, show_policy, import_data_sim, import_betas_sim, export_txt_sim, export_pic_sim)
     end_time_sim = time.time()
