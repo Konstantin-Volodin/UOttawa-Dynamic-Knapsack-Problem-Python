@@ -9,7 +9,8 @@ data_type = "complex"
 # Optimization Paramers
 iter_lims = 100000
 beta_fun = [
-    (0,0.75)
+    (0,0.75),
+    (10000,0.9)
 ]
 sub_mip_gap = 0.001
 import_data_opt = f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
