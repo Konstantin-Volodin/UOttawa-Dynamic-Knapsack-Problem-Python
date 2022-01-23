@@ -1,5 +1,8 @@
 #!/bin/bash
-for i in *.out;
+for i in *.sh;
 do
-  echo "$i"
+    if ["$i" != "job-all.sh"]
+    then 
+        echo "$i"
+    fi
 done
