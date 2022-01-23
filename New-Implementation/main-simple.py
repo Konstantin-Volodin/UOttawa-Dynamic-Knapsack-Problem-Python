@@ -35,9 +35,9 @@ for i in test_modifier_list:
     import_data_p2 = export_data_p2
 
     # Simulation Parameters
-    replications = 3
-    warm_up = 0
-    duration = 100
+    replications = 10
+    warm_up = 1500
+    duration = 5000
     show_policy = False
     import_data_sim = import_data_opt
     import_betas_sim = export_data_opt
