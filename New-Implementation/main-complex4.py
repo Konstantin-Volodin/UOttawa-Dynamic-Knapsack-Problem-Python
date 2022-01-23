@@ -7,7 +7,7 @@ test_modifier = "exp-full-cw1-cc5-cv100-gam95-"
 data_type = "complex"
 
 # Optimization Paramers
-iter_lims = 50000
+iter_lims = 100000
 beta_fun = [
     (0,0.75)
 ]

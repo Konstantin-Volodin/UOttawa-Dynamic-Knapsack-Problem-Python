@@ -7,9 +7,10 @@ test_modifier = "cw1-cc5-cv100-gam99-"
 data_type = "full"
 
 # Optimization Paramers
-iter_lims = 50000
+iter_lims = 100000
 beta_fun = [
-    (0,0.75)
+    (0,0.75),
+    (10000,0.9)
 ]
 sub_mip_gap = 0.001
 import_data_opt = f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
