@@ -23,14 +23,14 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     ##### Read Data #####
     #region
 
-    # replications = 3
-    # warm_up = 1000
-    # duration = 3000
-    # show_policy =  False
-    # import_data = "Data/sens-data/simple/cw1-cc10-cv100-gam95-simple-data.xlsx"
-    # import_beta = "Data/sens-data/simple/betas/cw1-cc10-cv100-gam95-simple-optimal.pkl"
-    # export_txt = "Data/sens-res/simple/cw1-cc10-cv100-gam95-simple-optimal-res.txt"
-    # export_pic = "Data/sens-res/simple/cw1-cc10-cv100-gam95-simple-optimal-res.html"
+    replications = 1
+    warm_up = 0
+    duration = 50
+    show_policy =  False
+    import_data = "Data/sens-data/full/exp-zero-cw1-cc5-cv100-gam95-full-data.xlsx"
+    import_beta = "Data/sens-data/full/betas/exp-zero-cw1-cc5-cv100-gam95-full-optimal.pkl"
+    export_txt = "Data/sens-res/full/exp-zero-cw1-cc5-cv100-gam95-full-optimal-res.txt"
+    export_pic = "Data/sens-res/full/exp-zero-cw1-cc5-cv100-gam95-full-optimal-res.html"
 
     my_path = os.getcwd()
     input_data = data_import.read_data(os.path.join(my_path, import_data))
@@ -144,13 +144,13 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
 
     # Cost Params
     myv_cost_cw = myopic.addVars(K, vtype=GRB.CONTINUOUS, name='var_cost_cw')
-    myv_cost_cs = myopic.addVars(K,M, vtype=GRB.CONTINUOUS, name='var_cost_cs')
+    myv_cost_cs = myopic.addVars(K,[0]+T, vtype=GRB.CONTINUOUS, name='var_cost_cs')
     myv_cost_cc = myopic.addVars(K, vtype=GRB.CONTINUOUS, name='var_cost_cc')
     myv_cost_cv = myopic.addVar(vtype=GRB.CONTINUOUS, name='var_cost_cv')
 
     # Fix Costs
     for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
-    for m,k in itertools.product(M, K): myv_cost_cs[(k,m)].UB = cs[k][m]; myv_cost_cs[(k,m)].LB = cs[k][m];
+    for t,k in itertools.product(T, K): myv_cost_cs[(k,t)].UB = cs[k][t]; myv_cost_cs[(k,t)].LB = cs[k][t];
     for k in K: myv_cost_cc[k].UB = cc[k]; myv_cost_cc[k].LB = cc[k];
     for k in K: myv_cost_cv.UB = cv; myv_cost_cv.LB = cv;
 
