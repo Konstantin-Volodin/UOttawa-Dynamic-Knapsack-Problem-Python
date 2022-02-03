@@ -345,10 +345,10 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
         model_to_import.optimize()
         vars_to_import = model_to_import.getVars()
         for var in vars_to_import:
-            if var.X != 0:
-                col_to_import = model_to_import.getCol(var)
-                sa_var = master.addVar(vtype = GRB.CONTINUOUS, name= f"sa_{iter}", column = col_to_import, obj=var.obj)
-                iter += 1
+            # if var.X != 0:
+            col_to_import = model_to_import.getCol(var)
+            sa_var = master.addVar(vtype = GRB.CONTINUOUS, name= f"sa_{iter}", column = col_to_import, obj=var.obj)
+            iter += 1
 
 
     # Solve Phase 2

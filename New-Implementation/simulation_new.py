@@ -19,21 +19,25 @@ import plotly.graph_objects as go
 
 #endregion
 
-def main_func(replications, warm_up, duration, show_policy, import_data, import_beta, export_txt, export_pic):
+def main_func(replications, warm_up, duration, show_policy, import_data, import_beta, export_txt, export_pic, export_state_my, export_state_md):
     ##### Read Data #####
     #region
 
-    replications = 1
-    warm_up = 0
-    duration = 50
-    show_policy =  False
-    import_data = "Data/sens-data/full/exp-zero-cw1-cc5-cv100-gam95-full-data.xlsx"
-    import_beta = "Data/sens-data/full/betas/exp-zero-cw1-cc5-cv100-gam95-full-optimal.pkl"
-    export_txt = "Data/sens-res/full/exp-zero-cw1-cc5-cv100-gam95-full-optimal-res.txt"
-    export_pic = "Data/sens-res/full/exp-zero-cw1-cc5-cv100-gam95-full-optimal-res.html"
+
+    # replications = 1
+    # warm_up = 0
+    # duration = 50
+    # show_policy =  False
+    # import_data = "Data/sens-data/full/exp-zero-cw1-cc5-cv100-gam95-full-data.xlsx"
+    # import_beta = "Data/sens-data/full/betas/exp-zero-cw1-cc5-cv100-gam95-full-optimal.pkl"
+    # export_txt = "Data/sens-res/full/exp-zero-cw1-cc5-cv100-gam95-full-optimal-res.txt"
+    # export_pic = "Data/sens-res/full/exp-zero-cw1-cc5-cv100-gam95-full-optimal-res.html"
 
     my_path = os.getcwd()
     input_data = data_import.read_data(os.path.join(my_path, import_data))
+    
+    export_state_my = os.path.join(my_path,export_state_my)
+    export_state_md = os.path.join(my_path,export_state_md)
 
     # Quick Assess to Various Parameters
     TL = input_data.transition.wait_limit
@@ -78,6 +82,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     # Initial State
     init_state = {'ul': E_UL, 'pw': E_PW, 'ps': E_PS}
     init_state_strm =  np.random.default_rng(199725)
+    # for i in itertools.product(M,D,K,C): init_state['pw'][i] = 10
+    # for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = 0
     for i in itertools.product(M,D,K,C): init_state['pw'][i] = init_state_strm.poisson(E_PW[i])
     for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = init_state_strm.poisson(E_PS[i])
 
@@ -89,52 +95,64 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     ##### Various Functions #####
     #region
     def non_zero_state(state):
+        ret_str = ""
         non_zero_st = {'ul': {}, 'pw': {}, 'ps': {}}
         for k,v in state['ul'].items(): 
             if v != 0: 
-                print(f'\tState - Units Left Over - {(k)} - {v}')
-                non_zero_st['ul'][k] = v
+                ret_str += f'\tState - Units Left Over - {k} - {v}\n'
+                # print(f'\tState - Units Left Over - {k} - {v}')
+                # non_zero_st['ul'][k] = v
         for k,v in state['pw'].items(): 
             if v != 0: 
-                print(f'\tState - Patients Waiting - {k} - {v}')
-                non_zero_st['pw'][k] = v
+                ret_str += f'\tState - Patients Waiting - {k} - {v}\n'
+                # print(f'\tState - Patients Waiting - {k} - {v}')
+                # non_zero_st['pw'][k] = v
         for k,v in state['ps'].items(): 
             if v != 0: 
-                print(f'\tState - Patients Scheduled - {k} - {v}')
-                non_zero_st['ps'][k] = v
-        return(non_zero_st)
+                ret_str += f'\tState - Patients Scheduled - {k} - {v}\n'
+                # print(f'\tState - Patients Scheduled - {k} - {v}')
+                # non_zero_st['ps'][k] = v
+        return(ret_str)
 
     def non_zero_action(action):
+        ret_str = ""
         non_zero_ac = {'sc':{}, 'rsc':{}, 'uv': {}, 'ulp': {}, 'uup': {}, 'pwp':{}, 'psp': {}}
         for k,v in action['sc'].items():
             if v != 0: 
-                print(f'\tAction - Schedule Patients - {k} - {v}')
-                non_zero_ac['sc'][k] = v
+                ret_str += f'\tAction - Schedule Patients - {k} - {v}\n'
+                # print(f'\tAction - Schedule Patients - {k} - {v}')
+                # non_zero_ac['sc'][k] = v
         for k,v in action['rsc'].items():
             if v != 0: 
-                print(f'\tAction - Reschedule Patients - {k} - {v}')
-                non_zero_ac['rsc'][k] = v
+                ret_str += f'\tAction - Reschedule Patients - {k} - {v}\n'
+                # print(f'\tAction - Reschedule Patients - {k} - {v}')
+                # non_zero_ac['rsc'][k] = v
         for k,v in action['uv'].items():
             if v != 0: 
-                print(f'\tAction - Units Violated - {k} - {v}')
-                non_zero_ac['uv'][k] = v
+                ret_str += f'\tAction - Units Violated - {k} - {v}\n'
+                # print(f'\tAction - Units Violated - {k} - {v}')
+                # non_zero_ac['uv'][k] = v
         for k,v in action['ulp'].items():
             if v != 0: 
-                print(f'\tPost Action - Units Left Over - {k} - {v}')
-                non_zero_ac['ulp'][k] = v
+                ret_str += f'\tPost Action - Units Left Over - {k} - {v}\n'
+                # print(f'\tPost Action - Units Left Over - {k} - {v}')
+                # non_zero_ac['ulp'][k] = v
         for k,v in action['pwp'].items():
             if v != 0: 
-                print(f'\tPost Action - Patients Waiting - {k} - {v}')
-                non_zero_ac['pwp'][k] = v
+                ret_str += f'\tPost Action - Patients Waiting - {k} - {v}\n'
+                # print(f'\tPost Action - Patients Waiting - {k} - {v}')
+                # non_zero_ac['pwp'][k] = v
         for k,v in action['psp'].items():
             if v != 0: 
-                print(f'\tPost Action - Patients Scheduled - {k} - {v}')
-                non_zero_ac['psp'][k] = v
+                ret_str += f'\tPost Action - Patients Scheduled - {k} - {v}\n'
+                # print(f'\tPost Action - Patients Scheduled - {k} - {v}')
+                # non_zero_ac['psp'][k] = v
         for k,v in action['uup'].items():
             if v != 0: 
-                print(f'\tPost Action - Units Used - {k} - {v}')
-                non_zero_ac['uup'][k] = v
-        return(non_zero_ac)
+                ret_str += f'\tPost Action - Units Used - {k} - {v}\n'
+                # print(f'\tPost Action - Units Used - {k} - {v}')
+                # non_zero_ac['uup'][k] = v
+        return(ret_str)
     #endregion
 
     ##### Myopic Model #####
@@ -352,6 +370,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     my_sim_cost = []
     my_sim_disc = []
 
+    if show_policy:
+        text_file = open(export_state_my, 'w')
     # Simulation
     for repl in trange(replications, desc='Myopic'):
 
@@ -369,10 +389,15 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         state = deepcopy(init_state)
 
         # Single Replication
-        for day in range(duration):
+        for day in trange(duration):
 
             # Save State Data
-            if show_policy: rp_st.append(deepcopy(state))
+            # rp_st.append(deepcopy(state))
+            if show_policy:
+                # with open(export_state_my, 'w') as text_file:
+                text_file.write(f'Day {day+1} \n')
+                text_file.write(f'{non_zero_state(state)} \n')
+                    
 
             # Generate Action (With slightly different logic)
             for k in K: myv_cost_cw[k].UB = cv-1; myv_cost_cw[k].LB = cv-1;
@@ -404,7 +429,12 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             for i in itertools.product(T,P): action['uup'][i] = myv_aux_uup[i].X
             for i in itertools.product(M,D,K,C): action['pwp'][i] = myv_aux_pwp[i].X
             for i in itertools.product(T,M,D,K,C): action['psp'][i] = myv_aux_psp[i].X
-            if show_policy: rp_ac.append(action)
+            # if show_policy: rp_ac.append(action)
+            
+            if show_policy: 
+                # with open(export_state_my, 'w') as text_file:
+                text_file.write(f'{non_zero_action(action)}\n')
+                text_file.write(f'\tCost: {myo_cost.getValue()}\n')
 
             # Transition between States
             # Units Leftover / Unit Deviation
@@ -468,6 +498,9 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     md_sim_cost = []
     md_sim_disc = []
 
+
+    if show_policy:
+        text_file = open(export_state_md, 'w')
     for repl in trange(replications, desc='MDP'):
         
         # Random streams
@@ -483,10 +516,14 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         rp_disc = 0
         state = deepcopy(init_state)
 
-        for day in range(duration):
+        for day in trange(duration):
 
             # Save State Data
-            if show_policy: rp_st.append(deepcopy(state))
+            # if show_policy: rp_st.append(deepcopy(state))
+            if show_policy: 
+                # with open(export_state_md, 'w') as text_file:
+                text_file.write(f'Day {day+1}\n')
+                text_file.write(f"{non_zero_state(state)}\n")
 
             # Generate Action
             if day >= warm_up:
@@ -523,7 +560,12 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 for i in itertools.product(T,P): action['uup'][i] = mdv_aux_uup[i].X
                 for i in itertools.product(M,D,K,C): action['pwp'][i] = mdv_aux_pwp[i].X
                 for i in itertools.product(T,M,D,K,C): action['psp'][i] = mdv_aux_psp[i].X
-                if show_policy: rp_ac.append(action)
+                # if show_policy: rp_ac.append(action)
+                
+                if show_policy: 
+                    # with open(export_state_md, 'w') as text_file:
+                    text_file.write(f'{non_zero_action(action)}\n')
+                    text_file.write(f'\tCost: {mdo_cost.getValue()}\n')
             else:
                 
                 for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = GRB.INFINITY; myv_ac_sc[(t,m,d,k,c)].LB = 0
@@ -536,7 +578,12 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 for i in itertools.product(T,P): action['uup'][i] = myv_aux_uup[i].X
                 for i in itertools.product(M,D,K,C): action['pwp'][i] = myv_aux_pwp[i].X
                 for i in itertools.product(T,M,D,K,C): action['psp'][i] = myv_aux_psp[i].X
-                if show_policy: rp_ac.append(action)
+                # if show_policy: rp_ac.append(action)
+                
+                if show_policy: 
+                    # with open(export_state_md, 'w') as text_file:
+                    text_file.write(f'{non_zero_action(action)}\n')
+                    text_file.write(f'\tCost: {myo_cost.getValue()}\n')
             
             # Transition between States
             if day >= warm_up:
@@ -650,36 +697,36 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
 
     ##### Expected State Values #####
     #region
-    if show_policy:
-        total_days = replications * (duration - warm_up)
-        exp_st = {'ul': {}, 'pw':{}, 'ps': {}}
-        for p in P: exp_st['ul'][p] = 0
-        for i in itertools.product(M,D,K,C): exp_st['pw'][i] = 0
-        for i in itertools.product(T,M,D,K,C): exp_st['ps'][i] = 0
+    # if show_policy:
+    #     total_days = replications * (duration - warm_up)
+    #     exp_st = {'ul': {}, 'pw':{}, 'ps': {}}
+    #     for p in P: exp_st['ul'][p] = 0
+    #     for i in itertools.product(M,D,K,C): exp_st['pw'][i] = 0
+    #     for i in itertools.product(T,M,D,K,C): exp_st['ps'][i] = 0
 
-        for repl in range(len(my_sim_st)):
-            for day in range(len(my_sim_st[repl][warm_up:])):
-                for p in P: exp_st['ul'][p] += my_sim_st[repl][day+warm_up]['ul'][p] / total_days
-                for i in itertools.product(M,D,K,C): exp_st['pw'][i] += my_sim_st[repl][day+warm_up]['pw'][i] / total_days
-                for i in itertools.product(T,M,D,K,C): exp_st['ps'][i] += my_sim_st[repl][day+warm_up]['ps'][i] / total_days
+    #     for repl in range(len(my_sim_st)):
+    #         for day in range(len(my_sim_st[repl][warm_up:])):
+    #             for p in P: exp_st['ul'][p] += my_sim_st[repl][day+warm_up]['ul'][p] / total_days
+    #             for i in itertools.product(M,D,K,C): exp_st['pw'][i] += my_sim_st[repl][day+warm_up]['pw'][i] / total_days
+    #             for i in itertools.product(T,M,D,K,C): exp_st['ps'][i] += my_sim_st[repl][day+warm_up]['ps'][i] / total_days
     #endregion
 
     ##### Comparison of policies #####
     #region
-    if show_policy:
-        print('MYOPIC POLICY')
-        for i in range(20):
-            print(f'Day {i+1}')
-            non_zero_state(my_sim_st[0][i])
-            non_zero_action(my_sim_ac[0][i])
-            print(f'\tCost: {my_sim_cost[0][i]}')
-        print()
+    # if show_policy:
+    #     print('MYOPIC POLICY')
+    #     for i in range(20):
+    #         print(f'Day {i+1}')
+    #         non_zero_state(my_sim_st[0][i])
+    #         non_zero_action(my_sim_ac[0][i])
+    #         print(f'\tCost: {my_sim_cost[0][i]}')
+    #     print()
         
-        print('MDP POLICY')
-        for i in range(20):
-            print(f'Day {i+1}')
-            non_zero_state(md_sim_st[0][i])
-            non_zero_action(md_sim_ac[0][i])
-            print(f'\tCost: {md_sim_cost[0][i]}')
+    #     print('MDP POLICY')
+    #     for i in range(20):
+    #         print(f'Day {i+1}')
+    #         non_zero_state(md_sim_st[0][i])
+    #         non_zero_action(md_sim_ac[0][i])
+    #         print(f'\tCost: {md_sim_cost[0][i]}')
         #endregion
         # %%

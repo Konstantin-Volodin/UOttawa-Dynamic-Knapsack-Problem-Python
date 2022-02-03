@@ -1,7 +1,8 @@
+#%%
 import optimization_new
 import simulation_new
 import time
-
+#%%
 # Test Type
 test_modifier_list = [
     'cw1-cc1-cv10-gam95-',

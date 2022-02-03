@@ -33,3 +33,7 @@ h h
 h l
 l h
 l l 
+
+
+cv 1000 - try that
+try to get coefficient for action for MDP - completely non factored
