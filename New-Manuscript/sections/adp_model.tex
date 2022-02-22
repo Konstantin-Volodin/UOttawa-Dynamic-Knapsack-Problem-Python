@@ -174,7 +174,8 @@ Once $\vec{\beta}$ values have been approximated, you may use the model below to
 	\min_{\vec{A}} c(\vec{S}, \vec{A}) + \gamma v(S')
 \end{equation*}	
 
-\begin{equation}\begin{alignedat}{10}
+\begin{equation}
+	\begin{alignedat}{10}
 		&	v(S') = \Bigg( 
 		&& 	\beta^0 + 
 		\bigg( \sum_{p \in p\_co} \beta_{p}^{ul} (\hat{ul_{p}}) \bigg) +
@@ -201,3 +202,44 @@ Once $\vec{\beta}$ values have been approximated, you may use the model below to
 
 Subject to:
 constraints in section "\nameref{state-action constraints}"
+
+\subsection{Representation in terms of actions only}
+
+\begin{equation}
+	\begin{alignedat}{10}
+		& \beta_{ul} && \text{if } ul_{p} >0: && sc_{1mdkc} * \beta_{p}^{ul}  && \forall pmdkc \\
+		& \beta_{pw} \text{ part 1 } && all && - sc_{tm-1dkc} * \beta_{mdkc}^{pw} && \forall tm\in\{1...M-1\}dkc \\
+		& \beta_{pw} \text{ part 1 } && all && - sc_{tM-1dkc} * \beta_{Mdkc}^{pw} && \forall tdkc \\
+		& \beta_{pw} \text{ part 1 } && all && - sc_{tMdkc} * \beta_{Mdkc}^{pw} && \forall tdkc \\
+		& \beta_{pw} \text{ part 2 } && all && - sc_{tm-1d-1kc} * (\beta_{mdkc}^{pw} * ptp\_dc_{d-1c}) && \forall tdkc, m \in \{TL_{c} ... M-1 \} \\
+		& \beta_{pw} \text{ part 2 } && all && - sc_{tM-1d-1kc} * (\beta_{Mdkc}^{pw} * ptp\_dc_{d-1c}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 2 } && all && - sc_{tMd-1kc} * (\beta_{Mdkc}^{pw} * ptp\_dc_{d-1c}) && \forall tdkc \\ 
+		& \beta_{pw} \text{ part 3 } && all && sc_{tm-1dkc} * (\beta_{mdkc}^{pw} * ptp\_dc_{dc}) && \forall tdkc, m \in \{TL_{c} ... M-1 \} \\
+		& \beta_{pw} \text{ part 3 } && all && sc_{tM-1dkc} * (\beta_{Mdkc}^{pw} * ptp\_dc_{dc}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 3 } && all && sc_{tMdkc} * (\beta_{Mdkc}^{pw} * ptp\_dc_{dc}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 4 } && all && -sc_{tm-1dk-1c} * (\beta_{mdkc}^{pw} * ptp\_kc_{k-1c}) && \forall tdkc, m \in \{ TL_{c} ... M-1 \} \\
+		& \beta_{pw} \text{ part 4 } && all && -sc_{tm-1d-1k-1c} * (\beta_{mdkc}^{pw} * ptp\_kc_{k-1c} * ptp\_dc_{d-1c}) && \forall tdkc, m \in \{ TL_{c} ... M-1 \} \\ 
+		& \beta_{pw} \text{ part 4 } && all && sc_{tm-1dk-1c} * (\beta_{mdkc}^{pw} * ptp\_kc_{k-1c} * ptp\_dc_{dc}) && \forall tdkc, m \in \{ TL_{c} ... M-1 \} \\
+		& \beta_{pw} \text{ part 4 } && all && -sc_{tM-1dk-1c} * (\beta_{Mdkc}^{pw} * ptp\_kc_{k-1c}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 4 } && all && -sc_{tM-1d-1k-1c} * (\beta_{Mdkc}^{pw} * ptp\_kc_{k-1c} * ptp\_dc_{d-1c}) && \forall tdkc \\ 
+		& \beta_{pw} \text{ part 4 } && all && sc_{tM-1dk-1c} * (\beta_{Mdkc}^{pw} * ptp\_kc_{k-1c} * ptp\_dc_{dc}) && \forall tdkc  \\
+		& \beta_{pw} \text{ part 4 } && all && -sc_{tMdk-1c} * (\beta_{Mdkc}^{pw} * ptp\_kc_{k-1c}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 4 } && all && -sc_{tMd-1k-1c} * (\beta_{Mdkc}^{pw} * ptp\_kc_{k-1c} * ptp\_dc_{d-1c}) && \forall tdkc \\ 
+		& \beta_{pw} \text{ part 4 } && all && sc_{tMdk-1c} * (\beta_{Mdkc}^{pw} * ptp\_kc_{k-1c} * ptp\_dc_{dc}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 5 } && all && sc_{tm-1dkc} * (\beta_{mdkc}^{pw} * ptp\_kc_{kc}) && \forall tdkc, m \in \{ TL_{c} ... M-1 \} \\
+		& \beta_{pw} \text{ part 5 } && all && sc_{tm-1d-1kc} * (\beta_{mdkc}^{pw} * ptp\_kc_{kc} * ptp\_dc_{d-1c}) && \forall tdkc, m \in \{ TL_{c} ... M-1 \} \\ 
+		& \beta_{pw} \text{ part 5 } && all && -sc_{tm-1dkc} * (\beta_{mdkc}^{pw} * ptp\_kc_{kc} * ptp\_dc_{dc}) && \forall tdkc, m \in \{ TL_{c} ... M-1 \} \\
+		& \beta_{pw} \text{ part 5 } && all && sc_{tM-1dkc} * (\beta_{Mdkc}^{pw} * ptp\_kc_{kc}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 5 } && all && sc_{tM-1d-1kc} * (\beta_{Mdkc}^{pw} * ptp\_kc_{kc} * ptp\_dc_{d-1c}) && \forall tdkc \\ 
+		& \beta_{pw} \text{ part 5 } && all && -sc_{tM-1dkc} * (\beta_{Mdkc}^{pw} * ptp\_kc_{kc} * ptp\_dc_{dc}) && \forall tdkc  \\
+		& \beta_{pw} \text{ part 5 } && all && sc_{tMdkc} * (\beta_{Mdkc}^{pw} * ptp\_kc_{kc}) && \forall tdkc \\
+		& \beta_{pw} \text{ part 5 } && all && sc_{tMd-1kc} * (\beta_{Mdkc}^{pw} * ptp\_kc_{kc} * ptp\_dc_{d-1c}) && \forall tdkc \\ 
+		& \beta_{pw} \text{ part 5 } && all && -sc_{tMdkc} * (\beta_{Mdkc}^{pw} * ptp\_kc_{kc} * ptp\_dc_{dc}) && \forall tdkc \\
+		& \beta_{ps} \text{ part 1 } && all && sc_{t+1m-1dkc} * \beta_{tmdkc}^{ps} && \forall t \in \{1...T-1 \} m \in \{ 1...M-1 \} dkc \\
+		& \beta_{ps} \text{ part 1 } && all && sc_{t+1M-1dkc} * \beta_{tMdkc}^{ps} && \forall t \in \{1...T-1 \} m \in \{ 1...M-1 \} dkc \\
+		& \beta_{ps} \text{ part 1 } && all && sc_{t+1Mdkc} * \beta_{tMdkc}^{ps} && \forall t \in \{1...T-1 \} dkc \\
+		& \beta_{ps} \text{ part 2 } && all && sc_{t+1m-1d-1kc} * (\beta_{tmdkc}^{ps} * ptp\_dc_{d-1c}) && \forall t \in \{1...T-1 \} dkc, m \in \{TL_{c} ... M-1 \} \\
+		& \beta_{ps} \text{ part 2 } && all && sc_{t+1M-1d-1kc} * (\beta_{tMdkc}^{ps} * ptp\_dc_{d-1c}) && \forall t \in \{1...T-1 \} dkc \\
+		& \beta_{ps} \text{ part 2 } && all && sc_{t+1Md-1kc} * (\beta_{tMdkc}^{ps} * ptp\_dc_{d-1c}) && \forall t \in \{1...T-1 \} dkc \\ 
+	\end{alignedat}
+\end{equation}

@@ -248,7 +248,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
 
     ##### MDP Model #####
     #region
-    MDP = Model('Myopic')
+    MDP = Model('MDP')
     MDP.params.LogToConsole = 0
 
     # State Action & Auxiliary Variables

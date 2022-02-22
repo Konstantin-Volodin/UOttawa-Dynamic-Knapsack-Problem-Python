@@ -1,9 +1,10 @@
+
 import optimization_new
 import simulation_new    
 import time
 
 # Test Type
-test_modifier = "exp-full-cw1-cc5-cv100-gam95-"
+test_modifier = "cw1-cc5-cv1000-gam99-"
 data_type = "full"
 
 # Optimization Paramers

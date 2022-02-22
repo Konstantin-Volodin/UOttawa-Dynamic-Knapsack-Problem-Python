@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.11.2)  12 JAN 2022 11:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.11.2)  11 FEB 2022 11:11
 entering extended mode
 **./Manuscript.tex
 (Manuscript.tex
@@ -438,15 +438,15 @@ Overfull \hbox (14.95137pt too wide) detected at line 72
 $[][][]$  
  []
 
-[7] [8]) [9] (Manuscript.aux)
+[7] [8] [9]) [10] (Manuscript.aux)
 Package rerunfilecheck Info: File `Manuscript.out' has not changed.
-(rerunfilecheck)             Checksum: 2F800EF84984B89BD0BDE79632E620D9;3900.
+(rerunfilecheck)             Checksum: EB5F131CD1C61DF28A9E286862AB766C;4168.
  ) 
 Here is how much of TeX's memory you used:
- 9907 strings out of 478927
- 145446 string characters out of 2850165
- 543023 words of memory out of 3000000
- 27499 multiletter control sequences out of 15000+600000
+ 9911 strings out of 478927
+ 145496 string characters out of 2850165
+ 543025 words of memory out of 3000000
+ 27500 multiletter control sequences out of 15000+600000
  411628 words of font info for 59 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  60i,20n,66p,484b,466s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -467,9 +467,9 @@ nstantin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pf
 b><C:/Users/Konstantin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
 s/cm/cmsy5.pfb><C:/Users/Konstantin/AppData/Local/Programs/MiKTeX/fonts/type1/p
 ublic/amsfonts/cm/cmsy7.pfb>
-Output written on Manuscript.pdf (9 pages, 237947 bytes).
+Output written on Manuscript.pdf (10 pages, 242446 bytes).
 PDF statistics:
- 389 PDF objects out of 1000 (max. 8388607)
- 130 named destinations out of 1000 (max. 500000)
- 241 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 400 PDF objects out of 1000 (max. 8388607)
+ 133 named destinations out of 1000 (max. 500000)
+ 249 words of extra memory for PDF output out of 10000 (max. 10000000)
 

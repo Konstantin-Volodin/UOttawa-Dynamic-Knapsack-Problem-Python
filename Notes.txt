@@ -37,3 +37,8 @@ l l
 
 cv 1000 - try that
 try to get coefficient for action for MDP - completely non factored
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+THE WAY MODEL IS FORMULATED M HAS TO BE max(TL)+1
+	- because the way it is formulated - patients will always be assumed to transition starting on second last wait list

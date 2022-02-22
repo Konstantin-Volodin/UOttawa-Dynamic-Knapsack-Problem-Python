@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.11.2)  2 NOV 2021 18:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.11.2)  11 FEB 2022 11:10
 entering extended mode
 **./adp_model.tex
 (adp_model.tex
@@ -3460,14 +3460,14 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.177 \begin{equation}\begin{alignedat}
-                                       {10}
+l.178 	\begin{alignedat}
+                        {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 ! Misplaced alignment tab character &.
-l.178 		&
+l.179 		&
          	v(S') = \Bigg(
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3477,7 +3477,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.179 		&
+l.180 		&
          & 	\beta^0 +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3487,7 +3487,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.179 		&&
+l.180 		&&
            	\beta^0 +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3499,39 +3499,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.181 		&
-         	&&	\bigg( \sum_{dc} \beta_{0dkc}^{pw} pea_{dkc} \bigg) +
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.181 		&	&
-           &	\bigg( \sum_{dc} \beta_{0dkc}^{pw} pea_{dkc} \bigg) +
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.181 		&	&&
-            	\bigg( \sum_{dc} \beta_{0dkc}^{pw} pea_{dkc} \bigg) +
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-<recently read> &
-                 
-l.184 		&
+l.185 		&
          	&&	\qquad \qquad \bigg( \sum_{m=TL_{c}dkc}^{M-1} \beta_{mdkc}^{pw}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3541,7 +3509,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.184 		&	&
+l.185 		&	&
            &	\qquad \qquad \bigg( \sum_{m=TL_{c}dkc}^{M-1} \beta_{mdkc}^{pw}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3551,7 +3519,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.184 		&	&&
+l.185 		&	&&
             	\qquad \qquad \bigg( \sum_{m=TL_{c}dkc}^{M-1} \beta_{mdkc}^{pw}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3563,7 +3531,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.187 		&
+l.188 		&
          	&&	\qquad \qquad \bigg( \sum_{dkc} \beta_{Mdkc}^{pw}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3573,7 +3541,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.187 		&	&
+l.188 		&	&
            &	\qquad \qquad \bigg( \sum_{dkc} \beta_{Mdkc}^{pw}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3583,7 +3551,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.187 		&	&&
+l.188 		&	&&
             	\qquad \qquad \bigg( \sum_{dkc} \beta_{Mdkc}^{pw}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3595,7 +3563,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.190 		&
+l.191 		&
           	&&	\bigg( \sum_{t=1m=1dkc}^{T-1, TL_{c}-1} \beta_{tmdkc}^{ps}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3605,7 +3573,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.190 		& 	&
+l.191 		& 	&
             &	\bigg( \sum_{t=1m=1dkc}^{T-1, TL_{c}-1} \beta_{tmdkc}^{ps}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3615,7 +3583,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.190 		& 	&&
+l.191 		& 	&&
              	\bigg( \sum_{t=1m=1dkc}^{T-1, TL_{c}-1} \beta_{tmdkc}^{ps}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3627,7 +3595,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.192 		&
+l.193 		&
          	&&	\qquad \bigg( \sum_{t=1m=TL_{c}dkc}^{T-1M-1} \beta_{tmdkc}^{ps}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3637,7 +3605,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.192 		&	&
+l.193 		&	&
            &	\qquad \bigg( \sum_{t=1m=TL_{c}dkc}^{T-1M-1} \beta_{tmdkc}^{ps}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3647,8 +3615,40 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.192 		&	&&
+l.193 		&	&&
             	\qquad \bigg( \sum_{t=1m=TL_{c}dkc}^{T-1M-1} \beta_{tmdkc}^{ps}
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.196 		&
+         	&&	\qquad \bigg( \sum_{t=1dkc}^{T-1} \beta_{tmdkc}^{ps} \sum_{M-1}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.196 		&	&
+           &	\qquad \bigg( \sum_{t=1dkc}^{T-1} \beta_{tmdkc}^{ps} \sum_{M-1}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.196 		&	&&
+            	\qquad \bigg( \sum_{t=1dkc}^{T-1} \beta_{tmdkc}^{ps} \sum_{M-1}...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -3663,34 +3663,40 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.196 	\end{alignedat}
+l.200 	\end{alignedat}
                       
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 
-Overfull \hbox (1654.51576pt too wide) detected at line 197
+Overfull \hbox (2027.51842pt too wide) detected at line 201
 []\OML/cmm/m/it/10 v\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 S[]\OT1/cmr/m/n/10 ) = []
 \OML/cmm/m/it/10 [] \OT1/cmr/m/n/10 + [] [] \OML/cmm/m/it/10 []\OT1/cmr/m/n/1
-0 ([])[] + [] [] [] \OML/cmm/m/it/10 []pea[][] \OT1/cmr/m/n/10 + [] [] \OML/cm
-m/m/it/10 []\OT1/cmr/m/n/10 ([][][] + []   [] [] \OML/cmm/m/it/10 []\OT1/cmr/
-m/n/10 ([][] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pwt[]d[]\OT1
-/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/
-it/10 pwt[]d[]\OT1/cmr/m/n/10 ] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m
-/it/10 pwt[]k[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr/
-m/n/10 [\OML/cmm/m/it/10 pwt[]k[]\OT1/cmr/m/n/10 ])[] + []   [] [] \OML/cmm/m/i
-t/10 [] []\OT1/cmr/m/n/10 ([][] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/
-m/it/10 pwt[]d[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr
-/m/n/10 [\OML/cmm/m/it/10 pwt[]d[]\OT1/cmr/m/n/10 ] + \OML/cmm/m/it/10 E\OT1/cm
-r/m/n/10 [\OML/cmm/m/it/10 pwt[]k[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cm
-m/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pwt[]k[]\OT1/cmr/m/n/10 ])[] + [] 
-[] [] \OML/cmm/m/it/10 []\OT1/cmr/m/n/10 ([])[] + []  [] [] \OML/cmm/m/it/10 
-[]\OT1/cmr/m/n/10 ([] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pst
-[]d[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\O
-ML/cmm/m/it/10 pst[]d[]\OT1/cmr/m/n/10 ] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\
-OML/cmm/m/it/10 pst[]k[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E
-\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pst[]k[]\OT1/cmr/m/n/10 ])[][]
+0 ([])[] + [] [] \OML/cmm/m/it/10 []pea[][] \OT1/cmr/m/n/10 + [] [] \OML/cmm/m
+/it/10 []\OT1/cmr/m/n/10 ([][][] + []   [] [] \OML/cmm/m/it/10 []\OT1/cmr/m/n
+/10 ([][] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pwt[]d[]\OT1/cm
+r/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/
+10 pwt[]d[]\OT1/cmr/m/n/10 ] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it
+/10 pwt[]k[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr/m/n
+/10 [\OML/cmm/m/it/10 pwt[]k[]\OT1/cmr/m/n/10 ])[] + []   [] [] \OML/cmm/m/it/1
+0 [] []\OT1/cmr/m/n/10 ([][] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/i
+t/10 pwt[]d[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr/m/
+n/10 [\OML/cmm/m/it/10 pwt[]d[]\OT1/cmr/m/n/10 ] + \OML/cmm/m/it/10 E\OT1/cmr/m
+/n/10 [\OML/cmm/m/it/10 pwt[]k[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m
+/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pwt[]k[]\OT1/cmr/m/n/10 ])[] + [] [] 
+[] \OML/cmm/m/it/10 []\OT1/cmr/m/n/10 ([][])[] + []  [] [] \OML/cmm/m/it/10 [
+]\OT1/cmr/m/n/10 ([][] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 ps
+t[]d[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\
+OML/cmm/m/it/10 pst[]d[]\OT1/cmr/m/n/10 ] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [
+\OML/cmm/m/it/10 pst[]k[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 
+E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pst[]k[]\OT1/cmr/m/n/10 ])[] + []  [] [] \OM
+L/cmm/m/it/10 [] []\OT1/cmr/m/n/10 ([][] + \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [
+\OML/cmm/m/it/10 pst[]d[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10   \OML/cmm/m/it/10 
+E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pst[]d[]\OT1/cmr/m/n/10 ] + \OML/cmm/m/it/10
+ E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pst[]k[]\OT1/cmr/m/n/10 ] \OMS/cmsy/m/n/10 
+  \OML/cmm/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 pst[]k[]\OT1/cmr/m/n/10 ]
+)[][]
  []
 
 Missing character: There is no S in font nullfont!
@@ -3725,7 +3731,7 @@ Missing character: There is no o in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no " in font nullfont!
 ! Undefined control sequence.
-l.200 constraints in section "\nameref
+l.204 constraints in section "\nameref
                                       {state-action constraints}"
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3757,13 +3763,1072 @@ Missing character: There is no n in font nullfont!
 Missing character: There is no t in font nullfont!
 Missing character: There is no s in font nullfont!
 Missing character: There is no " in font nullfont!
-)
-! Emergency stop.
-<*> ./adp_model.tex
-                   
-*** (job aborted, no legal \end found)
 
- 
+Overfull \hbox (20.0pt too wide) in paragraph at lines 203--205
+[]
+ []
+
+! Undefined control sequence.
+l.206 \subsection
+                 {Representation in terms of actions only}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+Missing character: There is no R in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no a in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no m in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no a in font nullfont!
+Missing character: There is no c in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no l in font nullfont!
+Missing character: There is no y in font nullfont!
+
+Overfull \hbox (20.0pt too wide) in paragraph at lines 206--207
+[]
+ []
+
+
+Overfull \hbox (20.0pt too wide) in paragraph at lines 208--208
+[] 
+ []
+
+
+! LaTeX Error: Environment alignedat undefined.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.209 	\begin{alignedat}
+                        {10}
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+! Misplaced alignment tab character &.
+l.210 		&
+          \beta_{ul} && \text{if } ul_{p} >0: && sc_{1mdkc} * \beta_{p}^{ul}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.210 		& \beta_{ul} &
+                      & \text{if } ul_{p} >0: && sc_{1mdkc} * \beta_{p}^{ul}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.210 		& \beta_{ul} &&
+                        \text{if } ul_{p} >0: && sc_{1mdkc} * \beta_{p}^{ul}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.210 		& \beta_{ul} && \text
+                             {if } ul_{p} >0: && sc_{1mdkc} * \beta_{p}^{ul}...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.210 		& \beta_{ul} && \text{if } ul_{p} >0: &
+                                               & sc_{1mdkc} * \beta_{p}^{ul}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.210 		& \beta_{ul} && \text{if } ul_{p} >0: &&
+                                                 sc_{1mdkc} * \beta_{p}^{ul}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.210 ...{p} >0: && sc_{1mdkc} * \beta_{p}^{ul}  &
+                                                  & \forall pmdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.210 ...p} >0: && sc_{1mdkc} * \beta_{p}^{ul}  &&
+                                                   \forall pmdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.211 		&
+          \beta_{pw} \text{ part 1 } && all && - sc_{tm-1dkc} * \beta_{mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.211 		& \beta_{pw} \text
+                          { part 1 } && all && - sc_{tm-1dkc} * \beta_{mdkc}...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.211 		& \beta_{pw} \text{ part 1 } &
+                                      & all && - sc_{tm-1dkc} * \beta_{mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.211 		& \beta_{pw} \text{ part 1 } &&
+                                        all && - sc_{tm-1dkc} * \beta_{mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.211 		& \beta_{pw} \text{ part 1 } && all &
+                                             & - sc_{tm-1dkc} * \beta_{mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.211 		& \beta_{pw} \text{ part 1 } && all &&
+                                               - sc_{tm-1dkc} * \beta_{mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.211 ...l && - sc_{tm-1dkc} * \beta_{mdkc}^{pw} &
+                                                  & \forall tm\in\{1...M-1\}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.211 ... && - sc_{tm-1dkc} * \beta_{mdkc}^{pw} &&
+                                                   \forall tm\in\{1...M-1\}d...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.212 		&
+          \beta_{pw} \text{ part 1 } && all && - sc_{tM-1dkc} * \beta_{Mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.212 		& \beta_{pw} \text
+                          { part 1 } && all && - sc_{tM-1dkc} * \beta_{Mdkc}...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.212 		& \beta_{pw} \text{ part 1 } &
+                                      & all && - sc_{tM-1dkc} * \beta_{Mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.212 		& \beta_{pw} \text{ part 1 } &&
+                                        all && - sc_{tM-1dkc} * \beta_{Mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.212 		& \beta_{pw} \text{ part 1 } && all &
+                                             & - sc_{tM-1dkc} * \beta_{Mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.212 		& \beta_{pw} \text{ part 1 } && all &&
+                                               - sc_{tM-1dkc} * \beta_{Mdkc}...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.212 ...l && - sc_{tM-1dkc} * \beta_{Mdkc}^{pw} &
+                                                  & \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.212 ... && - sc_{tM-1dkc} * \beta_{Mdkc}^{pw} &&
+                                                   \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.213 		&
+          \beta_{pw} \text{ part 1 } && all && - sc_{tMdkc} * \beta_{Mdkc}^{...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.213 		& \beta_{pw} \text
+                          { part 1 } && all && - sc_{tMdkc} * \beta_{Mdkc}^{...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.213 		& \beta_{pw} \text{ part 1 } &
+                                      & all && - sc_{tMdkc} * \beta_{Mdkc}^{...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.213 		& \beta_{pw} \text{ part 1 } &&
+                                        all && - sc_{tMdkc} * \beta_{Mdkc}^{...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.213 		& \beta_{pw} \text{ part 1 } && all &
+                                             & - sc_{tMdkc} * \beta_{Mdkc}^{...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.213 		& \beta_{pw} \text{ part 1 } && all &&
+                                               - sc_{tMdkc} * \beta_{Mdkc}^{...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.213 ...all && - sc_{tMdkc} * \beta_{Mdkc}^{pw} &
+                                                  & \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.213 ...ll && - sc_{tMdkc} * \beta_{Mdkc}^{pw} &&
+                                                   \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.214 		&
+          \beta_{pw} \text{ part 2 } && all && - sc_{tm-1d-1kc} * (\beta_{md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.214 		& \beta_{pw} \text
+                          { part 2 } && all && - sc_{tm-1d-1kc} * (\beta_{md...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.214 		& \beta_{pw} \text{ part 2 } &
+                                      & all && - sc_{tm-1d-1kc} * (\beta_{md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.214 		& \beta_{pw} \text{ part 2 } &&
+                                        all && - sc_{tm-1d-1kc} * (\beta_{md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.214 		& \beta_{pw} \text{ part 2 } && all &
+                                             & - sc_{tm-1d-1kc} * (\beta_{md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.214 		& \beta_{pw} \text{ part 2 } && all &&
+                                               - sc_{tm-1d-1kc} * (\beta_{md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.214 ... * (\beta_{mdkc}^{pw} * ptp\_dc_{d-1c}) &
+                                                  & \forall tdkc, m \in \{TL...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.214 ...* (\beta_{mdkc}^{pw} * ptp\_dc_{d-1c}) &&
+                                                   \forall tdkc, m \in \{TL_...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.215 		&
+          \beta_{pw} \text{ part 2 } && all && - sc_{tM-1d-1kc} * (\beta_{Md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.215 		& \beta_{pw} \text
+                          { part 2 } && all && - sc_{tM-1d-1kc} * (\beta_{Md...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.215 		& \beta_{pw} \text{ part 2 } &
+                                      & all && - sc_{tM-1d-1kc} * (\beta_{Md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.215 		& \beta_{pw} \text{ part 2 } &&
+                                        all && - sc_{tM-1d-1kc} * (\beta_{Md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.215 		& \beta_{pw} \text{ part 2 } && all &
+                                             & - sc_{tM-1d-1kc} * (\beta_{Md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.215 		& \beta_{pw} \text{ part 2 } && all &&
+                                               - sc_{tM-1d-1kc} * (\beta_{Md...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.215 ... * (\beta_{Mdkc}^{pw} * ptp\_dc_{d-1c}) &
+                                                  & \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.215 ...* (\beta_{Mdkc}^{pw} * ptp\_dc_{d-1c}) &&
+                                                   \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.216 		&
+          \beta_{pw} \text{ part 2 } && all && - sc_{tMd-1kc} * (\beta_{Mdkc...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.216 		& \beta_{pw} \text
+                          { part 2 } && all && - sc_{tMd-1kc} * (\beta_{Mdkc...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.216 		& \beta_{pw} \text{ part 2 } &
+                                      & all && - sc_{tMd-1kc} * (\beta_{Mdkc...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.216 		& \beta_{pw} \text{ part 2 } &&
+                                        all && - sc_{tMd-1kc} * (\beta_{Mdkc...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.216 		& \beta_{pw} \text{ part 2 } && all &
+                                             & - sc_{tMd-1kc} * (\beta_{Mdkc...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.216 		& \beta_{pw} \text{ part 2 } && all &&
+                                               - sc_{tMd-1kc} * (\beta_{Mdkc...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.216 ... * (\beta_{Mdkc}^{pw} * ptp\_dc_{d-1c}) &
+                                                  & \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.216 ...* (\beta_{Mdkc}^{pw} * ptp\_dc_{d-1c}) &&
+                                                   \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.217 		&
+          \beta_{pw} \text{ part 3 } && all && sc_{tm-1dkc} * (\beta_{mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.217 		& \beta_{pw} \text
+                          { part 3 } && all && sc_{tm-1dkc} * (\beta_{mdkc}^...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.217 		& \beta_{pw} \text{ part 3 } &
+                                      & all && sc_{tm-1dkc} * (\beta_{mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.217 		& \beta_{pw} \text{ part 3 } &&
+                                        all && sc_{tm-1dkc} * (\beta_{mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.217 		& \beta_{pw} \text{ part 3 } && all &
+                                             & sc_{tm-1dkc} * (\beta_{mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.217 		& \beta_{pw} \text{ part 3 } && all &&
+                                               sc_{tm-1dkc} * (\beta_{mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.217 ...c} * (\beta_{mdkc}^{pw} * ptp\_dc_{dc}) &
+                                                  & \forall tdkc, m \in \{TL...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.217 ...} * (\beta_{mdkc}^{pw} * ptp\_dc_{dc}) &&
+                                                   \forall tdkc, m \in \{TL_...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.218 		&
+          \beta_{pw} \text{ part 3 } && all && sc_{tM-1dkc} * (\beta_{Mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.218 		& \beta_{pw} \text
+                          { part 3 } && all && sc_{tM-1dkc} * (\beta_{Mdkc}^...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.218 		& \beta_{pw} \text{ part 3 } &
+                                      & all && sc_{tM-1dkc} * (\beta_{Mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.218 		& \beta_{pw} \text{ part 3 } &&
+                                        all && sc_{tM-1dkc} * (\beta_{Mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.218 		& \beta_{pw} \text{ part 3 } && all &
+                                             & sc_{tM-1dkc} * (\beta_{Mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.218 		& \beta_{pw} \text{ part 3 } && all &&
+                                               sc_{tM-1dkc} * (\beta_{Mdkc}^...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.218 ...c} * (\beta_{Mdkc}^{pw} * ptp\_dc_{dc}) &
+                                                  & \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.218 ...} * (\beta_{Mdkc}^{pw} * ptp\_dc_{dc}) &&
+                                                   \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.219 		&
+          \beta_{pw} \text{ part 3 } && all && sc_{tMdkc} * (\beta_{Mdkc}^{p...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.219 		& \beta_{pw} \text
+                          { part 3 } && all && sc_{tMdkc} * (\beta_{Mdkc}^{p...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.219 		& \beta_{pw} \text{ part 3 } &
+                                      & all && sc_{tMdkc} * (\beta_{Mdkc}^{p...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.219 		& \beta_{pw} \text{ part 3 } &&
+                                        all && sc_{tMdkc} * (\beta_{Mdkc}^{p...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.219 		& \beta_{pw} \text{ part 3 } && all &
+                                             & sc_{tMdkc} * (\beta_{Mdkc}^{p...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.219 		& \beta_{pw} \text{ part 3 } && all &&
+                                               sc_{tMdkc} * (\beta_{Mdkc}^{p...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.219 ...c} * (\beta_{Mdkc}^{pw} * ptp\_dc_{dc}) &
+                                                  & \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.219 ...} * (\beta_{Mdkc}^{pw} * ptp\_dc_{dc}) &&
+                                                   \forall tdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.220 		&
+          \beta_{pw} \text{ part 4 } && all && -sc_{tm-1dk-1c} * (\beta_{mdk...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.220 		& \beta_{pw} \text
+                          { part 4 } && all && -sc_{tm-1dk-1c} * (\beta_{mdk...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.220 		& \beta_{pw} \text{ part 4 } &
+                                      & all && -sc_{tm-1dk-1c} * (\beta_{mdk...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.220 		& \beta_{pw} \text{ part 4 } &&
+                                        all && -sc_{tm-1dk-1c} * (\beta_{mdk...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.220 		& \beta_{pw} \text{ part 4 } && all &
+                                             & -sc_{tm-1dk-1c} * (\beta_{mdk...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.220 		& \beta_{pw} \text{ part 4 } && all &&
+                                               -sc_{tm-1dk-1c} * (\beta_{mdk...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.220 ... * (\beta_{mdkc}^{pw} * ptp\_kc_{k-1c}) &
+                                                  & \forall tdkc, m \in \{ T...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.220 ...* (\beta_{mdkc}^{pw} * ptp\_kc_{k-1c}) &&
+                                                   \forall tdkc, m \in \{ TL...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.221 		&
+          \beta_{pw} \text{ part 4 } && all && -sc_{tm-1d-1k-1c} * (\beta_{m...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.221 		& \beta_{pw} \text
+                          { part 4 } && all && -sc_{tm-1d-1k-1c} * (\beta_{m...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.221 		& \beta_{pw} \text{ part 4 } &
+                                      & all && -sc_{tm-1d-1k-1c} * (\beta_{m...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.221 		& \beta_{pw} \text{ part 4 } &&
+                                        all && -sc_{tm-1d-1k-1c} * (\beta_{m...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.221 		& \beta_{pw} \text{ part 4 } && all &
+                                             & -sc_{tm-1d-1k-1c} * (\beta_{m...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.221 		& \beta_{pw} \text{ part 4 } && all &&
+                                               -sc_{tm-1d-1k-1c} * (\beta_{m...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.221 ...{pw} * ptp\_kc_{k-1c} * ptp\_dc_{d-1c}) &
+                                                  & \forall tdkc, m \in \{ T...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.221 ...pw} * ptp\_kc_{k-1c} * ptp\_dc_{d-1c}) &&
+                                                   \forall tdkc, m \in \{ TL...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.222 		&
+          \beta_{pw} \text{ part 4 } && all && sc_{tm-1dk-1c} * (\beta_{mdkc...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Undefined control sequence.
+l.222 		& \beta_{pw} \text
+                          { part 4 } && all && sc_{tm-1dk-1c} * (\beta_{mdkc...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Misplaced alignment tab character &.
+l.222 		& \beta_{pw} \text{ part 4 } &
+                                      & all && sc_{tm-1dk-1c} * (\beta_{mdkc...
+(That makes 100 errors; please try again.) 
 Here is how much of TeX's memory you used:
  35 strings out of 478927
  706 string characters out of 2850165
@@ -3772,4 +4837,5 @@ Here is how much of TeX's memory you used:
  403738 words of font info for 28 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  24i,6n,25p,235b,114s stack positions out of 5000i,500n,10000p,200000b,80000s
+
 !  ==> Fatal error occurred, no output PDF file produced!
