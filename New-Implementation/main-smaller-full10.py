@@ -7,10 +7,10 @@ test_modifier = "exp-zero-cw1-cc5-cv1000-gam95-"
 data_type = "smaller-full"
 
 # Optimization Paramers
-iter_lims = 100000
+iter_lims = 1000000
 beta_fun = [
     (0,0.75),
-    (10000,0.9)
+    (10000,0.8)
 ]
 sub_mip_gap = 0.001
 import_data_opt = f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
@@ -32,7 +32,7 @@ export_state_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_
 
 # Execute
 start_time_opt = time.time()
-# optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2)
+optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2, import_data_p2)
 end_time_opt = time.time()
 simulation_new.main_func(replications, warm_up, duration, show_policy, import_data_sim, import_betas_sim, export_txt_sim, export_pic_sim, export_state_my, export_state_md)
 end_time_sim = time.time()

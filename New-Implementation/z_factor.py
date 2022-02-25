@@ -13,7 +13,7 @@ from pprint import pprint
 import plotly.express as px
 
 # Improting Data
-test_modifier = "cw1-cc5-cv100-gam95-"
+test_modifier = "cw1-cc5-cv100-gam99-"
 data_type = "smaller-full"
 
 import_data =  f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
@@ -353,7 +353,7 @@ coef_df['DK'] = coef_df['D'] + " \t" + coef_df['K']
 #     fig.show(renderer="browser")
 
 
-fig = px.line(coef_df, x='T',y='Val',color='DK', facet_row='C', facet_col='M', title=f'Scheduling Objective', markers=True)
+fig = px.line(coef_df, x='T',y='Val',color='DK', facet_row='C', facet_col='M', title=f'{test_modifier} Scheduling Objective', markers=True)
 fig.show(renderer="browser")
 # %%
 

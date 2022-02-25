@@ -9,3 +9,8 @@ sbatch job-smaller-full7.sh
 sbatch job-smaller-full8.sh
 sbatch job-smaller-full9.sh
 sbatch job-smaller-full10.sh
+sbatch job-smaller-full11.sh
+sbatch job-smaller-full12.sh
+sbatch job-smaller-full13.sh
+sbatch job-smaller-full14.sh
+sbatch job-smaller-full15.sh

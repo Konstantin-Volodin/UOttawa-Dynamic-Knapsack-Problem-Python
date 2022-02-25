@@ -3,7 +3,7 @@ import simulation_new
 import time
 
 # Test Type
-test_modifier = "cw1-cc5-cv1000-gam999-"
+test_modifier = "cw1-cc5-cv10-gam99-"
 data_type = "smaller-full"
 
 # Optimization Paramers
@@ -32,7 +32,7 @@ export_state_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_
 
 # Execute
 start_time_opt = time.time()
-optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2, import_data_p2)
+optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2)
 end_time_opt = time.time()
 simulation_new.main_func(replications, warm_up, duration, show_policy, import_data_sim, import_betas_sim, export_txt_sim, export_pic_sim, export_state_my, export_state_md)
 end_time_sim = time.time()
