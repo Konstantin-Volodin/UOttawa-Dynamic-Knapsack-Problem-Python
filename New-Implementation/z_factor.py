@@ -13,7 +13,7 @@ from pprint import pprint
 import plotly.express as px
 
 # Improting Data
-test_modifier = "cw1-cc5-cv100-gam99-"
+test_modifier = "exp-full-cw1-cc5-cv10-gam95-"
 data_type = "smaller-full"
 
 import_data =  f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
