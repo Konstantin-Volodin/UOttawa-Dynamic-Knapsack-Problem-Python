@@ -13,7 +13,7 @@ from pprint import pprint
 import plotly.express as px
 
 # Improting Data
-test_modifier = "exp-full-cw1-cc5-cv100-gam95-"
+test_modifier = "cw1-cc5-cv10-gam99-"
 data_type = "smaller-full"
 
 import_data =  f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
@@ -187,7 +187,7 @@ MDP.setObjective( mdo_cost+(gam*mdo_val), GRB.MINIMIZE )
 MDP.update()
 
 #%%
-# Set Betas to 0
+# # Set Betas to 0
 # betas['b0'] = 0
 # for p in P:
 #     betas['bul'][p] = 0
@@ -365,14 +365,14 @@ coef_df['DK'] = coef_df['D'] + " \t" + coef_df['K']
 #     fig.show(renderer="browser")
 
 
-fig = px.line(coef_df.query(f'M == 0 and C == "{C[0]}"'), x='T',y='Val',color='DK', facet_row='C', facet_col='M', title=f'{test_modifier} Scheduling Objective', markers=True)
-# for k in K:
-    # fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
-fig.show(renderer="browser")
+# fig = px.line(coef_df.query(f'M == 0 and C == "{C[0]}"'), x='T',y='Val',color='DK', facet_row='C', facet_col='M', title=f'{test_modifier} Scheduling Objective', markers=True)
+# # for k in K:
+#     # fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
+# fig.show(renderer="browser")
 
 fig = px.line(coef_df, x='T',y='Val',color='DK', facet_row='C', facet_col='M', title=f'{test_modifier} Scheduling Objective', markers=True)
-# for k in K:
-    # fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
+for k in K:
+    fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
 fig.show(renderer="browser")
 # %%
 

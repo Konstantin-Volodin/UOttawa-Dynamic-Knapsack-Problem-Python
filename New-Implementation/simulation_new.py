@@ -1,7 +1,9 @@
 #%%
 ##### Initialization & Changeable Parameters #####
 #region
+from lib2to3.pgen2.token import NEWLINE
 from os import linesep
+import csv
 
 from numpy.core.fromnumeric import prod
 from Modules import data_import
@@ -16,10 +18,11 @@ from tqdm.auto import trange
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import pandas as pd
 
 #endregion
 
-def main_func(replications, warm_up, duration, show_policy, import_data, import_beta, export_txt, export_pic, export_state_my, export_state_md):
+def main_func(replications, warm_up, duration, show_policy, import_data, import_beta, export_txt, export_pic, export_state_my, export_state_md, export_cost_my, export_cost_md, export_util_my, export_util_md):
     ##### Read Data #####
     #region
 
@@ -82,10 +85,10 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     # Initial State
     init_state = {'ul': E_UL, 'pw': E_PW, 'ps': E_PS}
     init_state_strm =  np.random.default_rng(199725)
-    # for i in itertools.product(M,D,K,C): init_state['pw'][i] = 10
-    # for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = 0
-    for i in itertools.product(M,D,K,C): init_state['pw'][i] = init_state_strm.poisson(E_PW[i])
-    for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = init_state_strm.poisson(E_PS[i])
+    for i in itertools.product(M,D,K,C): init_state['pw'][i] = 0
+    for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = 0
+    # for i in itertools.product(M,D,K,C): init_state['pw'][i] = init_state_strm.poisson(E_PW[i])
+    # for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = init_state_strm.poisson(E_PS[i])
 
     # Betas
     with open(os.path.join(my_path, import_beta), 'rb') as handle:
@@ -153,6 +156,27 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 # print(f'\tPost Action - Units Used - {k} - {v}')
                 # non_zero_ac['uup'][k] = v
         return(ret_str)
+    
+    def retrive_surg_subset(df, d, k, c, m, day):
+        '''
+        # Given a patient dataset, retrieves patient who are specific surgery type (accomodates transitions)
+        # Parameters: df - dataset, d - complexity, k - priority, c - surgery type, m - filter by wait time, day - current day
+        '''
+        # Filter on complexity, priority, and surgery type
+        df_last_rows = df.groupby('id').tail(1).reset_index()
+        df_surg_subset = df_last_rows.query(f"priority=='{k}' and complexity=='{d}' and surgery=='{c}'")
+        df_surg_full_subset = df[df['id'].isin(df_surg_subset['id'])]
+
+        # Filter on wait time
+        if m != M[-1]:
+            df_wait_subset = df_surg_full_subset.query(f"arrived_on == {day-m}")
+            df_wat_full_subset = df[df['id'].isin(df_wait_subset['id'])]
+        else:
+            df_wait_subset = df_surg_full_subset.query(f"action == 'arrived'").query(f"arrived_on <= {day-m}")
+            df_wat_full_subset = df[df['id'].isin(df_wait_subset['id'])]
+
+        return(df_wat_full_subset)
+        
     #endregion
 
     ##### Myopic Model #####
@@ -371,7 +395,13 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     my_sim_disc = []
 
     if show_policy:
-        text_file = open(export_state_my, 'w')
+        text_file = open(export_state_my, 'w', newline="")
+        cost_file = open(export_cost_my, 'w', newline="")
+        util_file = open(export_util_my, 'w', newline="")
+        print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv", file=cost_file)
+        print(f"repl,period,horizon_period,usage_admin,usage_OR", file=util_file)
+        logging_file = open('Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-logging-MY.txt', 'w', newline="")
+
     # Simulation
     for repl in trange(replications, desc='Myopic'):
 
@@ -381,23 +411,23 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         my_strm_pst = np.random.default_rng(repl)
         my_strm_arr = np.random.default_rng(repl)
             
-        # Replication Data
+        # Aggregate Replication Data
         rp_st = []
         rp_ac = []
         rp_cost = []
         rp_disc = 0
         state = deepcopy(init_state)
 
+        # Detailed Logging Data
+        patient_data_df = pd.DataFrame( columns=['repl', 'period', 'policy', 'id','priority', 'complexity', 'surgery','action','arrived_on','sched_to', 'resch_from', 'resch_to', 'transition'] )
+        patient_id_count = 0
+
         # Single Replication
         for day in trange(duration):
 
-            # Save State Data
-            # rp_st.append(deepcopy(state))
-            if show_policy:
-                # with open(export_state_my, 'w') as text_file:
-                text_file.write(f'Day {day+1} \n')
-                text_file.write(f'{non_zero_state(state)} \n')
-                    
+            patient_data = {
+                'repl': [], 'period': [], 'policy': [], 'id': [], 'priority': [], 'complexity': [], 'surgery': [], 'action': [], 'arrived_on': [], 'sched_to': [], 'resch_from': [], 'resch_to': [], 'transition': []
+            }
 
             # Generate Action (With slightly different logic)
             for k in K: myv_cost_cw[k].UB = cv-1; myv_cost_cw[k].LB = cv-1;
@@ -417,71 +447,332 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = GRB.INFINITY; myv_ac_rsc[(t,tp,m,d,k,c)].LB = 0
 
             rp_cost.append(myo_cost.getValue())
+            print(f"{repl},{day}, {myo_cost.getValue()},{myo_cw.getValue()},{myo_cs.getValue()},{myo_brsc.getValue()},{myo_grsc.getValue()},{myo_cv.getValue()}", file=cost_file)
             if day >= warm_up:
                 rp_disc = myo_cost.getValue() + gam*rp_disc
 
             # Save Action
             action = {'sc':{}, 'rsc':{}, 'uv': {}, 'ulp': {}, 'uup': {}, 'pwp':{}, 'psp': {}}
-            for i in itertools.product(T,M,D,K,C): action['sc'][i] = myv_ac_sc[i].X 
-            for i in itertools.product(T,T,M,D,K,C): action['rsc'][i] = myv_ac_rsc[i].X
+            for i in itertools.product(T,M,D,K,C): action['sc'][i] = round(myv_ac_sc[i].X,0) 
+            for i in itertools.product(T,T,M,D,K,C): action['rsc'][i] = round(myv_ac_rsc[i].X,0)
             for i in itertools.product(T,P): action['uv'][i] = myv_aux_uv[i].X
-            for i in PCO: action['ulp'][i] = myv_aux_ulp[i].X
+            for i in PCO: action['ulp'][i] = round(myv_aux_ulp[i].X,0)
             for i in itertools.product(T,P): action['uup'][i] = myv_aux_uup[i].X
-            for i in itertools.product(M,D,K,C): action['pwp'][i] = myv_aux_pwp[i].X
-            for i in itertools.product(T,M,D,K,C): action['psp'][i] = myv_aux_psp[i].X
+            for i in itertools.product(M,D,K,C): 
+                action['pwp'][i] = round(myv_aux_pwp[i].X,0)
+                if action['pwp'][i] != 0: print(action['pwp'][i], file=logging_file)
+            for i in itertools.product(T,M,D,K,C): action['psp'][i] = round(myv_aux_psp[i].X,0)
+            
+            for t in T:
+                print(f"{repl},{day},{t-1},{action['uup'][(t,P[0])]},{action['uup'][(t,P[1])]}", file=util_file)
             # if show_policy: rp_ac.append(action)
             
-            if show_policy: 
+            #region Save Action Data for Logging
+            if show_policy:
+
+                pass
+
+                # Add entries for schedulings
+                for m,d,k,c in itertools.product(M, D, K, C):
+
+                    skip = True
+                    for t in T:
+                        if action['sc'][(t,m,d,k,c)] > 0.001: skip = False
+                    if skip == True: continue
+                    
+                    # Find all unscheduled patients based on m,d,k,c
+                    pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                    pat_unsched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) == 1)
+                    
+                    # Add entry for patients scheduled
+                    sched = 0
+                    for t in T:
+                        # print(action['sc'][(t,m,d,k,c)])
+                        for elem in range(int(action['sc'][(t,m,d,k,c)])):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('myopic')
+                            patient_data['id'].append(pat_unsched['id'].to_list()[sched])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('scheduled')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(t+day-1)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append(pd.NA)
+                            sched += 1
+
+                # Add entries for reschedulings
+                for t,m,d,k,c in itertools.product(T, M, D, K, C):
+                    
+                    skip = True
+                    for tp in T:
+                        if action['rsc'][(t,tp,m,d,k,c)] >= 0.001: skip = False
+                    if skip == True: continue
+
+                    pass
+
+                    # Finds all scheduled patients based on t,m,d,k,c
+                    pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                    pat_sched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) >= 2).groupby('id').tail(1).reset_index()
+                    pat_sched_subset = pat_sched.query(f"sched_to == {day+t-1} or resch_to == {day+t-1}")
+
+                    # Add entry for patient rescheduled
+                    resched = 0
+                    for tp in T:
+                        for elem in range(int(action['rsc'][(t,tp,m,d,k,c)])):  
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('myopic')
+                            patient_data['id'].append(pat_sched_subset['id'].to_list()[resched])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('rescheduled')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(t+day-1)
+                            patient_data['resch_to'].append(tp+day-1)
+                            patient_data['transition'].append(pd.NA)
+                            resched += 1
+
                 # with open(export_state_my, 'w') as text_file:
-                text_file.write(f'{non_zero_action(action)}\n')
-                text_file.write(f'\tCost: {myo_cost.getValue()}\n')
+                # text_file.write(f'{non_zero_action(action)}\n')
+                # text_file.write(f'\tCost: {myo_cost.getValue()}\n')
+
+                # Save Data to dataframe
+                patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                patient_data = {k : [] for k in patient_data}
+            #endregion
 
             # Transition between States
             # Units Leftover / Unit Deviation
-            for p in PCO: state['ul'][p] = myv_aux_ulp[p].X + round(my_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
+            for p in PCO: state['ul'][p] = action['ulp'][p] + round(my_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
             for p in PNCO: state['ul'][p] = round(my_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
 
             # Patients Waiting - set to post action
-            for m,d,k,c in itertools.product(M, D, K, C): state['pw'][(m,d,k,c)] = myv_aux_pwp[(m,d,k,c)].X
-            # Patients Waiting - calculate & execute D Transition
+            for m,d,k,c in itertools.product(M, D, K, C): state['pw'][(m,d,k,c)] = action['pwp'][(m,d,k,c)]
+
+            #region Patients Waiting - calculate & execute D Transition
             my_ptw_d = {}
             for m,d,k,c in itertools.product(M, D, K, C):
-                if d != D[-1] and m >= TL[c]: my_ptw_d[(m,d,k,c)] = my_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_d[(d,c)] )
+                if d != D[-1] and m >= TL[c]: 
+                    my_ptw_d[(m,d,k,c)] = my_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_d[(d,c)] )
+
+            # Save data on transitions
+            if show_policy:
+                for m,d,k,c in itertools.product(M, D, K, C):
+                    if d != D[-1] and m >= TL[c]: 
+                        if my_ptw_d[(m,d,k,c)] == 0: continue
+                        
+                        # Find all unscheduled patients based on m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_unsched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) == 1)
+
+                        # Save Entry
+                        for transition in range(my_ptw_d[(m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('myopic')
+                            patient_data['id'].append(pat_unsched['id'].to_list()[transition])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(D[D.index(d)+1])
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('complexity')
+                            
+                        # Save Data to dataframe
+                        patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                        patient_data = {k : [] for k in patient_data}
+            
             for m,d,k,c in itertools.product(M, D, K, C): 
-                if d != D[0] and m >= TL[c]: state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] + my_ptw_d[(m,D[D.index(d)-1],k,c)]
-            # Patients Waiting - calculate & execute K Transition
+                if d != D[-1] and m >= TL[c]: 
+                    state['pw'][(m,D[D.index(d)+1],k,c)] = state['pw'][(m,D[D.index(d)+1],k,c)] + my_ptw_d[(m,d,k,c)]
+                    state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] - my_ptw_d[(m,d,k,c)]
+            #endregion
+
+            #region Patients Waiting - calculate & execute K Transition
             my_ptw_k = {}
             for m,d,k,c in itertools.product(M, D, K, C):
-                if k != K[-1] and m >= TL[c]: my_ptw_k[(m,d,k,c)] = my_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_k[(k,c)] )
+                if k != K[-1] and m >= TL[c]: 
+                    my_ptw_k[(m,d,k,c)] = my_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_k[(k,c)] )
+
+            # Save data on transitions
+            if show_policy:
+                for m,d,k,c in itertools.product(M, D, K, C):
+                    if k != K[-1] and m >= TL[c]: 
+                        if my_ptw_k[(m,d,k,c)] == 0: continue
+                        
+                        # Find all unscheduled patients based on m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_unsched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) == 1)
+
+                        # Save Entry
+                        for transition in range(my_ptw_k[(m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('myopic')
+                            patient_data['id'].append(pat_unsched['id'].to_list()[transition])
+                            patient_data['priority'].append(K[K.index(k)+1])
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('priority')
+                            
+                        # Save Data to dataframe
+                        patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                        patient_data = {k : [] for k in patient_data}
+                
             for m,d,k,c in itertools.product(M, D, K, C): 
-                if d != D[-1] and m >= TL[c]: state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] - my_ptw_d[(m,d,k,c)]      
+                if k != K[-1] and m >= TL[c]: 
+                    state['pw'][(m,d,K[K.index(k)+1],c)] = state['pw'][(m,d,K[K.index(k)+1],c)] + my_ptw_k[(m,d,k,c)]
+                    state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] - my_ptw_k[(m,d,k,c)]    
+            #endregion
+
             # Patients Waiting - change wait time
             for d,k,c in itertools.product(D, K, C): state['pw'][(M[-1],d,k,c)] +=  state['pw'][(M[-2],d,k,c)]
             for m,d,k,c in itertools.product(M[1:-1][::-1], D, K, C): state['pw'][(m,d,k,c)] =  state['pw'][(m-1,d,k,c)]
-            for d,k,c in itertools.product(D, K, C): state['pw'][(0,d,k,c)] = my_strm_arr.poisson(pea[(d,k,c)])
+
+            #region Patient Arrivals
+            for d,k,c in itertools.product(D, K, C): 
+                arrivals = my_strm_arr.poisson(pea[(d,k,c)])
+
+                # Save Data for Logging
+                if show_policy:
+                    for arr in range(arrivals):
+                        patient_data['repl'].append(repl)
+                        patient_data['period'].append(day+1)
+                        patient_data['policy'].append('myopic')
+                        patient_data['id'].append(patient_id_count)
+                        patient_data['priority'].append(k)
+                        patient_data['complexity'].append(d)
+                        patient_data['surgery'].append(c)
+                        patient_data['action'].append('arrived')
+                        patient_data['arrived_on'].append(day+1)
+                        patient_data['sched_to'].append(pd.NA)
+                        patient_data['resch_from'].append(pd.NA)
+                        patient_data['resch_to'].append(pd.NA)
+                        patient_data['transition'].append(pd.NA)
+                        patient_id_count += 1
+                state['pw'][(0,d,k,c)] = arrivals
+            #endregion
 
             # Patients Scheduled - post action
-            for t,m,d,k,c in itertools.product(T, M, D, K, C): state['ps'][(t,m,d,k,c)] = myv_aux_psp[(t,m,d,k,c)].X
-            # Patients Scheduled - calculate & execute D Transition
+            for t,m,d,k,c in itertools.product(T, M, D, K, C): state['ps'][(t,m,d,k,c)] = action['psp'][(t,m,d,k,c)]
+
+            #region Patients Scheduled - calculate & execute D Transition
             my_pts_d = {}
             for t,m,d,k,c in itertools.product(T, M, D, K, C):
-                if d != D[-1] and m >= TL[c]: my_pts_d[(t,m,d,k,c)] = my_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_d[(d,c)] )
+                if d != D[-1] and m >= TL[c]: 
+                    my_pts_d[(t,m,d,k,c)] = my_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_d[(d,c)] )
+
+            # Save data on transitions
+            if show_policy:
+                for t,m,d,k,c in itertools.product(T, M, D, K, C):
+                    if d != D[-1] and m >= TL[c]: 
+                        if my_pts_d[(t,m,d,k,c)] == 0: continue
+                        
+                        # Find all scheduled patients based on t,m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_sched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) >= 2).groupby('id').tail(1).reset_index()
+                        pat_sched_subset = pat_sched.query(f"sched_to == {day+t-1} or resch_to == {day+t-1}")
+
+                        # Save Entry
+                        for transition in range(my_pts_d[(t,m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('myopic')
+                            patient_data['id'].append(pat_sched_subset['id'].to_list()[transition])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(D[D.index(d)+1])
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('complexity')
+
+                    # Save Data to dataframe
+                patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                patient_data = {k : [] for k in patient_data}
+
             for t,m,d,k,c in itertools.product(T, M, D, K, C): 
-                if d != D[0] and m >= TL[c]: state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] + my_pts_d[(t,m,D[D.index(d)-1],k,c)]
-            # Patients Scheduled - calculate & execute K Transition
+                if d != D[-1] and m >= TL[c]: 
+                    state['ps'][(t,m,D[D.index(d)+1],k,c)] = state['ps'][(t,m,D[D.index(d)+1],k,c)] + my_pts_d[(t,m,d,k,c)]
+                    state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] - my_pts_d[(t,m,d,k,c)]
+            #endregion
+
+            #region Patients Scheduled - calculate & execute K Transition
             my_pts_k = {}
             for t,m,d,k,c in itertools.product(T, M, D, K, C):
-                if k != K[-1] and m >= TL[c]: my_pts_k[(t,m,d,k,c)] = my_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_k[(k,c)] )
+                if k != K[-1] and m >= TL[c]: 
+                    my_pts_k[(t,m,d,k,c)] = my_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_k[(k,c)] )
+
+            # Save data on transitions
+            if show_policy:
+                for t,m,d,k,c in itertools.product(T, M, D, K, C):
+                    if k != K[-1] and m >= TL[c]: 
+                        if my_pts_k[(t,m,d,k,c)] == 0: continue
+                        
+                        # Find all scheduled patients based on t,m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_sched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) >= 2).groupby('id').tail(1).reset_index()
+                        pat_sched_subset = pat_sched.query(f"sched_to == {day+t-1} or resch_to == {day+t-1}")
+
+                        # Save Entry
+                        for transition in range(my_pts_k[(t,m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('myopic')
+                            patient_data['id'].append(pat_sched_subset['id'].to_list()[transition])
+                            patient_data['priority'].append(K[K.index(k)+1])
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('priority')
+
+                        # Save Data to dataframe
+                        patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                        patient_data = {k : [] for k in patient_data}
+                        
             for t,m,d,k,c in itertools.product(T, M, D, K, C): 
-                if d != D[-1] and m >= TL[c]: state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] - my_pts_d[(t,m,d,k,c)]     
+                if k != K[-1] and m >= TL[c]: 
+                    state['ps'][(t,m,d,K[K.index(k)+1],c)] = state['ps'][(t,m,d,K[K.index(k)+1],c)] + my_pts_k[(t,m,d,k,c)]
+                    state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] - my_pts_k[(t,m,d,k,c)]
+            # endregion
+
             # Patients Scheduled  - change wait time
             for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,M[-1],d,k,c)] +=  state['ps'][(t,M[-2],d,k,c)]
             for t,m,d,k,c in itertools.product(T, M[1:-1][::-1], D, K, C): state['ps'][(t,m,d,k,c)] =  state['ps'][(t,m-1,d,k,c)]
             for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,0,d,k,c)] = 0
+            
             # Patients Scheduled  - change scheduled time
             for t,m,d,k,c in itertools.product(T[:-1],M,D,K,C): state['ps'][(t,m,d,k,c)] = state['ps'][(t+1,m,d,k,c)]
             for m,d,k,c in itertools.product(M,D,K,C): state['ps'][(T[-1],m,d,k,c)] = 0
 
+            # Save Data to dataframe
+            if show_policy:
+                patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+
+        # Save logging
+        if show_policy:
+            patient_data_df.to_csv(text_file, index=None,)
+            
         my_sim_st.append(rp_st)
         my_sim_ac.append(rp_ac)
         my_sim_cost.append(rp_cost)
@@ -498,9 +789,15 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     md_sim_cost = []
     md_sim_disc = []
 
-
     if show_policy:
-        text_file = open(export_state_md, 'w')
+        text_file = open(export_state_md, 'w', newline="")
+        cost_file = open(export_cost_md, 'w', newline="")
+        util_file = open(export_util_md, 'w', newline="")
+        print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv", file=cost_file)
+        print(f"repl,period,horizon_period,usage_admin,usage_OR", file=util_file)
+        logging_file = open('Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-logging-MDP.txt', 'w', newline="")
+
+    # Simulation
     for repl in trange(replications, desc='MDP'):
         
         # Random streams
@@ -515,15 +812,17 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
         rp_cost = []
         rp_disc = 0
         state = deepcopy(init_state)
+        
+        # Detailed Logging Data
+        patient_data_df = pd.DataFrame( columns=['repl', 'period', 'policy', 'id','priority', 'complexity', 'surgery','action','arrived_on','sched_to', 'resch_from', 'resch_to', 'transition'] )
+        patient_id_count = 0
 
         for day in trange(duration):
+            
 
-            # Save State Data
-            # if show_policy: rp_st.append(deepcopy(state))
-            if show_policy: 
-                # with open(export_state_md, 'w') as text_file:
-                text_file.write(f'Day {day+1}\n')
-                text_file.write(f"{non_zero_state(state)}\n")
+            patient_data = {
+                'repl': [], 'period': [], 'policy': [], 'id': [], 'priority': [], 'complexity': [], 'surgery': [], 'action': [], 'arrived_on': [], 'sched_to': [], 'resch_from': [], 'resch_to': [], 'transition': []
+            }
 
             # Generate Action
             if day >= warm_up:
@@ -542,6 +841,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             # Save Cost
             if day >= warm_up:
                 rp_cost.append(mdo_cost.getValue())
+                print(f"{repl},{day}, {mdo_cost.getValue()},{mdo_cw.getValue()},{mdo_cs.getValue()},{mdo_brsc.getValue()},{mdo_grsc.getValue()},{mdo_cv.getValue()}", file=cost_file)
                 rp_disc = mdo_cost.getValue() + gam*rp_disc
             else:
                 for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
@@ -549,123 +849,340 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0); myv_ac_rsc[(t,tp,m,d,k,c)].LB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0)
                 myopic.optimize()
                 rp_cost.append(myo_cost.getValue())
+                print(f"{repl},{day}, {myo_cost.getValue()},{myo_cw.getValue()},{myo_cs.getValue()},{myo_brsc.getValue()},{myo_grsc.getValue()},{myo_cv.getValue()}", file=cost_file)
 
             # Save Action
             if day >= warm_up:
                 action = {'sc':{}, 'rsc':{}, 'uv': {}, 'ulp': {}, 'uup': {}, 'pwp':{}, 'psp': {}}
-                for i in itertools.product(T,M,D,K,C): action['sc'][i] = mdv_ac_sc[i].X 
-                for i in itertools.product(T,T,M,D,K,C): action['rsc'][i] = mdv_ac_rsc[i].X
+                for i in itertools.product(T,M,D,K,C): action['sc'][i] = round(mdv_ac_sc[i].X,0)
+                for i in itertools.product(T,T,M,D,K,C): action['rsc'][i] = round(mdv_ac_rsc[i].X,0)
                 for i in itertools.product(T,P): action['uv'][i] = mdv_aux_uv[i].X
-                for i in PCO: action['ulp'][i] = mdv_aux_ulp[i].X
+                for i in PCO: action['ulp'][i] = round(mdv_aux_ulp[i].X,0)
                 for i in itertools.product(T,P): action['uup'][i] = mdv_aux_uup[i].X
-                for i in itertools.product(M,D,K,C): action['pwp'][i] = mdv_aux_pwp[i].X
-                for i in itertools.product(T,M,D,K,C): action['psp'][i] = mdv_aux_psp[i].X
-                # if show_policy: rp_ac.append(action)
-                
-                if show_policy: 
-                    # with open(export_state_md, 'w') as text_file:
-                    text_file.write(f'{non_zero_action(action)}\n')
-                    text_file.write(f'\tCost: {mdo_cost.getValue()}\n')
+                for i in itertools.product(M,D,K,C): 
+                    action['pwp'][i] = round(mdv_aux_pwp[i].X,0)
+                    if action['pwp'][i] != 0: print(action['pwp'][i], file=logging_file)
+                for i in itertools.product(T,M,D,K,C): action['psp'][i] = round(mdv_aux_psp[i].X,0)
+
+                for t in T:
+                    print(f"{repl},{day},{t-1},{action['uup'][(t,P[0])]},{action['uup'][(t,P[1])]}", file=util_file)
             else:
                 
                 for t,m,d,k,c in itertools.product(T,M,D,K,C): myv_ac_sc[(t,m,d,k,c)].UB = GRB.INFINITY; myv_ac_sc[(t,m,d,k,c)].LB = 0
                 for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = GRB.INFINITY; myv_ac_rsc[(t,tp,m,d,k,c)].LB = 0
                 action = {'sc':{}, 'rsc':{}, 'uv': {}, 'ulp': {}, 'uup': {}, 'pwp':{}, 'psp': {}}
-                for i in itertools.product(T,M,D,K,C): action['sc'][i] = myv_ac_sc[i].X 
-                for i in itertools.product(T,T,M,D,K,C): action['rsc'][i] = myv_ac_rsc[i].X
+                for i in itertools.product(T,M,D,K,C): action['sc'][i] = round(myv_ac_sc[i].X,0) 
+                for i in itertools.product(T,T,M,D,K,C): action['rsc'][i] = round(myv_ac_rsc[i].X,0)
                 for i in itertools.product(T,P): action['uv'][i] = myv_aux_uv[i].X
-                for i in PCO: action['ulp'][i] = myv_aux_ulp[i].X
+                for i in PCO: action['ulp'][i] = round(myv_aux_ulp[i].X,0)
                 for i in itertools.product(T,P): action['uup'][i] = myv_aux_uup[i].X
-                for i in itertools.product(M,D,K,C): action['pwp'][i] = myv_aux_pwp[i].X
-                for i in itertools.product(T,M,D,K,C): action['psp'][i] = myv_aux_psp[i].X
-                # if show_policy: rp_ac.append(action)
+                for i in itertools.product(M,D,K,C): 
+                    action['pwp'][i] = round(myv_aux_pwp[i].X,0)
+                    if action['pwp'][i] != 0: print(action['pwp'][i], file=logging_file)
+                for i in itertools.product(T,M,D,K,C): action['psp'][i] = round(myv_aux_psp[i].X,0)
                 
-                if show_policy: 
-                    # with open(export_state_md, 'w') as text_file:
-                    text_file.write(f'{non_zero_action(action)}\n')
-                    text_file.write(f'\tCost: {myo_cost.getValue()}\n')
+                for t in T:
+                    print(f"{repl},{day},{t-1},{action['uup'][(t,P[0])]},{action['uup'][(t,P[1])]}", file=util_file)
+
             
-            # Transition between States
-            if day >= warm_up:
-                # Units Leftover / Unit Deviation
-                for p in PCO: state['ul'][p] = mdv_aux_ulp[p].X + round(md_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
-                for p in PNCO: state['ul'][p] = round(md_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
+            #region Save Action Data for Logging
+            if show_policy:
 
-                # Patients Waiting - set to post action
-                for m,d,k,c in itertools.product(M, D, K, C): state['pw'][(m,d,k,c)] = mdv_aux_pwp[(m,d,k,c)].X
-                # Patients Waiting - calculate D&K transition
-                md_ptw_d = {}
-                md_ptw_k = {}
+                # Add entries for schedulings
                 for m,d,k,c in itertools.product(M, D, K, C):
-                    if d != D[-1] and m >= TL[c]: md_ptw_d[(m,d,k,c)] = md_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_d[(d,c)] )
-                    if k != K[-1] and m >= TL[c]: md_ptw_k[(m,d,k,c)] = md_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_k[(k,c)] )
-                for m,d,k,c in itertools.product(M, D, K, C): 
-                    if d != D[0] and m >= TL[c]: state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] + md_ptw_d[(m,D[D.index(d)-1],k,c)]
-                    if d != D[-1] and m >= TL[c]: state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] - md_ptw_d[(m,d,k,c)]      
-                # Patients Waiting - change wait time
-                for d,k,c in itertools.product(D, K, C): state['pw'][(M[-1],d,k,c)] +=  state['pw'][(M[-2],d,k,c)]
-                for m,d,k,c in itertools.product(M[1:-1][::-1], D, K, C): state['pw'][(m,d,k,c)] =  state['pw'][(m-1,d,k,c)]
-                for d,k,c in itertools.product(D, K, C): state['pw'][(0,d,k,c)] = md_strm_arr.poisson(pea[(d,k,c)])
 
-                # Patients Scheduled - post action
-                for t,m,d,k,c in itertools.product(T, M, D, K, C): state['ps'][(t,m,d,k,c)] = mdv_aux_psp[(t,m,d,k,c)].X
-                # Patients Scheduled  - calculate D&K transition
-                md_pts_d = {}
-                md_pts_k = {}
+                    skip = True
+                    for t in T:
+                        if action['sc'][(t,m,d,k,c)] > 0.001: skip = False
+                    if skip == True: continue
+                    
+                    # Find all unscheduled patients based on m,d,k,c
+                    pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                    pat_unsched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) == 1)
+                    
+                    # Add entry for patients scheduled
+                    sched = 0
+                    for t in T:
+                        for elem in range(int(action['sc'][(t,m,d,k,c)])):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('MDP')
+                            patient_data['id'].append(pat_unsched['id'].to_list()[sched])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('scheduled')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(t+day-1)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append(pd.NA)
+                            sched += 1
+
+                # Add entries for reschedulings
                 for t,m,d,k,c in itertools.product(T, M, D, K, C):
-                    if d != D[-1] and m >= TL[c]: md_pts_d[(t,m,d,k,c)] = md_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_d[(d,c)] )
-                    if k != K[-1] and m >= TL[c]: md_pts_k[(t,m,d,k,c)] = md_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_k[(k,c)] )
-                for t,m,d,k,c in itertools.product(T, M, D, K, C): 
-                    if d != D[0] and m >= TL[c]: state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] + md_pts_d[(t,m,D[D.index(d)-1],k,c)]
-                    if d != D[-1] and m >= TL[c]: state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] - md_pts_d[(t,m,d,k,c)]     
-                # Patients Scheduled  - change wait time
-                for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,M[-1],d,k,c)] +=  state['ps'][(t,M[-2],d,k,c)]
-                for t,m,d,k,c in itertools.product(T, M[1:-1][::-1], D, K, C): state['ps'][(t,m,d,k,c)] =  state['ps'][(t,m-1,d,k,c)]
-                for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,0,d,k,c)] = 0
-                # Patients Scheduled  - change scheduled time
-                for t,m,d,k,c in itertools.product(T[:-1],M,D,K,C): state['ps'][(t,m,d,k,c)] = state['ps'][(t+1,m,d,k,c)]
-                for m,d,k,c in itertools.product(M,D,K,C): state['ps'][(T[-1],m,d,k,c)] = 0
-                pass
-            else:
-                # Units Leftover / Unit Deviation
-                for p in PCO: state['ul'][p] = myv_aux_ulp[p].X + round(md_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
-                for p in PNCO: state['ul'][p] = round(md_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
+                    
+                    skip = True
+                    for tp in T:
+                        if action['rsc'][(t,tp,m,d,k,c)] >= 0.001: skip = False
+                    if skip == True: continue
 
-                # Patients Waiting - set to post action
-                for m,d,k,c in itertools.product(M, D, K, C): state['pw'][(m,d,k,c)] = myv_aux_pwp[(m,d,k,c)].X
-                # Patients Waiting - calculate D&K transition
-                my_ptw_d = {}
-                my_ptw_k = {}
+                    pass
+
+                    # Finds all scheduled patients based on t,m,d,k,c
+                    pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                    pat_sched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) >= 2).groupby('id').tail(1).reset_index()
+                    pat_sched_subset = pat_sched.query(f"sched_to == {day+t-1} or resch_to == {day+t-1}")
+
+                    # Add entry for patient rescheduled
+                    resched = 0
+                    for tp in T:
+                        for elem in range(int(action['rsc'][(t,tp,m,d,k,c)])):  
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('MDP')
+                            patient_data['id'].append(pat_sched_subset['id'].to_list()[resched])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('rescheduled')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(t+day-1)
+                            patient_data['resch_to'].append(tp+day-1)
+                            patient_data['transition'].append(pd.NA)
+                            resched += 1
+
+                # Save Data to dataframe
+                patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                patient_data = {k : [] for k in patient_data}
+            #endregion
+            
+            ### Transition between States
+            # Units Leftover / Unit Deviation   
+            for p in PCO: state['ul'][p] = action['ulp'][p] + round(md_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
+            for p in PNCO: state['ul'][p] = round(md_strm_dev.uniform(p_dat[p].deviation[0],p_dat[p].deviation[1]), 2)
+
+            # Patients Waiting - set to post action
+            for m,d,k,c in itertools.product(M, D, K, C): state['pw'][(m,d,k,c)] = action['pwp'][(m,d,k,c)]
+
+            #region Patients Waiting - calculate & execute D Transition
+            md_ptw_d = {}
+            for m,d,k,c in itertools.product(M, D, K, C):
+                if d != D[-1] and m >= TL[c]: 
+                    md_ptw_d[(m,d,k,c)] = md_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_d[(d,c)] )
+
+            # Save data on transitions
+            if show_policy:
                 for m,d,k,c in itertools.product(M, D, K, C):
-                    if d != D[-1] and m >= TL[c]: my_ptw_d[(m,d,k,c)] = md_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_d[(d,c)] )
-                    if k != K[-1] and m >= TL[c]: my_ptw_k[(m,d,k,c)] = md_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_k[(k,c)] )
-                for m,d,k,c in itertools.product(M, D, K, C): 
-                    if d != D[0] and m >= TL[c]: state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] + my_ptw_d[(m,D[D.index(d)-1],k,c)]
-                    if d != D[-1] and m >= TL[c]: state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] - my_ptw_d[(m,d,k,c)]      
-                # Patients Waiting - change wait time
-                for d,k,c in itertools.product(D, K, C): state['pw'][(M[-1],d,k,c)] +=  state['pw'][(M[-2],d,k,c)]
-                for m,d,k,c in itertools.product(M[1:-1][::-1], D, K, C): state['pw'][(m,d,k,c)] =  state['pw'][(m-1,d,k,c)]
-                for d,k,c in itertools.product(D, K, C): state['pw'][(0,d,k,c)] = md_strm_arr.poisson(pea[(d,k,c)])
+                    if d != D[-1] and m >= TL[c]: 
+                        if md_ptw_d[(m,d,k,c)] == 0: continue
+                        
+                        # Find all unscheduled patients based on m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_unsched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) == 1)
 
-                # Patients Scheduled - post action
-                for t,m,d,k,c in itertools.product(T, M, D, K, C): state['ps'][(t,m,d,k,c)] = myv_aux_psp[(t,m,d,k,c)].X
-                # Patients Scheduled  - calculate D&K transition
-                my_pts_d = {}
-                my_pts_k = {}
+                        # Save Entry
+                        for transition in range(md_ptw_d[(m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('MDP')
+                            patient_data['id'].append(pat_unsched['id'].to_list()[transition])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(D[D.index(d)+1])
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('complexity')
+                            
+                        # Save Data to dataframe
+                        patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                        patient_data = {k : [] for k in patient_data}
+            
+            for m,d,k,c in itertools.product(M, D, K, C): 
+                if d != D[-1] and m >= TL[c]: 
+                    state['pw'][(m,D[D.index(d)+1],k,c)] = state['pw'][(m,D[D.index(d)+1],k,c)] + md_ptw_d[(m,d,k,c)]
+                    state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] - md_ptw_d[(m,d,k,c)]
+            #endregion
+
+            #region Patients Waiting - calculate & execute K Transition
+            md_ptw_k = {}
+            for m,d,k,c in itertools.product(M, D, K, C):
+                if k != K[-1] and m >= TL[c]: 
+                    md_ptw_k[(m,d,k,c)] = md_strm_pwt.binomial(state['pw'][(m,d,k,c)], ptp_k[(k,c)] )
+
+            # Save data on transitions
+            if show_policy:
+                for m,d,k,c in itertools.product(M, D, K, C):
+                    if k != K[-1] and m >= TL[c]: 
+                        if md_ptw_k[(m,d,k,c)] == 0: continue
+                        
+                        # Find all unscheduled patients based on m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_unsched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) == 1)
+
+                        # Save Entry
+                        for transition in range(md_ptw_k[(m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('MDP')
+                            patient_data['id'].append(pat_unsched['id'].to_list()[transition])
+                            patient_data['priority'].append(K[K.index(k)+1])
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('priority')
+                            
+                        # Save Data to dataframe
+                        patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                        patient_data = {k : [] for k in patient_data}
+                
+            for m,d,k,c in itertools.product(M, D, K, C): 
+                if k != K[-1] and m >= TL[c]: 
+                    state['pw'][(m,d,K[K.index(k)+1],c)] = state['pw'][(m,d,K[K.index(k)+1],c)] + md_ptw_k[(m,d,k,c)]
+                    state['pw'][(m,d,k,c)] = state['pw'][(m,d,k,c)] - md_ptw_k[(m,d,k,c)]    
+            #endregion
+
+            # Patients Waiting - change wait time
+            for d,k,c in itertools.product(D, K, C): state['pw'][(M[-1],d,k,c)] +=  state['pw'][(M[-2],d,k,c)]
+            for m,d,k,c in itertools.product(M[1:-1][::-1], D, K, C): state['pw'][(m,d,k,c)] =  state['pw'][(m-1,d,k,c)]
+
+            #region Patient Arrivals
+            for d,k,c in itertools.product(D, K, C): 
+                arrivals = md_strm_arr.poisson(pea[(d,k,c)])
+
+                # Save Data for Logging
+                if show_policy:
+                    for arr in range(arrivals):
+                        patient_data['repl'].append(repl)
+                        patient_data['period'].append(day+1)
+                        patient_data['policy'].append('MDP')
+                        patient_data['id'].append(patient_id_count)
+                        patient_data['priority'].append(k)
+                        patient_data['complexity'].append(d)
+                        patient_data['surgery'].append(c)
+                        patient_data['action'].append('arrived')
+                        patient_data['arrived_on'].append(day+1)
+                        patient_data['sched_to'].append(pd.NA)
+                        patient_data['resch_from'].append(pd.NA)
+                        patient_data['resch_to'].append(pd.NA)
+                        patient_data['transition'].append(pd.NA)
+                        patient_id_count += 1
+                state['pw'][(0,d,k,c)] = arrivals
+            #endregion
+
+            # Patients Scheduled - post action
+            for t,m,d,k,c in itertools.product(T, M, D, K, C): state['ps'][(t,m,d,k,c)] = action['psp'][(t,m,d,k,c)]
+
+            #region Patients Scheduled - calculate & execute D Transition
+            md_pts_d = {}
+            for t,m,d,k,c in itertools.product(T, M, D, K, C):
+                if d != D[-1] and m >= TL[c]: 
+                    md_pts_d[(t,m,d,k,c)] = md_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_d[(d,c)] )
+
+            # Save data on transitions
+            if show_policy:
                 for t,m,d,k,c in itertools.product(T, M, D, K, C):
-                    if d != D[-1] and m >= TL[c]: my_pts_d[(t,m,d,k,c)] = md_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_d[(d,c)] )
-                    if k != K[-1] and m >= TL[c]: my_pts_k[(t,m,d,k,c)] = md_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_k[(k,c)] )
-                for t,m,d,k,c in itertools.product(T, M, D, K, C): 
-                    if d != D[0] and m >= TL[c]: state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] + my_pts_d[(t,m,D[D.index(d)-1],k,c)]
-                    if d != D[-1] and m >= TL[c]: state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] - my_pts_d[(t,m,d,k,c)]     
-                # Patients Scheduled  - change wait time
-                for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,M[-1],d,k,c)] +=  state['ps'][(t,M[-2],d,k,c)]
-                for t,m,d,k,c in itertools.product(T, M[1:-1][::-1], D, K, C): state['ps'][(t,m,d,k,c)] =  state['ps'][(t,m-1,d,k,c)]
-                for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,0,d,k,c)] = 0
-                # Patients Scheduled  - change scheduled time
-                for t,m,d,k,c in itertools.product(T[:-1],M,D,K,C): state['ps'][(t,m,d,k,c)] = state['ps'][(t+1,m,d,k,c)]
-                for m,d,k,c in itertools.product(M,D,K,C): state['ps'][(T[-1],m,d,k,c)] = 0
-                pass
+                    if d != D[-1] and m >= TL[c]: 
+                        if md_pts_d[(t,m,d,k,c)] == 0: continue
+                        
+                        # Find all scheduled patients based on t,m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_sched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) >= 2).groupby('id').tail(1).reset_index()
+                        pat_sched_subset = pat_sched.query(f"sched_to == {day+t-1} or resch_to == {day+t-1}")
+
+                        # Save Entry
+                        for transition in range(md_pts_d[(t,m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('MDP')
+                            patient_data['id'].append(pat_sched_subset['id'].to_list()[transition])
+                            patient_data['priority'].append(k)
+                            patient_data['complexity'].append(D[D.index(d)+1])
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('complexity')
+
+                    # Save Data to dataframe
+                patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                patient_data = {k : [] for k in patient_data}
+
+            for t,m,d,k,c in itertools.product(T, M, D, K, C): 
+                if d != D[-1] and m >= TL[c]: 
+                    state['ps'][(t,m,D[D.index(d)+1],k,c)] = state['ps'][(t,m,D[D.index(d)+1],k,c)] + md_pts_d[(t,m,d,k,c)]
+                    state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] - md_pts_d[(t,m,d,k,c)]
+            #endregion
+
+            #region Patients Scheduled - calculate & execute K Transition
+            md_pts_k = {}
+            for t,m,d,k,c in itertools.product(T, M, D, K, C):
+                if k != K[-1] and m >= TL[c]: 
+                    md_pts_k[(t,m,d,k,c)] = md_strm_pst.binomial(state['ps'][(t,m,d,k,c)], ptp_k[(k,c)] )
+
+            # Save data on transitions
+            if show_policy:
+                for t,m,d,k,c in itertools.product(T, M, D, K, C):
+                    if k != K[-1] and m >= TL[c]: 
+                        if md_pts_k[(t,m,d,k,c)] == 0: continue
+                        
+                        # Find all scheduled patients based on t,m,d,k,c
+                        pat_subset = retrive_surg_subset(patient_data_df, d, k ,c, m, day)
+                        pat_sched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) >= 2).groupby('id').tail(1).reset_index()
+                        pat_sched_subset = pat_sched.query(f"sched_to == {day+t-1} or resch_to == {day+t-1}")
+
+                        # Save Entry
+                        for transition in range(md_pts_k[(t,m,d,k,c)]):
+                            patient_data['repl'].append(repl)
+                            patient_data['period'].append(day)
+                            patient_data['policy'].append('MDP')
+                            patient_data['id'].append(pat_sched_subset['id'].to_list()[transition])
+                            patient_data['priority'].append(K[K.index(k)+1])
+                            patient_data['complexity'].append(d)
+                            patient_data['surgery'].append(c)
+                            patient_data['action'].append('transition')
+                            patient_data['arrived_on'].append(pd.NA)
+                            patient_data['sched_to'].append(pd.NA)
+                            patient_data['resch_from'].append(pd.NA)
+                            patient_data['resch_to'].append(pd.NA)
+                            patient_data['transition'].append('priority')
+
+                        # Save Data to dataframe
+                        patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+                        patient_data = {k : [] for k in patient_data}
+                        
+            for t,m,d,k,c in itertools.product(T, M, D, K, C): 
+                if k != K[-1] and m >= TL[c]: 
+                    state['ps'][(t,m,d,K[K.index(k)+1],c)] = state['ps'][(t,m,d,K[K.index(k)+1],c)] + md_pts_k[(t,m,d,k,c)]
+                    state['ps'][(t,m,d,k,c)] = state['ps'][(t,m,d,k,c)] - md_pts_k[(t,m,d,k,c)]
+            # endregion
+
+            # Patients Scheduled  - change wait time
+            for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,M[-1],d,k,c)] +=  state['ps'][(t,M[-2],d,k,c)]
+            for t,m,d,k,c in itertools.product(T, M[1:-1][::-1], D, K, C): state['ps'][(t,m,d,k,c)] =  state['ps'][(t,m-1,d,k,c)]
+            for t,d,k,c in itertools.product(T, D, K, C): state['ps'][(t,0,d,k,c)] = 0
+            
+            # Patients Scheduled  - change scheduled time
+            for t,m,d,k,c in itertools.product(T[:-1],M,D,K,C): state['ps'][(t,m,d,k,c)] = state['ps'][(t+1,m,d,k,c)]
+            for m,d,k,c in itertools.product(M,D,K,C): state['ps'][(T[-1],m,d,k,c)] = 0
+
+            # Save Data to dataframe
+            if show_policy:
+                patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
+        
+        # Save logging
+        if show_policy:
+            patient_data_df.to_csv(text_file, index=None,)
 
         md_sim_st.append(rp_st)
         md_sim_ac.append(rp_ac)
