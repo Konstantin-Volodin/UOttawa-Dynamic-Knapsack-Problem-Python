@@ -2,20 +2,23 @@ library(tidyverse)
 library(readr)
 library(gridExtra)
 
+warmup <- 1000
+duration <- 3000
+
 ### READ DATA
 # State Data
-state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md.txt")
-state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my.txt")
+state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md-less-arr-.txt")
+state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my-less-arr-.txt")
 state <- bind_rows(state_md, state_my)
 rm(state_md,state_my)
 # Cost Data
-cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md.txt") %>% mutate(policy = "MDP")
-cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my.txt")  %>% mutate(policy = "Myopic")
+cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md-less-arr-.txt") %>% mutate(policy = "MDP")
+cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my-less-arr-.txt")  %>% mutate(policy = "Myopic")
 cost <- bind_rows(cost_md, cost_my)
 rm(cost_md,cost_my)
 # Utilization Data
-util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
-util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
+util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md-less-arr-.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
+util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my-less-arr-.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
 util <- bind_rows(util_md, util_my) %>% 
   mutate(bed = usage_admin/1.5, OR = usage_OR/11.25) %>%
   select(repl, period, policy, bed, OR) %>%
@@ -31,7 +34,7 @@ ts_cost_p <- ggplot(ts_cost, aes(x=period)) +
   geom_ribbon(aes(ymin=cost_m- (2*cost_sd), ymax=cost_m+ (2*cost_sd), fill=policy), alpha=0.3) +
   theme_minimal() + 
   theme(legend.position="bottom")
-bx_cost_p <- ggplot(cost %>% filter(period > 3000)) +
+bx_cost_p <- ggplot(cost %>% filter(period > warmup)) +
   geom_boxplot(aes(y=cost, fill=policy)) +
   theme_minimal() + 
   theme(legend.position="bottom")
@@ -40,7 +43,7 @@ bx_cost_p <- ggplot(cost %>% filter(period > 3000)) +
 
 ### UTILIZATION ANALYSIS
 # Utilization
-bx_util_p <- ggplot(util %>% filter(period > 3000)) +
+bx_util_p <- ggplot(util %>% filter(period > warmup)) +
   geom_boxplot(aes(y=util, x=resource, fill=policy)) +
   theme_minimal()
 
@@ -51,7 +54,7 @@ pwu_pat <- state %>%
   group_by(policy, repl, id) %>% 
   filter(action %in% c('arrived')) %>%
   ungroup() %>%
-  filter(arrived_on > 3000) %>%
+  filter(arrived_on > warmup) %>%
   select(policy, repl, id)
 # Post warm-up wait time (only completed)
 pwu_wait_c <- state %>%
@@ -76,7 +79,7 @@ pwu_wait_nc <- state %>%
   mutate(final_sched = case_when(
     is.na(sched_to) == F ~ sched_to,
     is.na(resch_to) == F ~ resch_to,
-    TRUE ~ 10001
+    TRUE ~ duration+1
   )) %>%
   mutate(final_sched = min(final_sched, na.rm=T)) %>%
   slice(c(1)) %>%
@@ -103,8 +106,8 @@ for (p in periods) {
     group_by(policy, repl, .drop=FALSE) %>%
     filter(arrived_on <= p & final_sched > p) %>% 
     summarize(wt_size = n()) %>%
-    # group_by(policy) %>%
-    # summarize(wt_size_m = mean(wt_size), wt_size_sd = sd(wt_size)) %>%
+    group_by(policy) %>%
+    summarize(wt_size_m = mean(wt_size), wt_size_sd = sd(wt_size)) %>%
     mutate(period = p)
   wl_data <- bind_rows(wl_data, wait_data)
 }
@@ -114,7 +117,7 @@ ts_wl_p <- ggplot(wl_data, aes(x=period)) +
   geom_ribbon(aes(ymin=wt_size_m - (2*wt_size_sd ), ymax=wt_size_m + (2*wt_size_sd ), fill=policy), alpha=0.3) +
   theme_minimal() + 
   theme(legend.position="bottom")
-bx_wl_p <- ggplot(wl_data %>% filter(period > 3000)) +
+bx_wl_p <- ggplot(wl_data %>% filter(period > warmup)) +
   geom_boxplot(aes(y=wt_size_m , fill=policy)) +
   theme_minimal() + 
   theme(legend.position="bottom")
@@ -125,7 +128,7 @@ bx_wl_p <- ggplot(wl_data %>% filter(period > 3000)) +
 # Usage of Reschedules
 resch_data <- state %>% 
   modify_if(is.character, as.factor) %>%
-  filter(action == 'rescheduled' & period > 3000) %>%
+  filter(action == 'rescheduled' & period > warmup) %>%
   group_by(repl,policy) %>% 
   summarize(resch = n()) %>%
   ungroup()
