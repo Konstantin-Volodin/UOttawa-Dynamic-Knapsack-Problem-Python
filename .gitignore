@@ -1,7 +1,4 @@
 
 *.lp
-*.pkl
 *.mps
-*.txt
-*.html
 .Rproj.user

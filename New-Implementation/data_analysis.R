@@ -31,7 +31,7 @@ rm(util_md,util_my)
 ts_cost <- cost %>% group_by(period, policy) %>% summarise(cost_m = mean(cost), cost_sd = sd(cost))
 ts_cost_p <- ggplot(ts_cost, aes(x=period)) +
   geom_line(aes(y=cost_m, color=policy)) +
-  geom_ribbon(aes(ymin=cost_m- (2*cost_sd), ymax=cost_m+ (2*cost_sd), fill=policy), alpha=0.3) +
+  geom_ribbon(aes(ymin=cost_m- (2*cost_sd/sqrt(30)), ymax=cost_m+ (2*cost_sd/sqrt(30)), fill=policy), alpha=0.3) +
   theme_minimal() + 
   theme(legend.position="bottom")
 bx_cost_p <- ggplot(cost %>% filter(period > warmup)) +
@@ -111,16 +111,22 @@ for (p in periods) {
     mutate(period = p)
   wl_data <- bind_rows(wl_data, wait_data)
 }
+
 #graphs
 ts_wl_p <- ggplot(wl_data, aes(x=period)) +
   geom_line(aes(y=wt_size_m , color=policy)) +
-  geom_ribbon(aes(ymin=wt_size_m - (2*wt_size_sd ), ymax=wt_size_m + (2*wt_size_sd ), fill=policy), alpha=0.3) +
+  geom_ribbon(aes(ymin=wt_size_m - (2*wt_size_sd / sqrt(30)), ymax=wt_size_m + (2*wt_size_sd / sqrt(30) ), fill=policy), alpha=0.3) +
   theme_minimal() + 
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") + 
+  labs(x = 'Week #', y='Size of the Waitlist', title='Waitlist Size over time')
 bx_wl_p <- ggplot(wl_data %>% filter(period > warmup)) +
   geom_boxplot(aes(y=wt_size_m , fill=policy)) +
   theme_minimal() + 
-  theme(legend.position="bottom")
+  theme(legend.position="bottom") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  labs(y='Size of the Waitlist', title='Waitlist Boxplot')
 
 
 

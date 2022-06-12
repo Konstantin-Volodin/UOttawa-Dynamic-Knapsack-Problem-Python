@@ -359,6 +359,9 @@ for t,m,d,k,c in itertools.product(T,M,D,K,C):
 coef_df = pd.Series(sc_coef).reset_index()
 coef_df.columns = ['T','M','D','K','C','Val']
 coef_df['DK'] = coef_df['D'] + " \t" + coef_df['K']
+coef_df = coef_df.assign( cw = lambda df: df['K'].map(lambda k: cw[k]) )
+coef_df = coef_df.assign( Val = -coef_df['Val'] + coef_df['cw'] )
+# coef_df = coef_df.assign( C = lambda df: df['C'].map(lambda c: f"Surgery {c.split('.')[0]}") )
 
 # for m in M:
 #     fig = px.line(coef_df.query(f'M == {m}'), x='T',y='Val',color='C', facet_row='D', facet_col='K', title=f'Scheduling Objective - Wait List: {m}', markers=True)
@@ -370,10 +373,24 @@ coef_df['DK'] = coef_df['D'] + " \t" + coef_df['K']
 #     # fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
 # fig.show(renderer="browser")
 
-fig = px.line(coef_df, x='T',y='Val',color='DK', facet_row='C', facet_col='M', title=f'{test_modifier} Scheduling Objective', markers=True)
-for k in K:
-    fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
-fig.show(renderer="browser")
+MN = [0, 1, 4]
+MT = ['New Arrivals', 'On Waitlist - no chance of transition', 'On Waitlist - change of transition']
+for m in range(len(MN)):
+    fig = px.line(
+        coef_df.query(f"T <= 4 and M == {MN[m]} and C == '{C[1]}'"), 
+        x='T',y='Val',color='D',symbol="K",
+        title=f'{test_modifier} Scheduling Objective - Surgery {4} <br>{MT[m]}', 
+        markers=True)
+    fig.update(
+        layout_yaxis_range = [18,30],
+        layout_xaxis_range = [0.98, 1.02])
+
+# for k in K:
+#     fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
+    fig.show(renderer="browser")
+
+
+
 # %%
 
 # %%
