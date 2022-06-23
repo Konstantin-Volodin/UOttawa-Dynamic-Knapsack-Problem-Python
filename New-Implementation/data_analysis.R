@@ -162,9 +162,10 @@ bx_resch
 
 
 ### Review Logging Data
-log_my <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-my#13.txt")
-log_my <- log_my %>% mutate(policy = "myopic")
-log_md <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-md#13.txt")
+number <- 5
+log_my <- read_csv(paste0("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-my#",number,".txt"))
+log_my <- log_my %>% mutate(policy = "myopic") %>% mutate(period = as.character(period))
+log_md <- read_csv(paste0("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-md#",number,".txt"))
 log_md <- log_md %>% mutate(policy = "MDP") %>% mutate(period = as.character(period))
 log <- bind_rows(log_md, log_my)
 rm(log_md,log_my)

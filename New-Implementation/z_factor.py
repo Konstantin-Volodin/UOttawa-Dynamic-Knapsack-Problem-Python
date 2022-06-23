@@ -354,22 +354,23 @@ coef_df.columns = ['T','M','D','K','C','Val']
 coef_df['DK'] = coef_df['D'] + " \t" + coef_df['K']
 input_data.ppe_data['Admissions'].util = 0.6
 input_data.ppe_data['OR_Time'].util = 0.957
-temp = list(map(
-    lambda x: {x[0]: x[1] / input_data.ppe_data[x[0][0]].expected_units}, 
-    input_data.usage.items()
-))
-ppe_usage = {}
-for i in temp: ppe_usage[list(i.keys())[0]] = list(i.values())[0]
-resource_usage = {}
-for d,c in itertools.product(D,C): resource_usage[(d,c)] = ppe_usage[('OR_Time',d,c)] + ppe_usage[('Admissions'), d, c]
-resource_usages_list = list(map(lambda x: resource_usage[(x['D'],x['C'])], coef_df[['D','C']].to_dict('records')))
+# temp = list(map(
+#     lambda x: {x[0]: x[1] / input_data.ppe_data[x[0][0]].expected_units}, 
+#     input_data.usage.items()
+# ))
+# ppe_usage = {}
+# for i in temp: ppe_usage[list(i.keys())[0]] = list(i.values())[0]
+# resource_usage = {}
+# for d,c in itertools.product(D,C): resource_usage[(d,c)] = ppe_usage[('OR_Time',d,c)] + ppe_usage[('Admissions'), d, c]
+# resource_usages_list = list(map(lambda x: resource_usage[(x['D'],x['C'])], coef_df[['D','C']].to_dict('records')))
 
-coef_df = coef_df.assign( cw = lambda df: df['K'].map(lambda k: cw[k]) )
-coef_df = coef_df.assign( or_usage =  resource_usages_list )
+# coef_df = coef_df.assign( cw = lambda df: df['K'].map(lambda k: cw[k]) )
+# coef_df = coef_df.assign( or_usage =  resource_usages_list )
 
-coef_df = coef_df.assign( Val = (-coef_df['Val'] + coef_df['cw'])/coef_df['or_usage'])
-coef_df = coef_df.assign( C = lambda df: df['C'].map(lambda c: f"Surgery {c.split('.')[0]}") )
-coef_df['DKC'] = coef_df['D'] + "," + coef_df['K'] + "," + coef_df['C']
+# coef_df = coef_df.assign( Val = (-coef_df['Val'] + coef_df['cw'])/coef_df['or_usage'])
+coef_df = coef_df.assign( Val = -coef_df['Val'])
+# coef_df = coef_df.assign( C = lambda df: df['C'].map(lambda c: f"Surgery {c.split('.')[0]}") )
+# coef_df['DKC'] = coef_df['D'] + "," + coef_df['K'] + "," + coef_df['C']
 
 # for m in M:
 #     fig = px.line(coef_df.query(f'M == {m}'), x='T',y='Val',color='C', facet_row='D', facet_col='K', title=f'Scheduling Objective - Wait List: {m}', markers=True)
@@ -397,29 +398,7 @@ coef_df['DKC'] = coef_df['D'] + "," + coef_df['K'] + "," + coef_df['C']
 #     fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
 
 
-fig = px.line(coef_df.query(f"M == {M[-1]} and K == '{K[1]}'"), x='T',y='Val',symbol='D', color='C', line_dash='D')
+fig = px.line(coef_df.query(f"M == {M[-1]}"), x='T',y='Val',symbol='DK', color='C', line_dash='D')
 fig.show(renderer="browser")
-
-
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
 
 # %%
