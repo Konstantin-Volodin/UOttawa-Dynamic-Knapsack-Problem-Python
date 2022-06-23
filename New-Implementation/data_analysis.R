@@ -157,3 +157,17 @@ bx_wait_nc
 grid.arrange(ts_wl_p, bx_wl_p, ncol=2)
 # reschedules
 bx_resch
+
+
+
+
+### Review Logging Data
+log_my <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-my#13.txt")
+log_my <- log_my %>% mutate(policy = "myopic")
+log_md <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-md#13.txt")
+log_md <- log_md %>% mutate(policy = "MDP") %>% mutate(period = as.character(period))
+log <- bind_rows(log_md, log_my)
+rm(log_md,log_my)
+
+log %>% filter(period == 0 & `state-aciton` == "action") %>% filter(policy == 'MDP')
+

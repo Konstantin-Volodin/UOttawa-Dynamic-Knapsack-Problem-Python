@@ -59,7 +59,7 @@ def read_data(data_file_path):
         ppe_type = ""
         if ppe_row[1] == True: ppe_type = "carry-over"
         else: ppe_type = "non-carry-over"
-        ppe_data[ppe_row[0]] = ppe_data_class(ppe_type, ppe_row[2], [float(i) for i in ppe_row[3].split(',')])
+        ppe_data[ppe_row[0]] = ppe_data_class(ppe_type, ppe_row[2], [float(i) for i in ppe_row[3].split(',')], 0)
 
 
     # PPE Usage

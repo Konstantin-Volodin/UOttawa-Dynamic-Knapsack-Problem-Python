@@ -3,3 +3,20 @@ do some research on similar work -
 decide which graphs to show
 
 select interesting scenarios
+
+
+
+For Stephen's paper:
+	- ignore priority
+	- desegregate by wait time as well
+
+For EJOR paper
+	- figure out why the priority is not working as expected
+	- do sensitivity analysis to decide when the priority starts
+		- all the penalty values
+		- the primarily 
+	- what we want to accomplish is that wait times for higher priority should be shorter that for lower priority
+
+
+timelines:
+	- On Monday (20th)

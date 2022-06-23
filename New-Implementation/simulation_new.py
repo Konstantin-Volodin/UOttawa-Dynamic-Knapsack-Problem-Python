@@ -76,6 +76,25 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     init_state = {'ul': E_UL, 'pw': E_PW, 'ps': E_PS}
     for i in itertools.product(M,D,K,C): init_state['pw'][i] = 100
     for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = 0
+    for i in itertools.product(P): init_state['ul'][i] = 0
+
+    # Review Importance
+    for m in M:
+        init_state['pw'][(m, 'Complexity 1', 'P2', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+        init_state['pw'][(m, 'Complexity 1', 'P3', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+        init_state['pw'][(m, 'Complexity 2', 'P2', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+        init_state['pw'][(m, 'Complexity 1', 'P2', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+        init_state['pw'][(m, 'Complexity 1', 'P3', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+        init_state['pw'][(m, 'Complexity 1', 'P2', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+        init_state['pw'][(m, 'Complexity 2', 'P3', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+        init_state['pw'][(m, 'Complexity 2', 'P2', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+        init_state['pw'][(m, 'Complexity 2', 'P3', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+        init_state['pw'][(m, 'Complexity 2', 'P2', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+        init_state['pw'][(m, 'Complexity 1', 'P3', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+        init_state['pw'][(m, 'Complexity 2', 'P3', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+
+    for k,v in init_state['pw'].items():
+        print(k,v)
 
     # Betas
     with open(os.path.join(my_path, import_beta), 'rb') as handle:
@@ -1233,42 +1252,3 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     with open(os.path.join(my_path, export_txt), "w") as text_file:
         print(f'Myopic: \t Discounted Cost {np.average(my_sim_disc):.2f} \t Average Cost {np.average(my_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(my_avg_cost[:warm_up]):.2f}', file=text_file)
         print(f'MDP: \t\t Discounted Cost {np.average(md_sim_disc):.2f} \t Average Cost {np.average(md_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(md_avg_cost[:warm_up]):.2f}', file=text_file)
-    # print(f'Myopic: \t Discounted Cost {np.average(my_sim_disc):.2f} \t Average Cost {np.average(my_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(my_avg_cost[:warm_up]):.2f}')
-    # print(f'MDP: \t\t Discounted Cost {np.average(md_sim_disc):.2f} \t Average Cost {np.average(md_avg_cost[warm_up:]):.2f} \t Warm Up Cost {np.average(md_avg_cost[:warm_up]):.2f}')
-    #endregion
-
-    ##### Expected State Values #####
-    #region
-    # if show_policy:
-    #     total_days = replications * (duration - warm_up)
-    #     exp_st = {'ul': {}, 'pw':{}, 'ps': {}}
-    #     for p in P: exp_st['ul'][p] = 0
-    #     for i in itertools.product(M,D,K,C): exp_st['pw'][i] = 0
-    #     for i in itertools.product(T,M,D,K,C): exp_st['ps'][i] = 0
-
-    #     for repl in range(len(my_sim_st)):
-    #         for day in range(len(my_sim_st[repl][warm_up:])):
-    #             for p in P: exp_st['ul'][p] += my_sim_st[repl][day+warm_up]['ul'][p] / total_days
-    #             for i in itertools.product(M,D,K,C): exp_st['pw'][i] += my_sim_st[repl][day+warm_up]['pw'][i] / total_days
-    #             for i in itertools.product(T,M,D,K,C): exp_st['ps'][i] += my_sim_st[repl][day+warm_up]['ps'][i] / total_days
-    #endregion
-
-    ##### Comparison of policies #####
-    #region
-    # if show_policy:
-    #     print('MYOPIC POLICY')
-    #     for i in range(20):
-    #         print(f'Day {i+1}')
-    #         non_zero_state(my_sim_st[0][i])
-    #         non_zero_action(my_sim_ac[0][i])
-    #         print(f'\tCost: {my_sim_cost[0][i]}')
-    #     print()
-        
-    #     print('MDP POLICY')
-    #     for i in range(20):
-    #         print(f'Day {i+1}')
-    #         non_zero_state(md_sim_st[0][i])
-    #         non_zero_action(md_sim_ac[0][i])
-    #         print(f'\tCost: {md_sim_cost[0][i]}')
-        #endregion
-        # %%
