@@ -7,18 +7,18 @@ duration <- 3000
 
 ### READ DATA
 # State Data
-state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md-less-arr-.txt")
-state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my-less-arr-.txt")
+state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md-nopri.txt")
+state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my-nopri.txt")
 state <- bind_rows(state_md, state_my)
 rm(state_md,state_my)
 # Cost Data
-cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md-less-arr-.txt") %>% mutate(policy = "MDP")
-cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my-less-arr-.txt")  %>% mutate(policy = "Myopic")
+cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md-nopri.txt") %>% mutate(policy = "MDP")
+cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my-nopri.txt")  %>% mutate(policy = "Myopic")
 cost <- bind_rows(cost_md, cost_my)
 rm(cost_md,cost_my)
 # Utilization Data
-util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md-less-arr-.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
-util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my-less-arr-.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
+util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md-nopri.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
+util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my-nopri.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
 util <- bind_rows(util_md, util_my) %>% 
   mutate(bed = usage_admin/1.5, OR = usage_OR/11.25) %>%
   select(repl, period, policy, bed, OR) %>%

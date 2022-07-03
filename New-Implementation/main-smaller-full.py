@@ -11,36 +11,36 @@ data_type = "smaller-full"
 # Optimization Paramers
 iter_lims = 1000000
 beta_fun = [
-    (0,0.75),
-    (10000,0.95)
+    (0,0.9),
+    (10000,0.99)
 ]
 sub_mip_gap = 0.001
-import_data_opt = f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
-export_data_opt = f"Data/sens-data/{data_type}/betas/{test_modifier}{data_type}-optimal.pkl"
-export_data_p2 = f"Data/sens-data/{data_type}/full-model/{test_modifier}{data_type}-p2.mps"
+import_data_opt = f"Data/sens-data/{data_type}/{test_modifier}{data_type}-nopri-data.xlsx"
+export_data_opt = f"Data/sens-data/{data_type}/betas/{test_modifier}{data_type}-nopri-optimal.pkl"
+export_data_p2 = f"Data/sens-data/{data_type}/full-model/{test_modifier}{data_type}-nopri-p2.mps"
 import_data_p2 = export_data_p2
 
 # Simulation Parameters
-replications = 1
-warm_up = 0
-duration = 5
+replications = 30
+warm_up = 1000
+duration = 3000
 show_policy = True
 import_data_sim = import_data_opt
 import_betas_sim = export_data_opt
-export_txt_sim = f"Data/sens-res/{data_type}/{test_modifier}{data_type}-optimal-res.txt"
-export_pic_sim = f"Data/sens-res/{data_type}/{test_modifier}{data_type}-optimal-res.html"
-export_state_my = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-state-my.txt"
-export_state_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-state-md.txt"
-export_cost_my = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-cost-my.txt"
-export_cost_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-cost-md.txt"
-export_util_my = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-util-my.txt"
-export_util_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-util-md.txt"
-export_sa_my = f"Data/sens-res/{data_type}/logging/{test_modifier}{data_type}-sa-my#13.txt"
-export_sa_md = f"Data/sens-res/{data_type}/logging/{test_modifier}{data_type}-sa-md#13.txt"
+export_txt_sim = f"Data/sens-res/{data_type}/{test_modifier}{data_type}-optimal-res-nopri.txt"
+export_pic_sim = f"Data/sens-res/{data_type}/{test_modifier}{data_type}-optimal-res-nopri.html"
+export_state_my = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-state-my-nopri.txt"
+export_state_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-state-md-nopri.txt"
+export_cost_my = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-cost-my-nopri.txt"
+export_cost_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-cost-md-nopri.txt"
+export_util_my = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-util-my-nopri.txt"
+export_util_md = f"Data/sens-res/{data_type}/state-action/{test_modifier}{data_type}-util-md-nopri.txt"
+export_sa_my = f"Data/sens-res/{data_type}/logging/{test_modifier}{data_type}-sa-my-nopri.txt"
+export_sa_md = f"Data/sens-res/{data_type}/logging/{test_modifier}{data_type}-sa-md-nopri.txt"
 
 #%% Execute
 start_time_opt = time.time()
-# optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2, import_data_p2)
+optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2, import_data_p2)
 end_time_opt = time.time()
 simulation_new.main_func(replications, warm_up, duration, show_policy, import_data_sim, import_betas_sim, export_txt_sim, export_pic_sim, export_state_my, export_state_md, export_cost_my, export_cost_md, export_util_my, export_util_md, export_sa_my, export_sa_md)
 end_time_sim = time.time()

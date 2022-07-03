@@ -74,24 +74,24 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
 
     # Initial State
     init_state = {'ul': E_UL, 'pw': E_PW, 'ps': E_PS}
-    for i in itertools.product(M,D,K,C): init_state['pw'][i] = 100
+    for i in itertools.product(M,D,K,C): init_state['pw'][i] = 0
     for i in itertools.product(T,M,D,K,C): init_state['ps'][i] = 0
     for i in itertools.product(P): init_state['ul'][i] = 0
 
     # Review Importance
-    for m in M:
-        init_state['pw'][(m, 'Complexity 1', 'P2', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
-        init_state['pw'][(m, 'Complexity 1', 'P3', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
-        init_state['pw'][(m, 'Complexity 2', 'P2', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
-        init_state['pw'][(m, 'Complexity 1', 'P2', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
-        init_state['pw'][(m, 'Complexity 1', 'P3', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
-        init_state['pw'][(m, 'Complexity 1', 'P2', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
-        init_state['pw'][(m, 'Complexity 2', 'P3', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
-        init_state['pw'][(m, 'Complexity 2', 'P2', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
-        init_state['pw'][(m, 'Complexity 2', 'P3', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
-        init_state['pw'][(m, 'Complexity 2', 'P2', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
-        init_state['pw'][(m, 'Complexity 1', 'P3', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
-        init_state['pw'][(m, 'Complexity 2', 'P3', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+    # for m in M:
+    #     init_state['pw'][(m, 'Complexity 1', 'P2', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+    #     init_state['pw'][(m, 'Complexity 1', 'P3', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+    #     init_state['pw'][(m, 'Complexity 2', 'P2', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+    #     init_state['pw'][(m, 'Complexity 1', 'P2', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+    #     init_state['pw'][(m, 'Complexity 1', 'P3', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+    #     init_state['pw'][(m, 'Complexity 1', 'P2', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+    #     init_state['pw'][(m, 'Complexity 2', 'P3', '6. SPINE POSTERIOR DISCECTOMY LUMBAR')] = 0
+    #     init_state['pw'][(m, 'Complexity 2', 'P2', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+    #     init_state['pw'][(m, 'Complexity 2', 'P3', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+    #     init_state['pw'][(m, 'Complexity 2', 'P2', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
+    #     init_state['pw'][(m, 'Complexity 1', 'P3', '4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR')] = 0
+    #     init_state['pw'][(m, 'Complexity 2', 'P3', '1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR')] = 0
 
     for k,v in init_state['pw'].items():
         print(k,v)

@@ -16,8 +16,8 @@ import plotly.express as px
 test_modifier = "cw1-cc5-cv10-gam99-"
 data_type = "smaller-full"
 
-import_data =  f"Data/sens-data/{data_type}/{test_modifier}{data_type}-data.xlsx"
-import_beta = f"Data/sens-data/{data_type}/betas/{test_modifier}{data_type}-optimal.pkl"
+import_data =  f"Data/sens-data/{data_type}/{test_modifier}{data_type}-nopri-data.xlsx"
+import_beta = f"Data/sens-data/{data_type}/betas/{test_modifier}{data_type}-nopri-optimal.pkl"
 
 my_path = os.getcwd()
 input_data = data_import.read_data(os.path.join(my_path, import_data))
@@ -354,23 +354,23 @@ coef_df.columns = ['T','M','D','K','C','Val']
 coef_df['DK'] = coef_df['D'] + " \t" + coef_df['K']
 input_data.ppe_data['Admissions'].util = 0.6
 input_data.ppe_data['OR_Time'].util = 0.957
-# temp = list(map(
-#     lambda x: {x[0]: x[1] / input_data.ppe_data[x[0][0]].expected_units}, 
-#     input_data.usage.items()
-# ))
-# ppe_usage = {}
-# for i in temp: ppe_usage[list(i.keys())[0]] = list(i.values())[0]
-# resource_usage = {}
-# for d,c in itertools.product(D,C): resource_usage[(d,c)] = ppe_usage[('OR_Time',d,c)] + ppe_usage[('Admissions'), d, c]
-# resource_usages_list = list(map(lambda x: resource_usage[(x['D'],x['C'])], coef_df[['D','C']].to_dict('records')))
+temp = list(map(
+    lambda x: {x[0]: x[1] / input_data.ppe_data[x[0][0]].expected_units}, 
+    input_data.usage.items()
+))
+ppe_usage = {}
+for i in temp: ppe_usage[list(i.keys())[0]] = list(i.values())[0]
+resource_usage = {}
+for d,c in itertools.product(D,C): resource_usage[(d,c)] = ppe_usage[('OR_Time',d,c)] + ppe_usage[('Admissions'), d, c]
+resource_usages_list = list(map(lambda x: resource_usage[(x['D'],x['C'])], coef_df[['D','C']].to_dict('records')))
 
-# coef_df = coef_df.assign( cw = lambda df: df['K'].map(lambda k: cw[k]) )
-# coef_df = coef_df.assign( or_usage =  resource_usages_list )
+coef_df = coef_df.assign( cw = lambda df: df['K'].map(lambda k: cw[k]) )
+coef_df = coef_df.assign( or_usage =  resource_usages_list )
 
-# coef_df = coef_df.assign( Val = (-coef_df['Val'] + coef_df['cw'])/coef_df['or_usage'])
-coef_df = coef_df.assign( Val = -coef_df['Val'])
-# coef_df = coef_df.assign( C = lambda df: df['C'].map(lambda c: f"Surgery {c.split('.')[0]}") )
-# coef_df['DKC'] = coef_df['D'] + "," + coef_df['K'] + "," + coef_df['C']
+coef_df = coef_df.assign( Val = (-coef_df['Val'] + coef_df['cw'])/coef_df['or_usage'])
+# coef_df = coef_df.assign( Val = -coef_df['Val'])
+coef_df = coef_df.assign( C = lambda df: df['C'].map(lambda c: f"Surgery {c.split('.')[0]}") )
+coef_df['DKC'] = coef_df['D'] + "," + coef_df['K'] + "," + coef_df['C']
 
 # for m in M:
 #     fig = px.line(coef_df.query(f'M == {m}'), x='T',y='Val',color='C', facet_row='D', facet_col='K', title=f'Scheduling Objective - Wait List: {m}', markers=True)
@@ -382,23 +382,21 @@ coef_df = coef_df.assign( Val = -coef_df['Val'])
 #     # fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
 # fig.show(renderer="browser")
 
-# MN = [0, 1, 4]
-# MT = ['New Arrivals', 'On Waitlist - no chance of transition', 'On Waitlist - change of transition']
-# for m in range(len(MN)):
-#     fig = px.line(
-#         coef_df.query(f"T <= 4 and M == {MN[m]}"), 
-#         x='T',y='Val',color='D',symbol="K", facet_col='C',
-#         title=f'{test_modifier} Scheduling Objective - Surgery {4} <br>{MT[m]}', 
-#         markers=True)
-    #fig.update(
-    #    layout_yaxis_range = [18,30],
-    #    layout_xaxis_range = [0.98, 1.02])
+coef_df_m = coef_df.query(f"M in @MN").assign(
+    M = lambda val: val['M'].apply(
+        lambda valy: "New Arr" if valy == 0 else 
+        ("Waitlist - no TR" if valy == 1 else "Waitlist - TR")
+    )
+)
+for c in ['Surgery 1', 'Surgery 4', 'Surgery 6']:
+    fig = px.line(
+        coef_df_m.query(f"D == '{D[0]}' and C == '{c}'"), y='Val', x='T', color='M', 
+        line_dash='DK',symbol = 'DK',
+        title=f"Scheduling Objective<br>Complexity 1 - {c}"
+    )
+    fig.show(renderer='browser')
 
-# for k in K:
-#     fig.add_hline(y=cw[k], line_dash="dot", annotation_text=f'CW {k}')
-
-
-fig = px.line(coef_df.query(f"M == {M[-1]}"), x='T',y='Val',symbol='DK', color='C', line_dash='D')
-fig.show(renderer="browser")
+# fig = px.line(coef_df, x='T',y='Val',symbol='DK', color='C', line_dash='DK', facet_col="M")
+# fig.show(renderer="browser")
 
 # %%
