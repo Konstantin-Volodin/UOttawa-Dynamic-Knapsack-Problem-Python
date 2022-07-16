@@ -46,6 +46,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     cs = input_data.model_param.cs
     cc = input_data.model_param.cc
     cv = input_data.model_param.cv
+    cuu = 1000
 
     ##### Generating Sets #####
     T = input_data.indices['t']
@@ -195,13 +196,14 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myv_cost_cs = myopic.addVars(K,[0]+T, vtype=GRB.CONTINUOUS, name='var_cost_cs')
     myv_cost_cc = myopic.addVars(K, vtype=GRB.CONTINUOUS, name='var_cost_cc')
     myv_cost_cv = myopic.addVar(vtype=GRB.CONTINUOUS, name='var_cost_cv')
+    myv_cost_cuu = myopic.addVar(vtype=GRB.CONTINUOUS, name='var_cost_cuu')
 
     # Fix Costs
     for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
     for t,k in itertools.product(T, K): myv_cost_cs[(k,t)].UB = cs[k][t]; myv_cost_cs[(k,t)].LB = cs[k][t];
     for k in K: myv_cost_cc[k].UB = cc[k]; myv_cost_cc[k].LB = cc[k];
     for k in K: myv_cost_cv.UB = cv; myv_cost_cv.LB = cv;
-
+    myv_cost_cuu.UB = cuu; myv_cost_cuu.LB = cuu; 
 
     # State Action & Auxiliary Variables
     myv_st_ul = myopic.addVars(P, vtype=GRB.CONTINUOUS, lb = 0, name='var_state_ul')
@@ -226,6 +228,9 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myv_aux_pst_d = myopic.addVars(T,M,D,K,C, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_pst_d')
     myv_aux_pst_k = myopic.addVars(T,M,D,K,C, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_pst_k')
 
+    myv_aux_uu = myopic.addVars(T, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_uu')
+    myv_aux_uub = myopic.addVars(T, vtype=GRB.BINARY, lb = 0, name='var_auxiliary_uub')
+
     # Definition of auxiliary variables
     myc_uup = myopic.addConstrs((myv_aux_uup[(t,p)] == quicksum( U[(p,d,c)] * myv_aux_psp[(t,m,d,k,c)] for m in M for d in D for k in K for c in C) for t in T for p in P), name='con_auxiliary_uup')
     myc_pwp = myopic.addConstrs((myv_aux_pwp[(m,d,k,c)] == myv_st_pw[(m,d,k,c)] - quicksum( myv_ac_sc[(t,m,d,k,c)] for t in T) for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp')
@@ -249,12 +254,18 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myc_aux_pwt_k_D = myopic.addConstrs((myv_aux_pwt_k[(m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_pwp[(m,d,k,c)] + myv_aux_pwt_d[(m,D[D.index(d)-1],k,c)]) for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pwt_k_D')
     myc_aux_pwt_k = {**myc_aux_pwt_k_0, **myc_aux_pwt_k_i, **myc_aux_pwt_k_D}
 
-
     myc_aux_pst_d = myopic.addConstrs((myv_aux_pst_d[(t,m,d,k,c)] == ptp_d[(d,c)] * myv_aux_psp[(t,m,d,k,c)] for t in T for m in M for d in D for k in K for c in C), name='con_auxiliary_pst_d')
     myc_aux_pst_k_0 = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[0]), name='con_auxiliary_pst_k_0')
     myc_aux_pst_k_i = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] + myv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - myv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pst_k')
     myc_aux_pst_k_D = myopic.addConstrs((myv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (myv_aux_psp[(t,m,d,k,c)] + myv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pst_k_D')
     myc_aux_pst_k = {**myc_aux_pst_k_0, **myc_aux_pst_k_i, **myc_aux_pst_k_D}
+
+    myc_aux_uu_0 = myopic.addConstrs((myv_aux_uu[(t)] >= 0 for t in T), name='con_auxiliary_uu_0')
+    myc_aux_uu_0M = myopic.addConstrs((myv_aux_uu[(t)] <= BM * myv_aux_uub[(t)] for t in T), name='con_auxiliary_uu_0M')
+    myc_aux_uu_1 = myopic.addConstr((myv_aux_uu[(1)] >= p_dat[P[0]].expected_units + myv_st_ul[P[0]] - myv_aux_uup[1,P[0]]), name='con_auxiliary_uu_1')
+    myc_aux_uu_1M = myopic.addConstr((myv_aux_uu[(1)] <= (p_dat[P[0]].expected_units + myv_st_ul[P[0]] - myv_aux_uup[1,P[0]]) + BM*(1 - myv_aux_uub[(1)])), name='con_auxiliary_uu_1M')
+    myc_aux_uu_m = myopic.addConstrs((myv_aux_uu[(t)] >= (p_dat[P[0]].expected_units + myv_aux_uup[t,P[0]]) for t in T[1:]), name='con_auxiliary_uu_m')
+    myc_aux_uu_mM = myopic.addConstrs((myv_aux_uu[(t)] <= (p_dat[P[0]].expected_units + myv_aux_uup[t,P[0]]) + BM * (1 - myv_aux_uub[(t)]) for t in T[1:]), name='con_auxiliary_uu_mM')
 
     # State Action Constraints
     myc_usage_1 = myopic.addConstrs((myv_aux_uup[(1,p)] <= p_dat[p].expected_units + myv_st_ul[p] + myv_aux_uv[(1,p)] for p in P), name='con_usage_1')
@@ -272,7 +283,9 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myo_brsc =   quicksum( (myv_cost_cs[(k,tp-t)]+myv_cost_cc[k]) * myv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp > t)
     myo_grsc =   quicksum( (myv_cost_cs[(k,t-tp)]-myv_cost_cc[k]) * myv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
     myo_cv =     quicksum( myv_cost_cv * myv_aux_uv[(t,p)] for  t in T for p in P)
-    myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv)
+    myo_cuu =    quicksum( cuu * myv_aux_uu[t] for t in T )
+    myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv + myo_cuu)
+    # myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv)
     myopic.setObjective( myo_cost, GRB.MINIMIZE )
     #endregion
 
@@ -304,6 +317,9 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     mdv_aux_pst_d = MDP.addVars(T,M,D,K,C, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_pst_d')
     mdv_aux_pst_k = MDP.addVars(T,M,D,K,C, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_pst_k')
 
+    mdv_aux_uu = MDP.addVars(T, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_uu')
+    mdv_aux_uub = MDP.addVars(T, vtype=GRB.BINARY, lb = 0, name='var_auxiliary_uub')
+
     # Definition of auxiliary variables
     mdc_uup = MDP.addConstrs((mdv_aux_uup[(t,p)] == quicksum( U[(p,d,c)] * mdv_aux_psp[(t,m,d,k,c)] for m in M for d in D for k in K for c in C) for t in T for p in P), name='con_auxiliary_uup')
     mdc_pwp = MDP.addConstrs((mdv_aux_pwp[(m,d,k,c)] == mdv_st_pw[(m,d,k,c)] - quicksum( mdv_ac_sc[(t,m,d,k,c)] for t in T) for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp')
@@ -333,6 +349,12 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     mdc_aux_pst_k_D = MDP.addConstrs((mdv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (mdv_aux_psp[(t,m,d,k,c)] + mdv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pst_k_D')
     mdc_aux_pst_k = {**mdc_aux_pst_k_0, **mdc_aux_pst_k_i, **mdc_aux_pst_k_D}
 
+    mdc_aux_uu_0 = MDP.addConstrs((mdv_aux_uu[(t)] >= 0 for t in T), name='con_auxiliary_uu_0')
+    mdc_aux_uu_0M = MDP.addConstrs((mdv_aux_uu[(t)] <= BM * mdv_aux_uub[(t)] for t in T), name='con_auxiliary_uu_0M')
+    mdc_aux_uu_1 = MDP.addConstr((mdv_aux_uu[(1)] >= p_dat[P[0]].expected_units + mdv_st_ul[P[0]] - mdv_aux_uup[1,P[0]]), name='con_auxiliary_uu_1')
+    mdc_aux_uu_1M = MDP.addConstr((mdv_aux_uu[(1)] <= (p_dat[P[0]].expected_units + mdv_st_ul[P[0]] - mdv_aux_uup[1,P[0]]) + BM*(1 - mdv_aux_uub[(1)])), name='con_auxiliary_uu_1M')
+    mdc_aux_uu_m = MDP.addConstrs((mdv_aux_uu[(t)] >= (p_dat[P[0]].expected_units + mdv_aux_uup[t,P[0]]) for t in T[1:]), name='con_auxiliary_uu_m')
+    mdc_aux_uu_mM = MDP.addConstrs((mdv_aux_uu[(t)] <= (p_dat[P[0]].expected_units + mdv_aux_uup[t,P[0]]) + BM * (1 - mdv_aux_uub[(t)]) for t in T[1:]), name='con_auxiliary_uu_mM')
 
     # State Action Constraints
     mdc_usage_1 = MDP.addConstrs((mdv_aux_uup[(1,p)] <= p_dat[p].expected_units + mdv_st_ul[p] + mdv_aux_uv[(1,p)] for p in P), name='con_usage_1')
@@ -386,7 +408,9 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     mdo_brsc =   quicksum( (cs[k][tp-t]+cc[k]) * mdv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp > t)
     mdo_grsc =   quicksum( (cs[k][t-tp]-cc[k]) * mdv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
     mdo_cv =     quicksum( cv * mdv_aux_uv[(t,p)] for  t in T for p in P)
-    mdo_cost = (mdo_cw + mdo_cs + mdo_brsc - mdo_grsc + mdo_cv)
+    mdo_cuu =    quicksum( cuu * mdv_aux_uu[t] for t in T )
+    mdo_cost = (mdo_cw + mdo_cs + mdo_brsc - mdo_grsc + mdo_cv + mdo_cuu)
+    # mdo_cost = (mdo_cw + mdo_cs + mdo_brsc - mdo_grsc + mdo_cv)
 
     MDP.setObjective( mdo_cost+(gam*mdo_val), GRB.MINIMIZE )
     #endregion
@@ -404,7 +428,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     logging_file = open(export_sa_my, 'w', newline="")
     cost_file = open(export_cost_my, 'w', newline="")
     util_file = open(export_util_my, 'w', newline="")
-    print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv", file=cost_file)
+    print(f"repl,period,policy,id,priority,complexity,surgery,action,arrived_on,sched_to,resch_from,resch_to,transition", file=text_file)
+    print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv,cost_cuu", file=cost_file)
     print(f"repl,period,horizon_period,usage_admin,usage_OR", file=util_file)
     print(f"repl,period,state-aciton,value,t,tp,m,d,k,c,p,val", file=logging_file)
 
@@ -472,7 +497,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = GRB.INFINITY; myv_ac_rsc[(t,tp,m,d,k,c)].LB = 0
 
             rp_cost.append(myo_cost.getValue())
-            print(f"{repl},{day}, {myo_cost.getValue()},{myo_cw.getValue()},{myo_cs.getValue()},{myo_brsc.getValue()},{myo_grsc.getValue()},{myo_cv.getValue()}", file=cost_file)
+            print(f"{repl},{day}, {myo_cost.getValue()},{myo_cw.getValue()},{myo_cs.getValue()},{myo_brsc.getValue()},{myo_grsc.getValue()},{myo_cv.getValue()},{myo_cuu.getValue()}", file=cost_file)
             if day >= warm_up:
                 rp_disc = myo_cost.getValue() + gam*rp_disc
 
@@ -798,7 +823,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
 
         # Save logging
-        patient_data_df.to_csv(text_file, index=None,)
+        patient_data_df.to_csv(text_file, index=None, header=False)
             
         my_sim_st.append(rp_st)
         my_sim_ac.append(rp_ac)
@@ -820,7 +845,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     logging_file = open(export_sa_md, 'w', newline="")
     cost_file = open(export_cost_md, 'w', newline="")
     util_file = open(export_util_md, 'w', newline="")
-    print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv", file=cost_file)
+    print(f"repl,period,policy,id,priority,complexity,surgery,action,arrived_on,sched_to,resch_from,resch_to,transition", file=text_file)
+    print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv,cost_cuu", file=cost_file)
     print(f"repl,period,horizon_period,usage_admin,usage_OR", file=util_file)
     print(f"repl,period,state-aciton,value,t,tp,m,d,k,c,p,val", file=logging_file)
 
@@ -885,7 +911,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             # Save Cost
             if day >= warm_up:
                 rp_cost.append(mdo_cost.getValue())
-                print(f"{repl},{day}, {mdo_cost.getValue()},{mdo_cw.getValue()},{mdo_cs.getValue()},{mdo_brsc.getValue()},{mdo_grsc.getValue()},{mdo_cv.getValue()}", file=cost_file)
+                print(f"{repl},{day}, {mdo_cost.getValue()},{mdo_cw.getValue()},{mdo_cs.getValue()},{mdo_brsc.getValue()},{mdo_grsc.getValue()},{mdo_cv.getValue()},{mdo_cuu.getValue()}", file=cost_file)
                 rp_disc = mdo_cost.getValue() + gam*rp_disc
             else:
                 for k in K: myv_cost_cw[k].UB = cw[k]; myv_cost_cw[k].LB = cw[k];
@@ -1226,7 +1252,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
         
         # Save logging
-        patient_data_df.to_csv(text_file, index=None,)
+        patient_data_df.to_csv(text_file, index=None, header=False)
 
         md_sim_st.append(rp_st)
         md_sim_ac.append(rp_ac)

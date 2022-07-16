@@ -2,23 +2,27 @@ library(tidyverse)
 library(readr)
 library(gridExtra)
 
-warmup <- 1000
-duration <- 3000
+warmup <- 250
+duration <- 1250
 
 ### READ DATA
 # State Data
-state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md-nopri.txt")
-state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my-nopri.txt")
+state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md-nopri-R1R2R3.txt",
+                     col_types = cols(id = col_double(), repl=col_double(), period=col_double(), arrived_on=col_double(), sched_to=col_double(), resch_from=col_double(),
+                                      resch_to=col_double())) %>% filter(!is.na(id))
+state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my-nopri-R1R2R3.txt",
+                     col_types = cols(id = col_double(), repl=col_double(), period=col_double(), arrived_on=col_double(), sched_to=col_double(), resch_from=col_double(), 
+                                      resch_to=col_double())) %>% filter(!is.na(id))
 state <- bind_rows(state_md, state_my)
 rm(state_md,state_my)
 # Cost Data
-cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md-nopri.txt") %>% mutate(policy = "MDP")
-cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my-nopri.txt")  %>% mutate(policy = "Myopic")
+cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md-nopri-R1R2R3.txt") %>% mutate(policy = "MDP")
+cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my-nopri-R1R2R3.txt")  %>% mutate(policy = "Myopic")
 cost <- bind_rows(cost_md, cost_my)
 rm(cost_md,cost_my)
 # Utilization Data
-util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md-nopri.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
-util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my-nopri.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
+util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md-nopri-R1R2R3.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
+util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my-nopri-R1R2R3.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
 util <- bind_rows(util_md, util_my) %>% 
   mutate(bed = usage_admin/1.5, OR = usage_OR/11.25) %>%
   select(repl, period, policy, bed, OR) %>%
@@ -46,6 +50,11 @@ bx_cost_p <- ggplot(cost %>% filter(period > warmup)) +
 bx_util_p <- ggplot(util %>% filter(period > warmup)) +
   geom_boxplot(aes(y=util, x=resource, fill=policy)) +
   theme_minimal()
+util %>% filter(period > warmup) %>%
+  group_by(policy, resource) %>%
+  summarize(util_m = mean(util), util_sd = sd(util)) %>%
+  mutate(util_me = 1.96 * util_sd / sqrt(30))
+
 
 
 ### WAIT TIME ANALYSIS
@@ -94,11 +103,36 @@ bx_wait_nc <- ggplot(pwu_wait_nc %>% right_join(pwu_pat)) +
   geom_boxplot(aes(y=wait, x=surgery, fill=policy)) +
   facet_grid(complexity ~ priority)
 
+pwu_wait_nc %>% filter(period > warmup) %>%
+  group_by(policy, surgery) %>%
+  summarize(w_m = mean(wait), w_sd = sd(wait)) %>%
+  mutate(w_me = 1.96 * w_sd / sqrt(30)) %>% select(-c(w_sd))
+pwu_wait_nc %>% filter(period > warmup) %>%
+  group_by(policy) %>%
+  summarize(w_m = mean(wait), w_sd = sd(wait)) %>%
+  mutate(w_me = 1.96 * w_sd / sqrt(30)) %>% select(-c(w_sd))
+
 
 
 ### WAITLIST SIZE
 #data
 periods <- pwu_wait_nc %>% distinct(period) %>% arrange(period) %>% pull(period)
+wl_data <- tibble()
+for (p in periods) {
+  print(p)
+  wait_data <- pwu_wait_nc %>%
+    group_by(policy, repl, surgery, .drop=FALSE) %>%
+    filter(arrived_on <= p & final_sched > p) %>% 
+    summarize(wt_size = n()) %>%
+    group_by(policy, surgery) %>%
+    summarize(wt_size_m = mean(wt_size), wt_size_sd = sd(wt_size)) %>%
+    mutate(period = p)
+  wl_data <- bind_rows(wl_data, wait_data)
+}
+wl_data %>% filter(period > warmup) %>%
+  group_by(policy, surgery) %>% 
+  summarize(wt_m = mean(wt_size_m), wt_sd = sd(wt_size_sd))  %>%
+  mutate(wt_me = 1.96 * (wt_sd / sqrt(30)) )
 wl_data <- tibble()
 for (p in periods) {
   print(p)
@@ -111,6 +145,11 @@ for (p in periods) {
     mutate(period = p)
   wl_data <- bind_rows(wl_data, wait_data)
 }
+wl_data %>% filter(period > warmup) %>%
+  group_by(policy) %>% 
+  summarize(wt_m = mean(wt_size_m), wt_sd = sd(wt_size_sd))  %>%
+  mutate(wt_me = 1.96 * (wt_sd / sqrt(30)) )
+
 
 #graphs
 ts_wl_p <- ggplot(wl_data, aes(x=period)) +
@@ -131,18 +170,76 @@ bx_wl_p <- ggplot(wl_data %>% filter(period > warmup)) +
 
 
 ### Reschedules Data  
-# Usage of Reschedules
+# Percentage of Reschedules
+resch_data <- state %>% 
+  modify_if(is.character, as.factor) %>%
+  filter(action == 'rescheduled' & period > warmup) %>%
+  group_by(repl,policy, surgery) %>% 
+  summarize(resch = n()) %>%
+  ungroup()
+arr_data <- state %>% 
+  modify_if(is.character, as.factor) %>%
+  filter(action == 'arrived' & period > warmup) %>%
+  group_by(repl,policy, surgery) %>%
+  summarize(arrv = n()) %>%
+  ungroup()
+resch_data %>% left_join(arr_data) %>% mutate(resch_perc = resch/arrv * 100) %>%
+  group_by(policy, surgery) %>%
+  summarize(rs_m = mean(resch_perc), rs_sd = sd(resch_perc))
+
 resch_data <- state %>% 
   modify_if(is.character, as.factor) %>%
   filter(action == 'rescheduled' & period > warmup) %>%
   group_by(repl,policy) %>% 
   summarize(resch = n()) %>%
   ungroup()
+arr_data <- state %>% 
+  modify_if(is.character, as.factor) %>%
+  filter(action == 'arrived' & period > warmup) %>%
+  group_by(repl,policy) %>%
+  summarize(arrv = n()) %>%
+  ungroup()
+resch_data %>% left_join(arr_data) %>% mutate(resch_perc = resch/arrv * 100) %>%
+  group_by(policy) %>%
+  summarize(rs_m = mean(resch_perc), rs_sd = sd(resch_perc))
+
 bx_resch <- ggplot(resch_data, aes(x=policy, y=resch, fill=policy)) +
   geom_boxplot() + 
   theme_minimal()
 
+### Transitions Data
+# Percentage of Transitions
+transit_data <- state %>% 
+  modify_if(is.character, as.factor) %>%
+  filter(action == 'transition' & period > warmup) %>%
+  group_by(repl,policy,surgery) %>% 
+  summarize(transit = n()) %>%
+  ungroup()
+arr_data <- state %>% 
+  modify_if(is.character, as.factor) %>%
+  filter(action == 'arrived' & period > warmup) %>%
+  group_by(repl,policy,surgery) %>%
+  summarize(arrv = n()) %>%
+  ungroup()
+transit_data %>% left_join(arr_data) %>% mutate(tr_perc = transit/arrv * 100) %>%
+  group_by(policy,surgery) %>%
+  summarize(tr_m = mean(tr_perc), tr_sd = sd(tr_perc))
 
+transit_data <- state %>% 
+  modify_if(is.character, as.factor) %>%
+  filter(action == 'transition' & period > warmup) %>%
+  group_by(repl,policy) %>% 
+  summarize(transit = n()) %>%
+  ungroup()
+arr_data <- state %>% 
+  modify_if(is.character, as.factor) %>%
+  filter(action == 'arrived' & period > warmup) %>%
+  group_by(repl,policy) %>%
+  summarize(arrv = n()) %>%
+  ungroup()
+transit_data %>% left_join(arr_data) %>% mutate(tr_perc = transit/arrv * 100) %>%
+  group_by(policy) %>%
+  summarize(tr_m = mean(tr_perc), tr_sd = sd(tr_perc))
 
 
 ### FINAL PLOTS

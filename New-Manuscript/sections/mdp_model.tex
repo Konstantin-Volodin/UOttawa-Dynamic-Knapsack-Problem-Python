@@ -54,6 +54,8 @@ Actions consist of rescheduling currently scheduled patients, and scheduling pat
 	\item $pwt\_k_{mdkc}$ - patients waiting transitioned in priority
 	\item $pst\_d_{tmdkc}$ - patients scheduled transitioned in complexity
 	\item $pst\_k_{tmdkc}$ - patients scheduled transitioned in priority
+	\item (R3) $uu_{tp}, \quad \forall p \in {\text{Admission}}$ - units underutilized for resource p, time t
+	\item (R3) $uub_{tp}, \quad \forall p \in {\text{Admission}}$ - binary variable to enforce $uu$ without using objective function
 \end{itemize}
 \subsubsection{Auxiliary Variable Definition}
 \label{auxiliary constraints}
@@ -86,7 +88,7 @@ Actions consist of rescheduling currently scheduled patients, and scheduling pat
 	
 	\item Define Resource Violation Variable
 	\begin{alignat}{10}
-		& uv_{tp} 
+		& uv_{1p} 
 			&& = max\{0 , \hat{uu}_{1p} - p\_{ue}_{1p} - ul_{p}\} \quad 
 			&& \forall p \\ 
 		& uv_{tp} 
@@ -129,6 +131,34 @@ Actions consist of rescheduling currently scheduled patients, and scheduling pat
 		& \hat{ul}_{p} 
 			&& \le (p\_ue_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad 
 			&& \forall p  \in p\_co
+	\end{alignat}
+	
+	\item(R3) Define Resource Underutilized
+	\begin{alignat}{10}
+		& uu_{1p} 
+			&& = max\{0 , p\_{ue}_{1p} + ul_{p} - \hat{uu}_{1p}\} \quad 
+			&& \forall p \in {\text{Admissions}} \\ 
+		& uu_{tp} 
+			&& = max\{0 , p\_{ue}_{tp} - \hat{uu}_{tp}\} \quad
+			&& \forall t \in \{2..T\} p \in {\text{Admissions}} \\ \\
+		& uu_{tp} 
+			&&\ge 0 \quad
+			&& \forall tp \\
+		& uu_{tp} 
+			&& \le  M(uub_{tp}) \quad
+			&& \forall tp \\
+		& uu_{1p} 
+			&&\ge p\_{ue}_{1p} + ul_{p} - \hat{uu}_{1p} \quad
+			&& \forall p \\
+		& uu_{1p} 
+		&& \le  (p\_{ue}_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-uub_{tp}) \quad
+		&& \forall p \\
+		& uu_{tp} 
+			&&\ge p\_{ue}_{tp} - \hat{uu}_{tp}\ \quad
+			&& \forall t \in \{2..T \} p \\
+		& uu_{tp} 
+		&& \le  (p\_{ue}_{tp} - \hat{uu}_{tp}\ + M(1-uub_{tp}) \quad
+		&& \forall t \in \{ 2..T \} p \\
 	\end{alignat}
 \end{itemize}
 
@@ -267,5 +297,7 @@ In this section we will have the following:
 			\sum_{
 				\substack{tt`mdkc \\ t' < t}}
 			(cs_{t-t', k} - cc) * (rsc_{tt'mdc})}^\text{Good Reschedule} + 
-		cv \sum_{tp} uv_{tp}
+		cv \sum_{tp} uv_{tp} \\ 
+		& && + \overbrace{
+			M (cuu) \sum_{tp} (uu_{tp})}^\text{(R3) Underutilization}
 \end{alignedat}\end{equation}

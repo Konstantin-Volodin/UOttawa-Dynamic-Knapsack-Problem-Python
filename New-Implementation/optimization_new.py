@@ -32,6 +32,7 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
     cs = input_data.model_param.cs
     cc = input_data.model_param.cc
     cv = input_data.model_param.cv
+    cuu = 1000
 
     ##### Generating Sets #####
     T = input_data.indices['t']
@@ -147,6 +148,9 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
     sv_aux_pst_d = sub_prob.addVars(T,M,D,K,C, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_pst_d')
     sv_aux_pst_k = sub_prob.addVars(T,M,D,K,C, vtype=GRB.CONTINUOUS, lb = 0, name='var_auxiliary_pst_k')
 
+    sv_aux_uu = sub_prob.addVars(T, vtype=GRB.CONTINUOUS, lb=0, name='var_auxiliary_uu')
+    sv_aux_uub = sub_prob.addVars(T, vtype=GRB.BINARY, lb=0, name='var_auxiliary_uub')
+
     # Definition of auxiliary variables
     sc_uup = sub_prob.addConstrs((sv_aux_uup[(t,p)] == quicksum( U[(p,d,c)] * sv_aux_psp[(t,m,d,k,c)] for m in M for d in D for k in K for c in C) for t in T for p in P), name='con_auxiliary_uup')
     sc_pwp = sub_prob.addConstrs((sv_aux_pwp[(m,d,k,c)] == sv_st_pw[(m,d,k,c)] - quicksum( sv_ac_sc[(t,m,d,k,c)] for t in T) for m in M for d in D for k in K for c in C), name='con_auxiliary_pwp')
@@ -175,6 +179,13 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
     sc_aux_pst_k_i = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)] - sv_aux_pst_d[(t,m,d,k,c)]) for t in T for m in M for d in D for k in K for c in C if d != D[0] and d != D[-1]), name='con_auxiliary_pwt_k')
     sc_aux_pst_k_D = sub_prob.addConstrs((sv_aux_pst_k[(t,m,d,k,c)] == ptp_k[(k,c)] * (sv_aux_psp[(t,m,d,k,c)] + sv_aux_pst_d[(t,m,D[D.index(d)-1],k,c)]) for t in T for m in M for d in D for k in K for c in C if d == D[-1]), name='con_auxiliary_pwt_k_D')
     sc_aux_pst_k = {**sc_aux_pst_k_0, **sc_aux_pst_k_i, **sc_aux_pst_k_D}
+
+    sc_aux_uu_0 = sub_prob.addConstrs((sv_aux_uu[(t)] >= 0 for t in T), name='con_auxiliary_uu_0')
+    sc_aux_uu_0M = sub_prob.addConstrs((sv_aux_uu[(t)] <= BM * sv_aux_uub[(t)] for t in T), name='con_auxiliary_uu_0M')
+    sc_aux_uu_1 = sub_prob.addConstr((sv_aux_uu[(1)] >= p_dat[P[0]].expected_units + sv_st_ul[P[0]] - sv_aux_uup[1,P[0]]), name='con_auxiliary_uu_1')
+    sc_aux_uu_1M = sub_prob.addConstr((sv_aux_uu[(1)] <= (p_dat[P[0]].expected_units + sv_st_ul[P[0]] - sv_aux_uup[1,P[0]]) + BM*(1 - sv_aux_uub[(1)])), name='con_auxiliary_uu_1M')
+    sc_aux_uu_m = sub_prob.addConstrs((sv_aux_uu[(t)] >= (p_dat[P[0]].expected_units + sv_aux_uup[t,P[0]]) for t in T[1:]), name='con_auxiliary_uu_m')
+    sc_aux_uu_mM = sub_prob.addConstrs((sv_aux_uu[(t)] <= (p_dat[P[0]].expected_units + sv_aux_uup[t,P[0]]) + BM * (1 - sv_aux_uub[(t)]) for t in T[1:]), name='con_auxiliary_uu_mM')
 
     # State Action Constraints
     sc_usage_1 = sub_prob.addConstrs((sv_aux_uup[(1,p)] <= p_dat[p].expected_units + sv_st_ul[p] + sv_aux_uv[(1,p)] for p in P), name='con_usage_1')
@@ -268,7 +279,9 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
         so_brsc =   quicksum( (cs[k][tp-t]+cc[k]) * sv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp > t)
         so_grsc =   quicksum( (cs[k][t-tp]-cc[k]) * sv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
         so_cv =     quicksum( cv * sv_aux_uv[(t,p)] for  t in T for p in P)
-        so_cost = (so_cw + so_cs + so_brsc - so_grsc + so_cv)
+        sc_cuu =    quicksum( cuu * sv_aux_uu[t] for t in T )
+        so_cost = (so_cw + so_cs + so_brsc - so_grsc + so_cv + sc_cuu)
+        # so_cost = (so_cw + so_cs + so_brsc - so_grsc + so_cv)
 
         sub_prob.setObjective( -so_val, GRB.MINIMIZE )
 
@@ -453,7 +466,9 @@ def main_func(iter_lims, beta_fun, sub_mip_gap, import_data, export_data, export
         so_brsc =   quicksum( (cs[k][tp-t]+cc[k]) * sv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp > t)
         so_grsc =   quicksum( (cs[k][t-tp]-cc[k]) * sv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
         so_cv =     quicksum( cv * sv_aux_uv[(t,p)] for  t in T for p in P)
-        so_cost = (so_cw + so_cs + so_brsc - so_grsc + so_cv)
+        sc_cuu =    quicksum( cuu * sv_aux_uu[t] for t in T )
+        so_cost = (so_cw + so_cs + so_brsc - so_grsc + so_cv + sc_cuu)
+        # so_cost = (so_cw + so_cs + so_brsc - so_grsc + so_cv)
 
         sub_prob.setObjective( so_cost-so_val, GRB.MINIMIZE )
 

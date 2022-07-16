@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.11.2)  12 JAN 2022 11:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.11.2)  10 JUL 2022 14:08
 entering extended mode
 **./mdp_model.tex
 (mdp_model.tex
@@ -2060,8 +2060,67 @@ Overfull \hbox (41.30965pt too wide) in paragraph at lines 56--57
 \OML/cmm/m/it/10 pst[]k[]$
  []
 
+Missing character: There is no R in font nullfont!
+Missing character: There is no 3 in font nullfont!
 ! Undefined control sequence.
-l.58 \subsubsection
+l.57 ...em R3 $uu_{tp}, \quad \forall p \in {\text
+                                                  {Bed}}$ - units underutili...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+Missing character: There is no - in font nullfont!
+Missing character: There is no u in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no u in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no d in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no u in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no l in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no z in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no d in font nullfont!
+Missing character: There is no f in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no s in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no u in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no c in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no p in font nullfont!
+Missing character: There is no , in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no m in font nullfont!
+Missing character: There is no e in font nullfont!
+Missing character: There is no t in font nullfont!
+
+Overfull \hbox (43.56798pt too wide) in paragraph at lines 57--58
+\OML/cmm/m/it/10 uu[];  \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p \OMS/cmsy/m/n/10 2
+
+ []
+
+
+Overfull \hbox (17.94794pt too wide) in paragraph at lines 57--58
+[]$
+ []
+
+! Undefined control sequence.
+l.59 \subsubsection
                    {Auxiliary Variable Definition}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2103,7 +2162,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.60 \begin{alignat}
+l.61 \begin{alignat}
                     {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -2112,7 +2171,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.61 	&
+l.62 	&
         \hat{uu}_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2124,13 +2183,13 @@ might try typing `S' now just to see what is salvageable.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.61 	& \hat
+l.62 	& \hat
             {uu}_{tp}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.62 		&
+l.63 		&
         & =  \sum_{mdkc} U_{pdc} \hat{ps}_{tmdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2140,7 +2199,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.62 		&&
+l.63 		&&
           =  \sum_{mdkc} U_{pdc} \hat{ps}_{tmdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2150,7 +2209,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.63 		&
+l.64 		&
         & \forall tp \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2160,7 +2219,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.63 		&&
+l.64 		&&
           \forall tp \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2172,7 +2231,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.64 	&
+l.65 	&
         \hat{pw}_{mdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2182,7 +2241,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.65 		&
+l.66 		&
         & = pw_{mdkc} - \sum_{t} sc_{tmdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2192,7 +2251,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.65 		&&
+l.66 		&&
           = pw_{mdkc} - \sum_{t} sc_{tmdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2202,7 +2261,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.66 		&
+l.67 		&
         & \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2212,7 +2271,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.66 		&&
+l.67 		&&
           \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2224,7 +2283,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.67 	&
+l.68 	&
         \hat{ps}_{tmdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2234,7 +2293,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.68 		&
+l.69 		&
         & = ps_{tmdkc} + sc_{tmdkc} +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2244,7 +2303,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.68 		&&
+l.69 		&&
           = ps_{tmdkc} + sc_{tmdkc} +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2254,7 +2313,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.70 		&
+l.71 		&
         & \forall tmdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2264,7 +2323,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.70 		&&
+l.71 		&&
           \forall tmdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2276,7 +2335,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.71 	&
+l.72 	&
         pwt\_d_{mdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2286,7 +2345,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.72 		&
+l.73 		&
         & = ptp\_{dc} * \hat{pw}_{mdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2296,7 +2355,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.72 		&&
+l.73 		&&
           = ptp\_{dc} * \hat{pw}_{mdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2306,7 +2365,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.73 		&
+l.74 		&
         & \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2316,7 +2375,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.73 		&&
+l.74 		&&
           \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2328,7 +2387,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.74 	&
+l.75 	&
         pwt\_k_{mdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2338,28 +2397,8 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.75 		&
-        & = ptp\_{kc} * ( \hat{pw}_{mdkc} + pwt\_d{md-1kc} - pwt\_d{mdkc} ) ...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.75 		&&
-          = ptp\_{kc} * ( \hat{pw}_{mdkc} + pwt\_d{md-1kc} - pwt\_d{mdkc} ) ...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
 l.76 		&
-        & \forall mdkc \\
+        & = ptp\_{kc} * ( \hat{pw}_{mdkc} + pwt\_d_{md-1kc} - pwt\_d_{mdkc} ...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -2369,6 +2408,26 @@ might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
 l.76 		&&
+          = ptp\_{kc} * ( \hat{pw}_{mdkc} + pwt\_d_{md-1kc} - pwt\_d_{mdkc} ...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.77 		&
+        & \forall mdkc \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.77 		&&
           \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2380,7 +2439,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.77 	&
+l.78 	&
         pst\_d_{tmdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2390,7 +2449,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.78 		&
+l.79 		&
         & = ptp\_{dc} * \hat{ps}_{tmdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2400,7 +2459,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.78 		&&
+l.79 		&&
           = ptp\_{dc} * \hat{ps}_{tmdkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2410,7 +2469,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.79 		&
+l.80 		&
         & \forall tmdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2420,7 +2479,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.79 		&&
+l.80 		&&
           \forall tmdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2432,7 +2491,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.80 	&
+l.81 	&
         pst\_k_{tmdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2442,28 +2501,8 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.81 		&
-        & = ptp\_{kc} * ( \hat{ps}_{tmdkc} + pst\_d{tmd-1kc} - pst\_d{tmdkc}...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.81 		&&
-          = ptp\_{kc} * ( \hat{ps}_{tmdkc} + pst\_d{tmd-1kc} - pst\_d{tmdkc}...
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
 l.82 		&
-        & \forall tmdkc
+        & = ptp\_{kc} * ( \hat{ps}_{tmdkc} + pst\_d_{tmd-1kc} - pst\_d_{tmdk...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -2473,6 +2512,26 @@ might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
 l.82 		&&
+          = ptp\_{kc} * ( \hat{ps}_{tmdkc} + pst\_d_{tmd-1kc} - pst\_d_{tmdk...
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.83 		&
+        & \forall tmdkc
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.83 		&&
           \forall tmdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2488,7 +2547,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.83 \end{alignat}
+l.84 \end{alignat}
                   
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -2497,7 +2556,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.83 \end{alignat}
+l.84 \end{alignat}
                   
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -2506,139 +2565,139 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (29.64786pt too wide) in paragraph at lines 58--84
+Overfull \hbox (29.64786pt too wide) in paragraph at lines 59--85
 [][] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (97.85228pt too wide) in paragraph at lines 58--84
+Overfull \hbox (97.85228pt too wide) in paragraph at lines 59--85
 [][] \OML/cmm/m/it/10 U[][][] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tp[] 
  []
 
 
-Overfull \hbox (42.76791pt too wide) in paragraph at lines 58--84
+Overfull \hbox (42.76791pt too wide) in paragraph at lines 59--85
 [][] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (39.72112pt too wide) in paragraph at lines 58--84
+Overfull \hbox (39.72112pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pw[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (76.92084pt too wide) in paragraph at lines 58--84
+Overfull \hbox (76.92084pt too wide) in paragraph at lines 59--85
 [][] \OML/cmm/m/it/10 sc[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 mdkc[] 
  []
 
 
-Overfull \hbox (43.048pt too wide) in paragraph at lines 58--84
+Overfull \hbox (43.048pt too wide) in paragraph at lines 59--85
 [][] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (40.2703pt too wide) in paragraph at lines 58--84
+Overfull \hbox (40.2703pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 ps[] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (39.5666pt too wide) in paragraph at lines 58--84
+Overfull \hbox (39.5666pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 sc[] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (65.82475pt too wide) in paragraph at lines 58--84
+Overfull \hbox (65.82475pt too wide) in paragraph at lines 59--85
 [][] \OML/cmm/m/it/10 rsc[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (93.75192pt too wide) in paragraph at lines 58--84
+Overfull \hbox (93.75192pt too wide) in paragraph at lines 59--85
 [][] \OML/cmm/m/it/10 rsc[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tmdkc[] 
  []
 
 
-Overfull \hbox (51.5839pt too wide) in paragraph at lines 58--84
+Overfull \hbox (51.5839pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pwt[]d[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (28.20605pt too wide) in paragraph at lines 58--84
+Overfull \hbox (28.20605pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 ptp[][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (61.60138pt too wide) in paragraph at lines 58--84
+Overfull \hbox (61.60138pt too wide) in paragraph at lines 59--85
 [][] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 mdkc[] 
  []
 
 
-Overfull \hbox (51.58507pt too wide) in paragraph at lines 58--84
+Overfull \hbox (51.58507pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pwt[]k[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (28.52203pt too wide) in paragraph at lines 58--84
+Overfull \hbox (28.52203pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 ptp[][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (43.8791pt too wide) in paragraph at lines 58--84
+Overfull \hbox (43.8791pt too wide) in paragraph at lines 59--85
 \OT1/cmr/m/n/10 ([][] +
  []
 
 
-Overfull \hbox (70.10884pt too wide) in paragraph at lines 58--84
+Overfull \hbox (59.04233pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pwt[]d[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (78.38676pt too wide) in paragraph at lines 58--84
+Overfull \hbox (74.30626pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pwt[]d[]\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 m
 dkc[] 
  []
 
 
-Overfull \hbox (51.86398pt too wide) in paragraph at lines 58--84
+Overfull \hbox (51.86398pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pst[]d[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (28.20605pt too wide) in paragraph at lines 58--84
+Overfull \hbox (28.20605pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 ptp[][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (65.49258pt too wide) in paragraph at lines 58--84
+Overfull \hbox (65.49258pt too wide) in paragraph at lines 59--85
 [][] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tmdkc[] 
  []
 
 
-Overfull \hbox (51.86516pt too wide) in paragraph at lines 58--84
+Overfull \hbox (51.86516pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pst[]k[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (28.52203pt too wide) in paragraph at lines 58--84
+Overfull \hbox (28.52203pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 ptp[][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (44.1592pt too wide) in paragraph at lines 58--84
+Overfull \hbox (44.1592pt too wide) in paragraph at lines 59--85
 \OT1/cmr/m/n/10 ([][] +
  []
 
 
-Overfull \hbox (70.9792pt too wide) in paragraph at lines 58--84
+Overfull \hbox (59.32242pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pst[]d[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (82.86824pt too wide) in paragraph at lines 58--84
+Overfull \hbox (78.19746pt too wide) in paragraph at lines 59--85
 \OML/cmm/m/it/10 pst[]d[]\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t
 mdkc$ 
  []
 
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 85--85
+Overfull \hbox (20.0pt too wide) in paragraph at lines 86--86
 [] 
  []
 
@@ -2680,7 +2739,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.88 	\begin{alignat}
+l.89 	\begin{alignat}
                      {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -2689,7 +2748,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.89 		&
+l.90 		&
          uv_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2703,13 +2762,13 @@ Missing character: There is no v in font nullfont!
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.89 		& uv_
+l.90 		& uv_
             {tp}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.90 			&
+l.91 			&
          & = max\{0 , \hat{uu}_{1p} - p\_{ue}_{1p} - ul_{p}\} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2719,7 +2778,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.90 			&&
+l.91 			&&
            = max\{0 , \hat{uu}_{1p} - p\_{ue}_{1p} - ul_{p}\} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2729,7 +2788,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.91 			&
+l.92 			&
          & \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2739,7 +2798,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.91 			&&
+l.92 			&&
            \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2751,7 +2810,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.92 		&
+l.93 		&
          uv_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2761,7 +2820,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.93 			&
+l.94 			&
          & = max\{0 , \hat{uu}_{tp} - p\_{ue}_{tp}\} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2771,7 +2830,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.93 			&&
+l.94 			&&
            = max\{0 , \hat{uu}_{tp} - p\_{ue}_{tp}\} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2781,7 +2840,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.94 			&
+l.95 			&
          & \forall t \in \{2..T\} p \\ \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2791,7 +2850,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.94 			&&
+l.95 			&&
            \forall t \in \{2..T\} p \\ \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2803,7 +2862,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.95 		&
+l.96 		&
          uv_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2813,7 +2872,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.96 			&
+l.97 			&
          &\ge 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2823,7 +2882,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.96 			&&
+l.97 			&&
           \ge 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2833,7 +2892,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.97 			&
+l.98 			&
          & \forall tp \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2843,7 +2902,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.97 			&&
+l.98 			&&
            \forall tp \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2855,7 +2914,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.98 		&
+l.99 		&
          uv_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2865,28 +2924,8 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.99 			&
-         & \le  M(uvb_{tp}) \quad
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.99 			&&
-           \le  M(uvb_{tp}) \quad
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
 l.100 			&
-          & \forall tp \\
+          & \le  M(uvb_{tp}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -2896,6 +2935,26 @@ might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
 l.100 			&&
+            \le  M(uvb_{tp}) \quad
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.101 			&
+          & \forall tp \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.101 			&&
             \forall tp \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2907,7 +2966,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.101 		&
+l.102 		&
           uv_{1p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2917,7 +2976,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.102 			&
+l.103 			&
           &\ge \hat{uu}_{1p} - p\_ue_{1p} - ul_{p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2927,7 +2986,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.102 			&&
+l.103 			&&
            \ge \hat{uu}_{1p} - p\_ue_{1p} - ul_{p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2937,7 +2996,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.103 			&
+l.104 			&
           & \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2947,7 +3006,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.103 			&&
+l.104 			&&
             \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2959,7 +3018,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.104 		&
+l.105 		&
           uv_{1p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2969,7 +3028,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.105 		&
+l.106 		&
          & \le  (\hat{uu}_{1p} - p\_ue_{1p} - ul_{p}) + M(1-uvb_{tp}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2979,7 +3038,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.105 		&&
+l.106 		&&
            \le  (\hat{uu}_{1p} - p\_ue_{1p} - ul_{p}) + M(1-uvb_{tp}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2989,7 +3048,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.106 		&
+l.107 		&
          & \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -2999,7 +3058,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.106 		&&
+l.107 		&&
            \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3011,7 +3070,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.107 		&
+l.108 		&
           uv_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3021,7 +3080,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.108 			&
+l.109 			&
           &\ge \hat{uu}_{tp} - p\_ue_{tp} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3031,7 +3090,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.108 			&&
+l.109 			&&
            \ge \hat{uu}_{tp} - p\_ue_{tp} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3041,7 +3100,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.109 			&
+l.110 			&
           & \forall t \in \{2..T \} p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3051,7 +3110,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.109 			&&
+l.110 			&&
             \forall t \in \{2..T \} p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3063,7 +3122,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.110 		&
+l.111 		&
           uv_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3073,7 +3132,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.111 		&
+l.112 		&
          & \le  (\hat{uu}_{tp} - p\_ue_{tp}) + M(1-uvb_{tp}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3083,7 +3142,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.111 		&&
+l.112 		&&
            \le  (\hat{uu}_{tp} - p\_ue_{tp}) + M(1-uvb_{tp}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3093,7 +3152,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.112 		&
+l.113 		&
          & \forall t \in \{ 2..T \} p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3103,7 +3162,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.112 		&&
+l.113 		&&
            \forall t \in \{ 2..T \} p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3113,13 +3172,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{itemize} on input line 85 ended by \end{alignat}.
+! LaTeX Error: \begin{itemize} on input line 86 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.113 	\end{alignat}
+l.114 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -3128,7 +3187,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.113 	\end{alignat}
+l.114 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -3137,171 +3196,171 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (18.1987pt too wide) in paragraph at lines 87--114
+Overfull \hbox (18.1987pt too wide) in paragraph at lines 88--115
 [] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (62.06117pt too wide) in paragraph at lines 87--114
+Overfull \hbox (62.06117pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 max\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; [][] 
 \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (31.79837pt too wide) in paragraph at lines 87--114
+Overfull \hbox (31.79837pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 p[][][] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (28.91756pt too wide) in paragraph at lines 87--114
+Overfull \hbox (28.91756pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 ul[]\OMS/cmsy/m/n/10 g 8\OML/cmm/m/it/10 p[] 
  []
 
 
-Overfull \hbox (28.77051pt too wide) in paragraph at lines 87--114
+Overfull \hbox (28.77051pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uv[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (61.09589pt too wide) in paragraph at lines 87--114
+Overfull \hbox (61.09589pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 max\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; [][] 
 \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (46.66638pt too wide) in paragraph at lines 87--114
+Overfull \hbox (46.66638pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 p[][][]\OMS/cmsy/m/n/10 g 8\OML/cmm/m/it/10 t \OMS/cmsy/m/n/10
  2
  []
 
 
-Overfull \hbox (32.81952pt too wide) in paragraph at lines 87--114
+Overfull \hbox (32.81952pt too wide) in paragraph at lines 88--115
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 2\OML/cmm/m/it/10 ::T\OMS/cmsy/m/n/10 g\OML/c
 mm/m/it/10 p[] 
  []
 
 
-Overfull \hbox (28.77051pt too wide) in paragraph at lines 87--114
+Overfull \hbox (28.77051pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (19.19795pt too wide) in paragraph at lines 87--114
+Overfull \hbox (19.19795pt too wide) in paragraph at lines 88--115
 \OT1/cmr/m/n/10 0 \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tp[] 
  []
 
 
-Overfull \hbox (28.77051pt too wide) in paragraph at lines 87--114
+Overfull \hbox (28.77051pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (55.63283pt too wide) in paragraph at lines 87--114
+Overfull \hbox (55.63283pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 M\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 uvb[]\OT1/cmr/m/n/10 ) \OMS
 /cmsy/m/n/10 8\OML/cmm/m/it/10 tp[] 
  []
 
 
-Overfull \hbox (29.7358pt too wide) in paragraph at lines 87--114
+Overfull \hbox (29.7358pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (27.83543pt too wide) in paragraph at lines 87--114
+Overfull \hbox (27.83543pt too wide) in paragraph at lines 88--115
 [][] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (31.79837pt too wide) in paragraph at lines 87--114
+Overfull \hbox (31.79837pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 p[]ue[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (23.91754pt too wide) in paragraph at lines 87--114
+Overfull \hbox (23.91754pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 ul[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p[] 
  []
 
 
-Overfull \hbox (29.7358pt too wide) in paragraph at lines 87--114
+Overfull \hbox (29.7358pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (31.72433pt too wide) in paragraph at lines 87--114
+Overfull \hbox (31.72433pt too wide) in paragraph at lines 88--115
 \OT1/cmr/m/n/10 ([][] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (31.79837pt too wide) in paragraph at lines 87--114
+Overfull \hbox (31.79837pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 p[]ue[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (24.99742pt too wide) in paragraph at lines 87--114
+Overfull \hbox (24.99742pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 ul[]\OT1/cmr/m/n/10 ) +
  []
 
 
-Overfull \hbox (27.45837pt too wide) in paragraph at lines 87--114
+Overfull \hbox (27.45837pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 M\OT1/cmr/m/n/10 (1 \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (37.34116pt too wide) in paragraph at lines 87--114
+Overfull \hbox (37.34116pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uvb[]\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p[] 
 
  []
 
 
-Overfull \hbox (28.77051pt too wide) in paragraph at lines 87--114
+Overfull \hbox (28.77051pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (26.87015pt too wide) in paragraph at lines 87--114
+Overfull \hbox (26.87015pt too wide) in paragraph at lines 88--115
 [][] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (41.66637pt too wide) in paragraph at lines 87--114
+Overfull \hbox (41.66637pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 p[]ue[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t \OMS/cmsy/m/n/10 
 2
  []
 
 
-Overfull \hbox (32.81952pt too wide) in paragraph at lines 87--114
+Overfull \hbox (32.81952pt too wide) in paragraph at lines 88--115
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 2\OML/cmm/m/it/10 ::T\OMS/cmsy/m/n/10 g\OML/c
 mm/m/it/10 p[] 
  []
 
 
-Overfull \hbox (28.77051pt too wide) in paragraph at lines 87--114
+Overfull \hbox (28.77051pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (30.75905pt too wide) in paragraph at lines 87--114
+Overfull \hbox (30.75905pt too wide) in paragraph at lines 88--115
 \OT1/cmr/m/n/10 ([][] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (34.72198pt too wide) in paragraph at lines 87--114
+Overfull \hbox (34.72198pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 p[]ue[]\OT1/cmr/m/n/10 ) +
  []
 
 
-Overfull \hbox (27.45837pt too wide) in paragraph at lines 87--114
+Overfull \hbox (27.45837pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 M\OT1/cmr/m/n/10 (1 \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (45.36542pt too wide) in paragraph at lines 87--114
+Overfull \hbox (45.36542pt too wide) in paragraph at lines 88--115
 \OML/cmm/m/it/10 uvb[]\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t \O
 MS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (32.81952pt too wide) in paragraph at lines 87--114
+Overfull \hbox (32.81952pt too wide) in paragraph at lines 88--115
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 2\OML/cmm/m/it/10 ::T\OMS/cmsy/m/n/10 g\OML/c
 mm/m/it/10 p[] 
  []
@@ -3340,7 +3399,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.116 	\begin{alignat}
+l.117 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -3349,7 +3408,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.117 		&
+l.118 		&
           \hat{ul}_{p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3361,13 +3420,13 @@ might try typing `S' now just to see what is salvageable.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.117 		& \hat
+l.118 		& \hat
               {ul}_{p}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.118 			&
+l.119 			&
           & = max \{0, p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3377,7 +3436,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.118 			&&
+l.119 			&&
             = max \{0, p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3387,7 +3446,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.119 			&
+l.120 			&
           & \forall p \in \{p_co\} \\ \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3397,7 +3456,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.119 			&&
+l.120 			&&
             \forall p \in \{p_co\} \\ \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3409,7 +3468,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.120 		&
+l.121 		&
           \hat{ul}_{p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3419,7 +3478,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.121 			&
+l.122 			&
           & \ge 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3429,7 +3488,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.121 			&&
+l.122 			&&
             \ge 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3439,7 +3498,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.122 			&
+l.123 			&
           & \forall p  \in p\_co \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3449,7 +3508,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.122 			&&
+l.123 			&&
             \forall p  \in p\_co \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3461,28 +3520,8 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.123 		&
+l.124 		&
           \hat{ul}_{p}
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.124 			&
-          & \le M (ulb_{p}) \quad
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.124 			&&
-            \le M (ulb_{p}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -3492,7 +3531,7 @@ might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
 l.125 			&
-          & \forall p  \in p\_co\\
+          & \le M (ulb_{p}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -3502,7 +3541,7 @@ might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
 l.125 			&&
-            \forall p  \in p\_co\\
+            \le M (ulb_{p}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -3511,39 +3550,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-<recently read> &
-                 
-l.126 		&
-          \hat{ul}_{p}
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.127 			&
-          & \ge p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \quad
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.127 			&&
-            \ge p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \quad
-I can't figure out why you would want to use a tab mark
-here. If you just want an ampersand, the remedy is
-simple: Just type `I\&' now. But if some right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Misplaced alignment tab character &.
-l.128 			&
+l.126 			&
           & \forall p  \in p\_co\\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3553,7 +3560,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.128 			&&
+l.126 			&&
             \forall p  \in p\_co\\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3565,7 +3572,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.129 		&
+l.127 		&
           \hat{ul}_{p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3575,8 +3582,8 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.130 			&
-          & \le (p\_ue_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad
+l.128 			&
+          & \ge p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -3585,8 +3592,40 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.130 			&&
-            \le (p\_ue_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad
+l.128 			&&
+            \ge p\_ue_{1p} + ul_{p} - \hat{uu}_{1p} \quad
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.129 			&
+          & \forall p  \in p\_co\\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.129 			&&
+            \forall p  \in p\_co\\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+<recently read> &
+                 
+l.130 		&
+          \hat{ul}_{p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -3596,7 +3635,7 @@ might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
 l.131 			&
-          & \forall p  \in p\_co
+          & \le (p\_ue_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -3606,6 +3645,26 @@ might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
 l.131 			&&
+            \le (p\_ue_{1p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.132 			&
+          & \forall p  \in p\_co
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
+
+! Misplaced alignment tab character &.
+l.132 			&&
             \forall p  \in p\_co
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3615,13 +3674,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{itemize} on input line 85 ended by \end{alignat}.
+! LaTeX Error: \begin{itemize} on input line 86 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.132 	\end{alignat}
+l.133 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -3630,7 +3689,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.132 	\end{alignat}
+l.133 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -3639,120 +3698,120 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (24.08301pt too wide) in paragraph at lines 115--133
+Overfull \hbox (24.08301pt too wide) in paragraph at lines 116--134
 [][] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (66.02411pt too wide) in paragraph at lines 115--133
+Overfull \hbox (66.02411pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 max\OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; p[]ue
 [] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (21.10852pt too wide) in paragraph at lines 115--133
+Overfull \hbox (21.10852pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 ul[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (45.08887pt too wide) in paragraph at lines 115--133
+Overfull \hbox (45.08887pt too wide) in paragraph at lines 116--134
 [][]\OMS/cmsy/m/n/10 g8\OML/cmm/m/it/10 p \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (23.95226pt too wide) in paragraph at lines 115--133
+Overfull \hbox (23.95226pt too wide) in paragraph at lines 116--134
 \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 p[]o\OMS/cmsy/m/n/10 g[] 
  []
 
 
-Overfull \hbox (24.08301pt too wide) in paragraph at lines 115--133
+Overfull \hbox (24.08301pt too wide) in paragraph at lines 116--134
 [][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (25.03123pt too wide) in paragraph at lines 115--133
+Overfull \hbox (25.03123pt too wide) in paragraph at lines 116--134
 \OT1/cmr/m/n/10 0 \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (14.20604pt too wide) in paragraph at lines 115--133
+Overfull \hbox (14.20604pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 p[]co[] 
  []
 
 
-Overfull \hbox (24.08301pt too wide) in paragraph at lines 115--133
+Overfull \hbox (24.08301pt too wide) in paragraph at lines 116--134
 [][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (56.41983pt too wide) in paragraph at lines 115--133
+Overfull \hbox (56.41983pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 M\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ulb[]\OT1/cmr/m/n/10 ) \OMS
 /cmsy/m/n/10 8\OML/cmm/m/it/10 p \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (14.20604pt too wide) in paragraph at lines 115--133
+Overfull \hbox (14.20604pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 p[]co[] 
  []
 
 
-Overfull \hbox (24.08301pt too wide) in paragraph at lines 115--133
+Overfull \hbox (24.08301pt too wide) in paragraph at lines 116--134
 [][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (31.79837pt too wide) in paragraph at lines 115--133
+Overfull \hbox (31.79837pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 p[]ue[] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (21.10852pt too wide) in paragraph at lines 115--133
+Overfull \hbox (21.10852pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 ul[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (40.08885pt too wide) in paragraph at lines 115--133
+Overfull \hbox (40.08885pt too wide) in paragraph at lines 116--134
 [][] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (14.20604pt too wide) in paragraph at lines 115--133
+Overfull \hbox (14.20604pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 p[]co[] 
  []
 
 
-Overfull \hbox (24.08301pt too wide) in paragraph at lines 115--133
+Overfull \hbox (24.08301pt too wide) in paragraph at lines 116--134
 [][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (35.68727pt too wide) in paragraph at lines 115--133
+Overfull \hbox (35.68727pt too wide) in paragraph at lines 116--134
 \OT1/cmr/m/n/10 (\OML/cmm/m/it/10 p[]ue[] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (21.10852pt too wide) in paragraph at lines 115--133
+Overfull \hbox (21.10852pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 ul[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (31.72433pt too wide) in paragraph at lines 115--133
+Overfull \hbox (31.72433pt too wide) in paragraph at lines 116--134
 [][]\OT1/cmr/m/n/10 ) +
  []
 
 
-Overfull \hbox (27.45837pt too wide) in paragraph at lines 115--133
+Overfull \hbox (27.45837pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 M\OT1/cmr/m/n/10 (1 \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (41.73927pt too wide) in paragraph at lines 115--133
+Overfull \hbox (41.73927pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 ulb[]\OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p \O
 MS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (14.20604pt too wide) in paragraph at lines 115--133
+Overfull \hbox (14.20604pt too wide) in paragraph at lines 116--134
 \OML/cmm/m/it/10 p[]co$ 
  []
 
@@ -3764,7 +3823,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.133 \end{itemize}
+l.134 \end{itemize}
                    
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -3774,7 +3833,7 @@ or  <return>  to continue without it.
 ! Undefined control sequence.
 <write> ...bel{auxiliary constraints}{{}{\thepage 
                                                   }}
-l.133 \end{itemize}
+l.134 \end{itemize}
                    
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3785,7 +3844,7 @@ and I'll forget about whatever was undefined.
 \newlabel{auxiliary constraints}{{}{}}
 ]
 ! Undefined control sequence.
-l.135 \subsubsection
+l.136 \subsubsection
                     {State-Action Constraints}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3817,7 +3876,7 @@ Missing character: There is no n in font nullfont!
 Missing character: There is no t in font nullfont!
 Missing character: There is no s in font nullfont!
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 135--137
+Overfull \hbox (20.0pt too wide) in paragraph at lines 136--138
 []
  []
 
@@ -3851,7 +3910,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.140 	\begin{alignat}
+l.141 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -3860,7 +3919,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.141 		&
+l.142 		&
           \hat{uu}_{1p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3872,13 +3931,13 @@ might try typing `S' now just to see what is salvageable.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.141 		& \hat
+l.142 		& \hat
               {uu}_{1p}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.142 			&
+l.143 			&
           & \le p\_ue_{1p} + ul_{p} + uv_{1p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3888,7 +3947,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.142 			&&
+l.143 			&&
             \le p\_ue_{1p} + ul_{p} + uv_{1p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3898,7 +3957,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.143 			&
+l.144 			&
           & \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3908,7 +3967,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.143 			&&
+l.144 			&&
             \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3920,7 +3979,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.144 		&
+l.145 		&
           \hat{uu}_{tp}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3930,7 +3989,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.145 			&
+l.146 			&
           & \le p\_ue_{tp} + uv_{tp} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3940,7 +3999,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.145 			&&
+l.146 			&&
             \le p\_ue_{tp} + uv_{tp} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3950,7 +4009,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.146 			&
+l.147 			&
           & \forall t \in \{ 2..T \}p
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3960,7 +4019,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.146 			&&
+l.147 			&&
             \forall t \in \{ 2..T \}p
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -3970,13 +4029,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{itemize} on input line 137 ended by \end{alignat}.
+! LaTeX Error: \begin{itemize} on input line 138 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.147 	\end{alignat}
+l.148 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -3985,7 +4044,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.147 	\end{alignat}
+l.148 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -3994,42 +4053,42 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (30.61314pt too wide) in paragraph at lines 139--148
+Overfull \hbox (30.61314pt too wide) in paragraph at lines 140--149
 [][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (31.79837pt too wide) in paragraph at lines 139--148
+Overfull \hbox (31.79837pt too wide) in paragraph at lines 140--149
 \OML/cmm/m/it/10 p[]ue[] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (21.10852pt too wide) in paragraph at lines 139--148
+Overfull \hbox (21.10852pt too wide) in paragraph at lines 140--149
 \OML/cmm/m/it/10 ul[] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (29.7671pt too wide) in paragraph at lines 139--148
+Overfull \hbox (29.7671pt too wide) in paragraph at lines 140--149
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p[] 
  []
 
 
-Overfull \hbox (29.64786pt too wide) in paragraph at lines 139--148
+Overfull \hbox (29.64786pt too wide) in paragraph at lines 140--149
 [][] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (30.83308pt too wide) in paragraph at lines 139--148
+Overfull \hbox (30.83308pt too wide) in paragraph at lines 140--149
 \OML/cmm/m/it/10 p[]ue[] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (36.82608pt too wide) in paragraph at lines 139--148
+Overfull \hbox (36.82608pt too wide) in paragraph at lines 140--149
 \OML/cmm/m/it/10 uv[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (32.81952pt too wide) in paragraph at lines 139--148
+Overfull \hbox (32.81952pt too wide) in paragraph at lines 140--149
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 2\OML/cmm/m/it/10 ::T\OMS/cmsy/m/n/10 g\OML/c
 mm/m/it/10 p$ 
  []
@@ -4080,7 +4139,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.150 	\begin{alignat}
+l.151 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -4089,7 +4148,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.151 		&
+l.152 		&
           rsc_{tt'mdkc} && = 0 \quad && \forall t \in \{ 2...T \}, t' \in \{...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4104,13 +4163,13 @@ Missing character: There is no c in font nullfont!
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.151 		& rsc_
+l.152 		& rsc_
               {tt'mdkc} && = 0 \quad && \forall t \in \{ 2...T \}, t' \in \{...
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.151 		& rsc_{tt'mdkc} &
+l.152 		& rsc_{tt'mdkc} &
                          & = 0 \quad && \forall t \in \{ 2...T \}, t' \in \{...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4120,7 +4179,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.151 		& rsc_{tt'mdkc} &&
+l.152 		& rsc_{tt'mdkc} &&
                            = 0 \quad && \forall t \in \{ 2...T \}, t' \in \{...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4130,7 +4189,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.151 		& rsc_{tt'mdkc} && = 0 \quad &
+l.152 		& rsc_{tt'mdkc} && = 0 \quad &
                                       & \forall t \in \{ 2...T \}, t' \in \{...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4140,7 +4199,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.151 		& rsc_{tt'mdkc} && = 0 \quad &&
+l.152 		& rsc_{tt'mdkc} && = 0 \quad &&
                                         \forall t \in \{ 2...T \}, t' \in \{...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4152,7 +4211,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.153 		&
+l.154 		&
           rsc_{tt'mdkc} && = 0 \quad && \forall tt'mdkc, \text{where } t=t'=1
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4162,7 +4221,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.153 		& rsc_{tt'mdkc} &
+l.154 		& rsc_{tt'mdkc} &
                          & = 0 \quad && \forall tt'mdkc, \text{where } t=t'=1
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4172,7 +4231,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.153 		& rsc_{tt'mdkc} &&
+l.154 		& rsc_{tt'mdkc} &&
                            = 0 \quad && \forall tt'mdkc, \text{where } t=t'=1
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4182,7 +4241,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.153 		& rsc_{tt'mdkc} && = 0 \quad &
+l.154 		& rsc_{tt'mdkc} && = 0 \quad &
                                       & \forall tt'mdkc, \text{where } t=t'=1
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4192,7 +4251,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.153 		& rsc_{tt'mdkc} && = 0 \quad &&
+l.154 		& rsc_{tt'mdkc} && = 0 \quad &&
                                         \forall tt'mdkc, \text{where } t=t'=1
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4202,7 +4261,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Undefined control sequence.
-l.153 ...c} && = 0 \quad && \forall tt'mdkc, \text
+l.154 ...c} && = 0 \quad && \forall tt'mdkc, \text
                                                   {where } t=t'=1
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4211,13 +4270,13 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-! LaTeX Error: \begin{itemize} on input line 137 ended by \end{alignat}.
+! LaTeX Error: \begin{itemize} on input line 138 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.154 	\end{alignat}
+l.155 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -4226,7 +4285,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.154 	\end{alignat}
+l.155 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -4235,45 +4294,45 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (39.05498pt too wide) in paragraph at lines 149--155
+Overfull \hbox (39.05498pt too wide) in paragraph at lines 150--156
 [] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (23.6111pt too wide) in paragraph at lines 149--155
+Overfull \hbox (23.6111pt too wide) in paragraph at lines 150--156
 \OT1/cmr/m/n/10 0 \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (50.87154pt too wide) in paragraph at lines 149--155
+Overfull \hbox (50.87154pt too wide) in paragraph at lines 150--156
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 2\OML/cmm/m/it/10 :::T\OMS/cmsy/m/n/10 g\OML/
 cmm/m/it/10 ; t[] \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (54.39946pt too wide) in paragraph at lines 149--155
+Overfull \hbox (54.39946pt too wide) in paragraph at lines 150--156
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 2\OML/cmm/m/it/10 :::T\OMS/cmsy/m/n/10 g\OML/
 cmm/m/it/10 mdkc[] 
  []
 
 
-Overfull \hbox (52.8594pt too wide) in paragraph at lines 149--155
+Overfull \hbox (52.8594pt too wide) in paragraph at lines 150--156
 \OML/cmm/m/it/10 rsc[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (90.31955pt too wide) in paragraph at lines 149--155
+Overfull \hbox (90.31955pt too wide) in paragraph at lines 150--156
 \OT1/cmr/m/n/10 0 \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tt[]mdkc; []t \OT1/cmr/m/n
 /10 =
  []
 
 
-Overfull \hbox (16.97218pt too wide) in paragraph at lines 149--155
+Overfull \hbox (16.97218pt too wide) in paragraph at lines 150--156
 \OML/cmm/m/it/10 t[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (5.00002pt too wide) in paragraph at lines 149--155
+Overfull \hbox (5.00002pt too wide) in paragraph at lines 150--156
 \OT1/cmr/m/n/10 1$ 
  []
 
@@ -4313,7 +4372,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.157 	\begin{alignat}
+l.158 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -4322,7 +4381,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.158 		&
+l.159 		&
           \sum_{t'} rsc_{tt'mdkc} 	&& \le ps_{tmdkc} \quad  && \forall tmdkc...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4334,13 +4393,13 @@ might try typing `S' now just to see what is salvageable.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.158 		& \sum
+l.159 		& \sum
               _{t'} rsc_{tt'mdkc} 	&& \le ps_{tmdkc} \quad  && \forall tmdkc...
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.158 		& \sum_{t'} rsc_{tt'mdkc} 	&
+l.159 		& \sum_{t'} rsc_{tt'mdkc} 	&
                                     & \le ps_{tmdkc} \quad  && \forall tmdkc...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4350,7 +4409,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.158 		& \sum_{t'} rsc_{tt'mdkc} 	&&
+l.159 		& \sum_{t'} rsc_{tt'mdkc} 	&&
                                       \le ps_{tmdkc} \quad  && \forall tmdkc...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4360,7 +4419,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.158 ...rsc_{tt'mdkc} 	&& \le ps_{tmdkc} \quad  &
+l.159 ...rsc_{tt'mdkc} 	&& \le ps_{tmdkc} \quad  &
                                                   & \forall tmdkc  \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4370,7 +4429,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.158 ...sc_{tt'mdkc} 	&& \le ps_{tmdkc} \quad  &&
+l.159 ...sc_{tt'mdkc} 	&& \le ps_{tmdkc} \quad  &&
                                                    \forall tmdkc  \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4382,7 +4441,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.159 		&
+l.160 		&
           \sum_{t} sc_{tmdkc} 		&& \le pw_{mdkc} \quad 	&& \forall mdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4392,7 +4451,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.159 		& \sum_{t} sc_{tmdkc} 		&
+l.160 		& \sum_{t} sc_{tmdkc} 		&
                                  & \le pw_{mdkc} \quad 	&& \forall mdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4402,7 +4461,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.159 		& \sum_{t} sc_{tmdkc} 		&&
+l.160 		& \sum_{t} sc_{tmdkc} 		&&
                                    \le pw_{mdkc} \quad 	&& \forall mdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4412,7 +4471,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.159 ...t} sc_{tmdkc} 		&& \le pw_{mdkc} \quad 	&
+l.160 ...t} sc_{tmdkc} 		&& \le pw_{mdkc} \quad 	&
                                                   & \forall mdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4422,7 +4481,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.159 ...} sc_{tmdkc} 		&& \le pw_{mdkc} \quad 	&&
+l.160 ...} sc_{tmdkc} 		&& \le pw_{mdkc} \quad 	&&
                                                    \forall mdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4432,13 +4491,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{itemize} on input line 137 ended by \end{alignat}.
+! LaTeX Error: \begin{itemize} on input line 138 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.160 	\end{alignat}
+l.161 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -4447,7 +4506,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.160 	\end{alignat}
+l.161 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -4456,22 +4515,22 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (71.30734pt too wide) in paragraph at lines 156--161
+Overfull \hbox (71.30734pt too wide) in paragraph at lines 157--162
 [][] \OML/cmm/m/it/10 rsc[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (65.49258pt too wide) in paragraph at lines 156--161
+Overfull \hbox (65.49258pt too wide) in paragraph at lines 157--162
 \OML/cmm/m/it/10 ps[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tmdkc[] 
  []
 
 
-Overfull \hbox (58.08737pt too wide) in paragraph at lines 156--161
+Overfull \hbox (58.08737pt too wide) in paragraph at lines 157--162
 [][] \OML/cmm/m/it/10 sc[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (61.33229pt too wide) in paragraph at lines 156--161
+Overfull \hbox (61.33229pt too wide) in paragraph at lines 157--162
 \OML/cmm/m/it/10 pw[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 mdkc$ 
  []
 
@@ -4496,7 +4555,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.163 	\begin{alignat}
+l.164 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -4505,7 +4564,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.164 		&
+l.165 		&
           ul_{p} 	&& \le p\_ue_{p} \quad 			&& \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4519,13 +4578,13 @@ Missing character: There is no l in font nullfont!
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.164 		& ul_
+l.165 		& ul_
              {p} 	&& \le p\_ue_{p} \quad 			&& \forall p \\
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.164 		& ul_{p} 	&
+l.165 		& ul_{p} 	&
                    & \le p\_ue_{p} \quad 			&& \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4535,7 +4594,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.164 		& ul_{p} 	&&
+l.165 		& ul_{p} 	&&
                      \le p\_ue_{p} \quad 			&& \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4545,7 +4604,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.164 		& ul_{p} 	&& \le p\_ue_{p} \quad 			&
+l.165 		& ul_{p} 	&& \le p\_ue_{p} \quad 			&
                                              & \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4555,7 +4614,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.164 		& ul_{p} 	&& \le p\_ue_{p} \quad 			&&
+l.165 		& ul_{p} 	&& \le p\_ue_{p} \quad 			&&
                                                \forall p \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4567,7 +4626,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.165 		&
+l.166 		&
           pw_{mdkc} 	&& \le pea_{dkc} * 2 \quad 			&& \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4577,7 +4636,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.165 		& pw_{mdkc} 	&
+l.166 		& pw_{mdkc} 	&
                       & \le pea_{dkc} * 2 \quad 			&& \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4587,7 +4646,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.165 		& pw_{mdkc} 	&&
+l.166 		& pw_{mdkc} 	&&
                         \le pea_{dkc} * 2 \quad 			&& \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4597,7 +4656,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.165 ...w_{mdkc} 	&& \le pea_{dkc} * 2 \quad 			&
+l.166 ...w_{mdkc} 	&& \le pea_{dkc} * 2 \quad 			&
                                                   & \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4607,7 +4666,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.165 ..._{mdkc} 	&& \le pea_{dkc} * 2 \quad 			&&
+l.166 ..._{mdkc} 	&& \le pea_{dkc} * 2 \quad 			&&
                                                    \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4619,7 +4678,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.166 		&
+l.167 		&
           ps_{tmdkc} && \le pea_{dkc} \quad 			&& \forall tmdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4629,7 +4688,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.166 		& ps_{tmdkc} &
+l.167 		& ps_{tmdkc} &
                       & \le pea_{dkc} \quad 			&& \forall tmdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4639,7 +4698,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.166 		& ps_{tmdkc} &&
+l.167 		& ps_{tmdkc} &&
                         \le pea_{dkc} \quad 			&& \forall tmdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4649,7 +4708,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.166 		& ps_{tmdkc} && \le pea_{dkc} \quad 			&
+l.167 		& ps_{tmdkc} && \le pea_{dkc} \quad 			&
                                                 & \forall tmdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4659,7 +4718,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.166 		& ps_{tmdkc} && \le pea_{dkc} \quad 			&&
+l.167 		& ps_{tmdkc} && \le pea_{dkc} \quad 			&&
                                                   \forall tmdkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -4669,13 +4728,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{itemize} on input line 137 ended by \end{alignat}.
+! LaTeX Error: \begin{itemize} on input line 138 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.167 	\end{alignat}
+l.168 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -4684,7 +4743,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.167 	\end{alignat}
+l.168 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -4693,42 +4752,42 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (15.17786pt too wide) in paragraph at lines 162--168
+Overfull \hbox (15.17786pt too wide) in paragraph at lines 163--169
 [] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (30.62126pt too wide) in paragraph at lines 162--168
+Overfull \hbox (30.62126pt too wide) in paragraph at lines 163--169
 \OML/cmm/m/it/10 p[]ue[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p[] 
  []
 
 
-Overfull \hbox (42.49883pt too wide) in paragraph at lines 162--168
+Overfull \hbox (42.49883pt too wide) in paragraph at lines 163--169
 \OML/cmm/m/it/10 pw[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (32.6302pt too wide) in paragraph at lines 162--168
+Overfull \hbox (32.6302pt too wide) in paragraph at lines 163--169
 \OML/cmm/m/it/10 pea[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (34.38899pt too wide) in paragraph at lines 162--168
+Overfull \hbox (34.38899pt too wide) in paragraph at lines 163--169
 \OT1/cmr/m/n/10 2 \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 mdkc[] 
  []
 
 
-Overfull \hbox (43.048pt too wide) in paragraph at lines 162--168
+Overfull \hbox (43.048pt too wide) in paragraph at lines 163--169
 \OML/cmm/m/it/10 ps[] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (60.63028pt too wide) in paragraph at lines 162--168
+Overfull \hbox (60.63028pt too wide) in paragraph at lines 163--169
 \OML/cmm/m/it/10 pea[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tmdkc$ 
  []
 
 ! Undefined control sequence.
-l.170 \subsection
+l.171 \subsection
                  {Transition}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4747,7 +4806,7 @@ Missing character: There is no i in font nullfont!
 Missing character: There is no o in font nullfont!
 Missing character: There is no n in font nullfont!
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 170--171
+Overfull \hbox (20.0pt too wide) in paragraph at lines 171--172
 [] 
  []
 
@@ -4788,7 +4847,7 @@ Missing character: There is no n in font nullfont!
 Missing character: There is no g in font nullfont!
 Missing character: There is no : in font nullfont!
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 172--173
+Overfull \hbox (20.0pt too wide) in paragraph at lines 173--174
 []
  []
 
@@ -4839,12 +4898,12 @@ Missing character: There is no i in font nullfont!
 Missing character: There is no o in font nullfont!
 Missing character: There is no n in font nullfont!
 
-Overfull \hbox (20.61696pt too wide) in paragraph at lines 174--175
+Overfull \hbox (20.61696pt too wide) in paragraph at lines 175--176
 \OML/cmm/m/it/10 p[]ued$
  []
 
 
-Overfull \hbox (20.61696pt too wide) in paragraph at lines 174--175
+Overfull \hbox (20.61696pt too wide) in paragraph at lines 175--176
 \OML/cmm/m/it/10 p[]ued$ 
  []
 
@@ -4896,12 +4955,12 @@ Missing character: There is no o in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no . in font nullfont!
 
-Overfull \hbox (14.9734pt too wide) in paragraph at lines 175--176
+Overfull \hbox (14.9734pt too wide) in paragraph at lines 176--177
 \OML/cmm/m/it/10 pea$
  []
 
 
-Overfull \hbox (14.9734pt too wide) in paragraph at lines 175--176
+Overfull \hbox (14.9734pt too wide) in paragraph at lines 176--177
 \OML/cmm/m/it/10 pea$ 
  []
 
@@ -4998,17 +5057,17 @@ Missing character: There is no s in font nullfont!
 Missing character: There is no t in font nullfont!
 Missing character: There is no . in font nullfont!
 
-Overfull \hbox (16.07062pt too wide) in paragraph at lines 176--177
+Overfull \hbox (16.07062pt too wide) in paragraph at lines 177--178
 \OML/cmm/m/it/10 pwt$
  []
 
 
-Overfull \hbox (13.32986pt too wide) in paragraph at lines 176--177
+Overfull \hbox (13.32986pt too wide) in paragraph at lines 177--178
 \OML/cmm/m/it/10 pst$
  []
 
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 180--180
+Overfull \hbox (20.0pt too wide) in paragraph at lines 181--181
 [] 
  []
 
@@ -5053,7 +5112,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.182 	\begin{alignat}
+l.183 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -5062,7 +5121,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.183 		&
+l.184 		&
           ul'_{p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5077,13 +5136,13 @@ Missing character: There is no ' in font nullfont!
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.183 		& ul'_
+l.184 		& ul'_
               {p}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.184 		&
+l.185 		&
          & = \hat{ul}_{p} + p\_ued_{p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5093,7 +5152,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.184 		&&
+l.185 		&&
            = \hat{ul}_{p} + p\_ued_{p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5103,7 +5162,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.185 		&
+l.186 		&
          & \forall p \in \{ p\_co \} \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5113,7 +5172,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.185 		&&
+l.186 		&&
            \forall p \in \{ p\_co \} \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5125,7 +5184,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.186 		&
+l.187 		&
           ul'_{p}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5135,7 +5194,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.187 		&
+l.188 		&
          & = p\_ued_{p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5145,7 +5204,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.187 		&&
+l.188 		&&
            = p\_ued_{p} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5155,7 +5214,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.188 		&
+l.189 		&
          & \forall p \in \{ p\_nco \}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5165,7 +5224,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.188 		&&
+l.189 		&&
            \forall p \in \{ p\_nco \}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5175,13 +5234,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{enumerate} on input line 180 ended by \end{alignat}.
+! LaTeX Error: \begin{enumerate} on input line 181 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.189 	\end{alignat}
+l.190 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -5190,7 +5249,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.189 	\end{alignat}
+l.190 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -5199,49 +5258,49 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (8.90515pt too wide) in paragraph at lines 181--190
+Overfull \hbox (8.90515pt too wide) in paragraph at lines 182--191
 []$
  []
 
 
-Overfull \hbox (11.71071pt too wide) in paragraph at lines 181--190
+Overfull \hbox (11.71071pt too wide) in paragraph at lines 182--191
 []$
  []
 
 
-Overfull \hbox (15.17786pt too wide) in paragraph at lines 181--190
+Overfull \hbox (15.17786pt too wide) in paragraph at lines 182--191
 [] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (21.3053pt too wide) in paragraph at lines 181--190
+Overfull \hbox (21.3053pt too wide) in paragraph at lines 182--191
 [][] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (45.27052pt too wide) in paragraph at lines 181--190
+Overfull \hbox (45.27052pt too wide) in paragraph at lines 182--191
 \OML/cmm/m/it/10 p[]ued[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p \OMS/cmsy/m/n/10
  2
  []
 
 
-Overfull \hbox (24.20607pt too wide) in paragraph at lines 181--190
+Overfull \hbox (24.20607pt too wide) in paragraph at lines 182--191
 \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 p[]co\OMS/cmsy/m/n/10 g[] 
  []
 
 
-Overfull \hbox (23.88623pt too wide) in paragraph at lines 181--190
+Overfull \hbox (23.88623pt too wide) in paragraph at lines 182--191
 \OML/cmm/m/it/10 ul[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (45.27052pt too wide) in paragraph at lines 181--190
+Overfull \hbox (45.27052pt too wide) in paragraph at lines 182--191
 \OML/cmm/m/it/10 p[]ued[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 p \OMS/cmsy/m/n/10
  2
  []
 
 
-Overfull \hbox (30.20842pt too wide) in paragraph at lines 181--190
+Overfull \hbox (30.20842pt too wide) in paragraph at lines 182--191
 \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 p[]nco\OMS/cmsy/m/n/10 g$ 
  []
 
@@ -5293,7 +5352,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.193 	\begin{alignat}
+l.194 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -5302,7 +5361,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.194 		&
+l.195 		&
           pw'_{0dkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5317,13 +5376,13 @@ Missing character: There is no ' in font nullfont!
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.194 		& pw'_
+l.195 		& pw'_
               {0dkc}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.195 			&
+l.196 			&
           & = pea_{dkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5333,7 +5392,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.195 			&&
+l.196 			&&
             = pea_{dkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5343,7 +5402,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.196 			&
+l.197 			&
           & \forall dc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5353,7 +5412,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.196 			&&
+l.197 			&&
             \forall dc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5365,7 +5424,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.197 		&
+l.198 		&
           pw'_{mdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5375,7 +5434,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.198 			&
+l.199 			&
           & = \hat{pw}_{m-1,dkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5385,7 +5444,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.198 			&&
+l.199 			&&
             = \hat{pw}_{m-1,dkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5395,7 +5454,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.199 			&
+l.200 			&
           & \forall m \in \{ 1...(TL_{c}-1) \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5405,7 +5464,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.199 			&&
+l.200 			&&
             \forall m \in \{ 1...(TL_{c}-1) \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5417,7 +5476,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.200 		&
+l.201 		&
           pw'_{mdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5427,7 +5486,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.201 			&
+l.202 			&
           & = \hat{pw}_{m-1,dkc} +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5437,7 +5496,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.201 			&&
+l.202 			&&
             = \hat{pw}_{m-1,dkc} +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5447,7 +5506,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Undefined control sequence.
-l.202 ...ce{pwt\_d_{m-1,d-1,c} - pwt\_d_{d}}^\text
+l.203 ...ce{pwt\_d_{m-1,d-1,c} - pwt\_d_{d}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -5456,7 +5515,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.204 ...verbrace{pwt\_k_{k-1} - pwt\_k_{k}}^\text
+l.205 ...verbrace{pwt\_k_{k-1} - pwt\_k_{k}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -5465,7 +5524,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Misplaced alignment tab character &.
-l.206 			&
+l.207 			&
           & \forall m \in \{ TL_{c}...M-1 \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5475,7 +5534,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.206 			&&
+l.207 			&&
             \forall m \in \{ TL_{c}...M-1 \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5487,7 +5546,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.207 		&
+l.208 		&
           pw'_{Mdc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5497,7 +5556,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.208 			&
+l.209 			&
           & = \sum_{M-1}^{M} \big(
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5507,7 +5566,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.208 			&&
+l.209 			&&
             = \sum_{M-1}^{M} \big(
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5517,7 +5576,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Undefined control sequence.
-l.210 ...brace{pwt\_d_{md-1,c} - pwt\_d_{d}}^\text
+l.211 ...brace{pwt\_d_{md-1,c} - pwt\_d_{d}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -5526,7 +5585,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.212 ...verbrace{pwt\_k_{k-1} - pwt\_k_{k}}^\text
+l.213 ...verbrace{pwt\_k_{k-1} - pwt\_k_{k}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -5535,7 +5594,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Misplaced alignment tab character &.
-l.214 			&
+l.215 			&
           & \forall dc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5545,7 +5604,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.214 			&&
+l.215 			&&
             \forall dc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5555,13 +5614,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{enumerate} on input line 180 ended by \end{alignat}.
+! LaTeX Error: \begin{enumerate} on input line 181 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.215 	\end{alignat}
+l.216 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -5570,7 +5629,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.215 	\end{alignat}
+l.216 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -5579,84 +5638,84 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (12.4595pt too wide) in paragraph at lines 192--216
+Overfull \hbox (12.4595pt too wide) in paragraph at lines 193--217
 []$
  []
 
 
-Overfull \hbox (15.26506pt too wide) in paragraph at lines 192--216
+Overfull \hbox (15.26506pt too wide) in paragraph at lines 193--217
 []$
  []
 
 
-Overfull \hbox (27.19843pt too wide) in paragraph at lines 192--216
+Overfull \hbox (27.19843pt too wide) in paragraph at lines 193--217
 [] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (42.71819pt too wide) in paragraph at lines 192--216
+Overfull \hbox (42.71819pt too wide) in paragraph at lines 193--217
 \OML/cmm/m/it/10 pea[] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 dc[] 
  []
 
 
-Overfull \hbox (42.49883pt too wide) in paragraph at lines 192--216
+Overfull \hbox (42.49883pt too wide) in paragraph at lines 193--217
 \OML/cmm/m/it/10 pw[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (68.60365pt too wide) in paragraph at lines 192--216
+Overfull \hbox (68.60365pt too wide) in paragraph at lines 193--217
 [][]\OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 m \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (48.11206pt too wide) in paragraph at lines 192--216
+Overfull \hbox (48.11206pt too wide) in paragraph at lines 193--217
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 1\OML/cmm/m/it/10 :::\OT1/cmr/m/n/10 (\OML/cm
 m/m/it/10 TL[] \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (28.9422pt too wide) in paragraph at lines 192--216
+Overfull \hbox (28.9422pt too wide) in paragraph at lines 193--217
 \OT1/cmr/m/n/10 1)\OMS/cmsy/m/n/10 g\OML/cmm/m/it/10 dkc[] 
  []
 
 
-Overfull \hbox (42.49883pt too wide) in paragraph at lines 192--216
+Overfull \hbox (42.49883pt too wide) in paragraph at lines 193--217
 \OML/cmm/m/it/10 pw[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (52.60135pt too wide) in paragraph at lines 192--216
+Overfull \hbox (52.60135pt too wide) in paragraph at lines 193--217
 [][] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (211.40071pt too wide) in paragraph at lines 192--216
+Overfull \hbox (211.40071pt too wide) in paragraph at lines 193--217
 [] \OT1/cmr/m/n/10 + []  \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 m \OMS/cmsy/m/n/10 
 2
  []
 
 
-Overfull \hbox (50.0148pt too wide) in paragraph at lines 192--216
+Overfull \hbox (50.0148pt too wide) in paragraph at lines 193--217
 \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 TL[]:::M \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (25.0533pt too wide) in paragraph at lines 192--216
+Overfull \hbox (25.0533pt too wide) in paragraph at lines 193--217
 \OT1/cmr/m/n/10 1\OMS/cmsy/m/n/10 g\OML/cmm/m/it/10 dkc[] 
  []
 
 
-Overfull \hbox (39.35895pt too wide) in paragraph at lines 192--216
+Overfull \hbox (39.35895pt too wide) in paragraph at lines 193--217
 \OML/cmm/m/it/10 pw[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (71.48816pt too wide) in paragraph at lines 192--216
+Overfull \hbox (71.48816pt too wide) in paragraph at lines 193--217
 [][] [][][] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (194.68082pt too wide) in paragraph at lines 192--216
+Overfull \hbox (194.68082pt too wide) in paragraph at lines 193--217
 [] \OT1/cmr/m/n/10 + [] [] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 dc$ 
  []
 
@@ -5708,7 +5767,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.219 	\begin{alignat}
+l.220 	\begin{alignat}
                       {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -5717,7 +5776,7 @@ or  <return>  to continue without it.
 Missing character: There is no 1 in font nullfont!
 Missing character: There is no 0 in font nullfont!
 ! Misplaced alignment tab character &.
-l.220 		&
+l.221 		&
           ps'_{t0dkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5732,13 +5791,13 @@ Missing character: There is no ' in font nullfont!
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.220 		& ps'_
+l.221 		& ps'_
               {t0dkc}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Misplaced alignment tab character &.
-l.221 			&
+l.222 			&
           & = 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5748,7 +5807,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.221 			&&
+l.222 			&&
             = 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5758,7 +5817,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.222 			&
+l.223 			&
           & \forall tdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5768,7 +5827,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.222 			&&
+l.223 			&&
             \forall tdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5780,7 +5839,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.223 		&
+l.224 		&
           ps'_{Tmdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5790,7 +5849,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.224 			&
+l.225 			&
           & = 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5800,7 +5859,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.224 			&&
+l.225 			&&
             = 0 \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5810,7 +5869,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.225 			&
+l.226 			&
           & \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5820,7 +5879,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.225 			&&
+l.226 			&&
             \forall mdkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5832,7 +5891,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.226 		&
+l.227 		&
           ps'_{tmdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5842,7 +5901,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.227 			&
+l.228 			&
           & = \hat{ps}_{t+1,m-1,dkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5852,7 +5911,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.227 			&&
+l.228 			&&
             = \hat{ps}_{t+1,m-1,dkc} \quad
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5862,7 +5921,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.228 			&
+l.229 			&
           & \forall t \ne T m \in \{ 1... TL-1 \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5872,7 +5931,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.228 			&&
+l.229 			&&
             \forall t \ne T m \in \{ 1... TL-1 \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5884,7 +5943,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.229 		&
+l.230 		&
           ps'_{tmdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5894,7 +5953,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.230 			&
+l.231 			&
           & = \hat{ps}_{t+1,m-1,dkc} +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5904,7 +5963,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.230 			&&
+l.231 			&&
             = \hat{ps}_{t+1,m-1,dkc} +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5914,7 +5973,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Undefined control sequence.
-l.231 ...st\_d_{t+1,m-1,d-1,c} - pst\_d_{d}}^\text
+l.232 ...st\_d_{t+1,m-1,d-1,c} - pst\_d_{d}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -5923,7 +5982,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.233 ...verbrace{pst\_k_{k-1} - pst\_k_{k}}^\text
+l.234 ...verbrace{pst\_k_{k-1} - pst\_k_{k}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -5932,7 +5991,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Misplaced alignment tab character &.
-l.235 			&
+l.236 			&
           & \forall t \ne T m \in \{ TL_{c}...M-1 \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5942,7 +6001,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.235 			&&
+l.236 			&&
             \forall t \ne T m \in \{ TL_{c}...M-1 \} dkc \\
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5954,7 +6013,7 @@ might try typing `S' now just to see what is salvageable.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.236 		&
+l.237 		&
           ps'_{tMdkc}
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5964,7 +6023,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.237 			&
+l.238 			&
           & = \sum_{M-1}^{M} \big(
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5974,7 +6033,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.237 			&&
+l.238 			&&
             = \sum_{M-1}^{M} \big(
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -5984,7 +6043,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Undefined control sequence.
-l.239 ...e{pst\_d_{t+1,md-1,c} - pst\_d_{d}}^\text
+l.240 ...e{pst\_d_{t+1,md-1,c} - pst\_d_{d}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -5993,7 +6052,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.241 ...verbrace{pst\_k_{k-1} - pst\_k_{k}}^\text
+l.242 ...verbrace{pst\_k_{k-1} - pst\_k_{k}}^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6002,7 +6061,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Misplaced alignment tab character &.
-l.243 			&
+l.244 			&
           & \forall t \ne T dkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6012,7 +6071,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.243 			&&
+l.244 			&&
             \forall t \ne T dkc
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6022,13 +6081,13 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-! LaTeX Error: \begin{enumerate} on input line 180 ended by \end{alignat}.
+! LaTeX Error: \begin{enumerate} on input line 181 ended by \end{alignat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.244 	\end{alignat}
+l.245 	\end{alignat}
                     
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
@@ -6037,7 +6096,7 @@ or  <return>  to continue without it.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.244 	\end{alignat}
+l.245 	\end{alignat}
                     
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
@@ -6046,114 +6105,114 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Overfull \hbox (9.71875pt too wide) in paragraph at lines 218--245
+Overfull \hbox (9.71875pt too wide) in paragraph at lines 219--246
 []$
  []
 
 
-Overfull \hbox (12.5243pt too wide) in paragraph at lines 218--245
+Overfull \hbox (12.5243pt too wide) in paragraph at lines 219--246
 []$
  []
 
 
-Overfull \hbox (30.21927pt too wide) in paragraph at lines 218--245
+Overfull \hbox (30.21927pt too wide) in paragraph at lines 219--246
 [] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (29.21997pt too wide) in paragraph at lines 218--245
+Overfull \hbox (29.21997pt too wide) in paragraph at lines 219--246
 \OT1/cmr/m/n/10 0 \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 tdkc[] 
  []
 
 
-Overfull \hbox (45.82681pt too wide) in paragraph at lines 218--245
+Overfull \hbox (45.82681pt too wide) in paragraph at lines 219--246
 \OML/cmm/m/it/10 ps[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (34.38899pt too wide) in paragraph at lines 218--245
+Overfull \hbox (34.38899pt too wide) in paragraph at lines 219--246
 \OT1/cmr/m/n/10 0 \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 mdkc[] 
  []
 
 
-Overfull \hbox (43.048pt too wide) in paragraph at lines 218--245
+Overfull \hbox (43.048pt too wide) in paragraph at lines 219--246
 \OML/cmm/m/it/10 ps[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (77.32588pt too wide) in paragraph at lines 218--245
+Overfull \hbox (77.32588pt too wide) in paragraph at lines 219--246
 [][] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t \OMS/cmsy/m/n/10 6\OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (25.45718pt too wide) in paragraph at lines 218--245
+Overfull \hbox (25.45718pt too wide) in paragraph at lines 219--246
 \OML/cmm/m/it/10 Tm \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (40.14941pt too wide) in paragraph at lines 218--245
+Overfull \hbox (40.14941pt too wide) in paragraph at lines 219--246
 \OMS/cmsy/m/n/10 f\OT1/cmr/m/n/10 1\OML/cmm/m/it/10 :::TL \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (25.0533pt too wide) in paragraph at lines 218--245
+Overfull \hbox (25.0533pt too wide) in paragraph at lines 219--246
 \OT1/cmr/m/n/10 1\OMS/cmsy/m/n/10 g\OML/cmm/m/it/10 dkc[] 
  []
 
 
-Overfull \hbox (43.048pt too wide) in paragraph at lines 218--245
+Overfull \hbox (43.048pt too wide) in paragraph at lines 219--246
 \OML/cmm/m/it/10 ps[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (65.38148pt too wide) in paragraph at lines 218--245
+Overfull \hbox (65.38148pt too wide) in paragraph at lines 219--246
 [][] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (211.90068pt too wide) in paragraph at lines 218--245
+Overfull \hbox (211.90068pt too wide) in paragraph at lines 219--246
 [] \OT1/cmr/m/n/10 + []  \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t \OMS/cmsy/m/n/10 
 6\OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (25.45718pt too wide) in paragraph at lines 218--245
+Overfull \hbox (25.45718pt too wide) in paragraph at lines 219--246
 \OML/cmm/m/it/10 Tm \OMS/cmsy/m/n/10 2
  []
 
 
-Overfull \hbox (50.0148pt too wide) in paragraph at lines 218--245
+Overfull \hbox (50.0148pt too wide) in paragraph at lines 219--246
 \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 TL[]:::M \OMS/cmsy/m/n/10  
  []
 
 
-Overfull \hbox (25.0533pt too wide) in paragraph at lines 218--245
+Overfull \hbox (25.0533pt too wide) in paragraph at lines 219--246
 \OT1/cmr/m/n/10 1\OMS/cmsy/m/n/10 g\OML/cmm/m/it/10 dkc[] 
  []
 
 
-Overfull \hbox (44.3283pt too wide) in paragraph at lines 218--245
+Overfull \hbox (44.3283pt too wide) in paragraph at lines 219--246
 \OML/cmm/m/it/10 ps[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (81.8933pt too wide) in paragraph at lines 218--245
+Overfull \hbox (81.8933pt too wide) in paragraph at lines 219--246
 [][] [][][] \OT1/cmr/m/n/10 +
  []
 
 
-Overfull \hbox (203.8729pt too wide) in paragraph at lines 218--245
+Overfull \hbox (203.8729pt too wide) in paragraph at lines 219--246
 [] \OT1/cmr/m/n/10 + [] [] \OMS/cmsy/m/n/10 8\OML/cmm/m/it/10 t \OMS/cmsy/m/n/1
 0 6\OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (22.28592pt too wide) in paragraph at lines 218--245
+Overfull \hbox (22.28592pt too wide) in paragraph at lines 219--246
 \OML/cmm/m/it/10 Tdkc$ 
  []
 
 ! Undefined control sequence.
-l.247 \subsection
+l.248 \subsection
                  {Costs}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6167,32 +6226,32 @@ Missing character: There is no s in font nullfont!
 Missing character: There is no t in font nullfont!
 Missing character: There is no s in font nullfont!
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 247--248
+Overfull \hbox (20.0pt too wide) in paragraph at lines 248--249
 [] 
  []
 
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 249--249
+Overfull \hbox (20.0pt too wide) in paragraph at lines 250--250
 [] 
  []
 
 
-Overfull \hbox (27.51158pt too wide) in paragraph at lines 250--251
+Overfull \hbox (27.51158pt too wide) in paragraph at lines 251--252
 \OML/cmm/m/it/10 cs[] \OT1/cmr/m/n/10 =
  []
 
 
-Overfull \hbox (32.92023pt too wide) in paragraph at lines 250--251
+Overfull \hbox (32.92023pt too wide) in paragraph at lines 251--252
 [][]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 [] \OMS/cmsy/m/n/10 
  []
 
 
-Overfull \hbox (20.29579pt too wide) in paragraph at lines 250--251
+Overfull \hbox (20.29579pt too wide) in paragraph at lines 251--252
 \OML/cmm/m/it/10 cw[]\OT1/cmr/m/n/10 )$ 
  []
 
 
-Overfull \hbox (20.0pt too wide) in paragraph at lines 253--253
+Overfull \hbox (20.0pt too wide) in paragraph at lines 254--254
 [] 
  []
 
@@ -6203,14 +6262,14 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.253 \begin{equation}\begin{alignedat}
+l.254 \begin{equation}\begin{alignedat}
                                        {10}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 ! Misplaced alignment tab character &.
-l.254 		&
+l.255 		&
           C = c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) =
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6220,7 +6279,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.255 		&
+l.256 		&
          &
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6230,7 +6289,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.255 		&&
+l.256 		&&
           
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6240,7 +6299,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Undefined control sequence.
-l.256 ...m_{mdkc} cw_{k} (\hat{pw}_{mdkc}) }^\text
+l.257 ...m_{mdkc} cw_{k} (\hat{pw}_{mdkc}) }^\text
                                                   {
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6249,7 +6308,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.260 		}^\text
+l.261 		}^\text
                {Prefer earlier appointments} \\
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6260,7 +6319,7 @@ and I'll forget about whatever was undefined.
 ! Misplaced alignment tab character &.
 <recently read> &
                  
-l.261 		&
+l.262 		&
          	&&  +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6270,7 +6329,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.261 		&	&
+l.262 		&	&
            &  +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6280,7 +6339,7 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 ! Misplaced alignment tab character &.
-l.261 		&	&&
+l.262 		&	&&
               +
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -6292,7 +6351,7 @@ might try typing `S' now just to see what is salvageable.
 ! Undefined control sequence.
 <argument>  \sum _{ \substack 
                               {tt`mdkc \\ t' > t}} (cs_{t'-t, k} + cc) * (rs...
-l.265 			(cs_{t'-t, k} + cc) * (rsc_{tt'mdc})}
+l.266 			(cs_{t'-t, k} + cc) * (rsc_{tt'mdc})}
                                               ^\text{Bad Reschedule} -
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6301,7 +6360,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.265 ...s_{t'-t, k} + cc) * (rsc_{tt'mdc})}^\text
+l.266 ...s_{t'-t, k} + cc) * (rsc_{tt'mdc})}^\text
                                                   {Bad Reschedule} -
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6312,7 +6371,7 @@ and I'll forget about whatever was undefined.
 ! Undefined control sequence.
 <argument>  \sum _{ \substack 
                               {tt`mdkc \\ t' < t}} (cs_{t-t', k} - cc) * (rs...
-l.269 			(cs_{t-t', k} - cc) * (rsc_{tt'mdc})}
+l.270 			(cs_{t-t', k} - cc) * (rsc_{tt'mdc})}
                                               ^\text{Good Reschedule} +
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6321,7 +6380,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.269 ...s_{t-t', k} - cc) * (rsc_{tt'mdc})}^\text
+l.270 ...s_{t-t', k} - cc) * (rsc_{tt'mdc})}^\text
                                                   {Good Reschedule} +
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -6330,20 +6389,20 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-! LaTeX Error: \begin{equation} on input line 253 ended by \end{alignedat}.
+! LaTeX Error: \begin{equation} on input line 254 ended by \end{alignedat}.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.271 \end{alignedat}
+l.272 \end{alignedat}
                      \end{equation}
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 
-Overfull \hbox (697.50972pt too wide) detected at line 271
+Overfull \hbox (697.50972pt too wide) detected at line 272
 []\OML/cmm/m/it/10 C \OT1/cmr/m/n/10 = \OML/cmm/m/it/10 c\OT1/cmr/m/n/10 ([]\OM
 L/cmm/m/it/10 ; []; []; []\OT1/cmr/m/n/10 ) = [] + [] []  + [] \OMS/cmsy/m/n/10
    [] \OT1/cmr/m/n/10 +\OML/cmm/m/it/10 cv [] uv[]
@@ -6358,8 +6417,8 @@ L/cmm/m/it/10 ; []; []; []\OT1/cmr/m/n/10 ) = [] + [] []  + [] \OMS/cmsy/m/n/10
  
 Here is how much of TeX's memory you used:
  32 strings out of 478927
- 665 string characters out of 2850165
- 312810 words of memory out of 3000000
+ 681 string characters out of 2850165
+ 312820 words of memory out of 3000000
  17990 multiletter control sequences out of 15000+600000
  403430 words of font info for 27 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
