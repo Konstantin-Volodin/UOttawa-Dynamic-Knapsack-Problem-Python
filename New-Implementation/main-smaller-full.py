@@ -41,7 +41,7 @@ export_sa_md = f"Data/sens-res/{data_type}/logging/{test_modifier}{data_type}-sa
 
 #%% Execute
 start_time_opt = time.time()
-optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2)
+# optimization_new.main_func(iter_lims, beta_fun, sub_mip_gap, import_data_opt, export_data_opt, export_data_p2, import_data_p2)
 end_time_opt = time.time()
 simulation_new.main_func(replications, warm_up, duration, show_policy, import_data_sim, import_betas_sim, export_txt_sim, export_pic_sim, export_state_my, export_state_md, export_cost_my, export_cost_md, export_util_my, export_util_md, export_sa_my, export_sa_md)
 end_time_sim = time.time()
