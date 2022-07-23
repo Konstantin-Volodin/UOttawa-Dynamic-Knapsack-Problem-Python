@@ -7,22 +7,22 @@ duration <- 1250
 
 ### READ DATA
 # State Data
-state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md-nopri-R1R2R3.txt",
+state_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-md-nopri-R1R2.txt",
                      col_types = cols(id = col_double(), repl=col_double(), period=col_double(), arrived_on=col_double(), sched_to=col_double(), resch_from=col_double(),
                                       resch_to=col_double())) %>% filter(!is.na(id))
-state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my-nopri-R1R2R3.txt",
+state_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-state-my-nopri-R1R2.txt",
                      col_types = cols(id = col_double(), repl=col_double(), period=col_double(), arrived_on=col_double(), sched_to=col_double(), resch_from=col_double(), 
                                       resch_to=col_double())) %>% filter(!is.na(id))
 state <- bind_rows(state_md, state_my)
 rm(state_md,state_my)
 # Cost Data
-cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md-nopri-R1R2R3.txt") %>% mutate(policy = "MDP")
-cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my-nopri-R1R2R3.txt")  %>% mutate(policy = "Myopic")
+cost_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-md-nopri-R1R2.txt") %>% mutate(policy = "MDP")
+cost_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-cost-my-nopri-R1R2.txt")  %>% mutate(policy = "Myopic")
 cost <- bind_rows(cost_md, cost_my)
 rm(cost_md,cost_my)
 # Utilization Data
-util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md-nopri-R1R2R3.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
-util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my-nopri-R1R2R3.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
+util_md <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-md-nopri-R1R2.txt") %>% mutate(policy = "MDP") %>% filter(horizon_period == 0)
+util_my <- read_csv("Data/sens-res/smaller-full/state-action/cw1-cc5-cv10-gam99-smaller-full-util-my-nopri-R1R2.txt") %>% mutate(policy = "Myopic") %>% filter(horizon_period == 0)
 util <- bind_rows(util_md, util_my) %>% 
   mutate(bed = usage_admin/1.5, OR = usage_OR/11.25) %>%
   select(repl, period, policy, bed, OR) %>%
@@ -269,3 +269,16 @@ rm(log_md,log_my)
 
 log %>% filter(period == 0 & `state-aciton` == "action") %>% filter(policy == 'MDP')
 
+
+
+log_md1 <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-md-nopri-R1R2.txt")
+log_md1 <- log_md1 %>% mutate(policy = "MDP") %>% mutate(period = as.character(period))
+log_my1 <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-my-nopri-R1R2.txt")
+log_my1 <- log_my1 %>% mutate(policy = "myopic") %>% mutate(period = as.character(period))
+log1 <- bind_rows(log_md1, log_my1)
+
+log_md2 <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-md-nopri-R1R2.txt")
+log_md2 <- log_md1 %>% mutate(policy = "MDP") %>% mutate(period = as.character(period))
+log_my2 <- read_csv("Data/sens-res/smaller-full/logging/cw1-cc5-cv10-gam99-smaller-full-sa-my-nopri-R1R2.txt")
+log_my2 <- log_my1 %>% mutate(policy = "myopic") %>% mutate(period = as.character(period))
+log2 <- bind_rows(log_md2, log_my2)
