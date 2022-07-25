@@ -1,4 +1,5 @@
 #%%
+from re import S
 from Modules import data_import
 
 import os.path
@@ -12,7 +13,7 @@ import pandas as pd
 from pprint import pprint
 import plotly.express as px
 
-# Improting Data
+# Importing Data
 test_modifier = "cw1-cc5-cv10-gam99-"
 data_type = "smaller-full"
 
@@ -206,14 +207,17 @@ for i in itertools.product(T,M,D,K,C):
     sc_coef[i] += mdv_ac_sc[i].Obj
 
 # Cost of Waiting
-for t,m,d,k,c in itertools.product(T,M,D,K,C):
-    sc_coef[(t,m,d,k,c)] -= cw[k]    
-
-# # Cost of over utilization
 # for t,m,d,k,c in itertools.product(T,M,D,K,C):
-#     sc_coef[(t,m,d,k,c)] += cv
+#     sc_coef[(t,m,d,k,c)] -= cw[k]    
+
+# Cost of under utilization
+# for t,m,d,k,c in itertools.product(T,M,D,K,C):
+#     sc_coef[(t,m,d,k,c)] -= 1000 * U[('Admissions',d,c)]
+
+# Cost of over utilization
+# for t,m,d,k,c in itertools.product(T,M,D,K,C):
 #     for p in P:
-#         sc_coef[(t,m,d,k,c)] += U[(p,d,c)]
+#         sc_coef[(t,m,d,k,c)] += cv * U[(p,d,c)]
 
 # ul
 for p,m,d,k,c in itertools.product(P, M, D, K, C):
@@ -378,7 +382,7 @@ coef_df['DK'] = coef_df['D'] + " \t" + coef_df['K']
 # coef_df = coef_df.assign( or_usage =  resource_usages_list )
 
 # coef_df = coef_df.assign( Val = (-coef_df['Val'] + coef_df['cw'])/coef_df['or_usage'])
-coef_df = coef_df.assign( Val = -coef_df['Val'])
+# coef_df = coef_df.assign( Val = -coef_df['Val'])
 coef_df = coef_df.assign( C = lambda df: df['C'].map(lambda c: f"Surgery {c.split('.')[0]}") )
 coef_df['DKC'] = coef_df['D'] + "," + coef_df['K'] + "," + coef_df['C']
 
