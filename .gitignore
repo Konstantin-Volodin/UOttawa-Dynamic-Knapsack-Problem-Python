@@ -3,3 +3,5 @@
 *.mps
 .Rproj.user
 *.txt
+New-Implementation/.RData
+New-Implementation/.Rhistory
