@@ -36,7 +36,8 @@ read_data <- function(path) {
   
   # Logging Data
   log_md <- read_csv(here('simulation_data',paste0('SA-md-',path,'.txt')), col_types = cols(
-    
+    period=col_double(),`state-aciton`=col_character(),value=col_character(), 
+    t=col_double(),tp=col_double(),m=col_double(),val=col_double()
   ))
   log_my
 }

@@ -284,8 +284,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     myo_grsc =   quicksum( (myv_cost_cs[(k,t-tp)]-myv_cost_cc[k]) * myv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
     myo_cv =     quicksum( myv_cost_cv * myv_aux_uv[(t,p)] for  t in T for p in P)
     myo_cuu =    quicksum( cuu * myv_aux_uu[t] for t in T )
-    myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv + myo_cuu)
-    # myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv)
+    # myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv + myo_cuu)
+    myo_cost = (myo_cw + myo_cs + myo_brsc - myo_grsc + myo_cv)
     myopic.setObjective( myo_cost, GRB.MINIMIZE )
     #endregion
 
@@ -409,8 +409,8 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
     mdo_grsc =   quicksum( (cs[k][t-tp]-cc[k]) * mdv_ac_rsc[(t,tp,m,d,k,c)] for t in T for tp in T for m in M for d in D for k in K for c in C if tp < t)
     mdo_cv =     quicksum( cv * mdv_aux_uv[(t,p)] for  t in T for p in P)
     mdo_cuu =    quicksum( cuu * mdv_aux_uu[t] for t in T )
-    mdo_cost = (mdo_cw + mdo_cs + mdo_brsc - mdo_grsc + mdo_cv + mdo_cuu)
-    # mdo_cost = (mdo_cw + mdo_cs + mdo_brsc - mdo_grsc + mdo_cv)
+    # mdo_cost = (mdo_cw + mdo_cs + mdo_brsc - mdo_grsc + mdo_cv + mdo_cuu)
+    mdo_cost = (mdo_cw + mdo_cs + mdo_brsc - mdo_grsc + mdo_cv)
 
     MDP.setObjective( mdo_cost+(gam*mdo_val), GRB.MINIMIZE )
     #endregion
@@ -524,7 +524,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             for t,m,d,k,c in itertools.product(T,M,D,K,C): 
                 if action['sc'][(t,m,d,k,c)] != 0: print(f"{repl},{day},action,sc,{t},tp,{m},{d},{k},{c},p,{action['sc'][(t,m,d,k,c)]}", file=logging_file)
             for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): 
-                if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},action,rsc,{day},{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=logging_file)
+                if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},{day},action,rsc,{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=logging_file)
             
             for m,d,k,c in itertools.product(M,D,K,C): 
                 if action['pwp'][(m,d,k,c)] != 0: print(f"{repl},{day},post-state,pwp,t,tp,{m},{d},{k},{c},p,{action['pwp'][(m,d,k,c)]}", file=logging_file)
@@ -919,7 +919,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
                 for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): myv_ac_rsc[(t,tp,m,d,k,c)].UB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0); myv_ac_rsc[(t,tp,m,d,k,c)].LB = round(myv_ac_rsc[(t,tp,m,d,k,c)].X,0)
                 myopic.optimize()
                 rp_cost.append(myo_cost.getValue())
-                print(f"{repl},{day}, {myo_cost.getValue()},{myo_cw.getValue()},{myo_cs.getValue()},{myo_brsc.getValue()},{myo_grsc.getValue()},{myo_cv.getValue()}", file=cost_file)
+                print(f"{repl},{day}, {myo_cost.getValue()},{myo_cw.getValue()},{myo_cs.getValue()},{myo_brsc.getValue()},{myo_grsc.getValue()},{myo_cv.getValue()},{myo_cuu.getValue()}", file=cost_file)
 
             # Save Action
             if day >= warm_up:
@@ -959,7 +959,7 @@ def main_func(replications, warm_up, duration, show_policy, import_data, import_
             for t,m,d,k,c in itertools.product(T,M,D,K,C): 
                 if action['sc'][(t,m,d,k,c)] != 0: print(f"{repl},{day},action,sc,{t},tp,{m},{d},{k},{c},p,{action['sc'][(t,m,d,k,c)]}", file=logging_file)
             for t,tp,m,d,k,c in itertools.product(T,T,M,D,K,C): 
-                if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},action,rsc,{day},{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=logging_file)
+                if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},{day},action,rsc,{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=logging_file)
             
             for m,d,k,c in itertools.product(M,D,K,C): 
                 if action['pwp'][(m,d,k,c)] != 0: print(f"{repl},{day},post-state,pwp,t,tp,{m},{d},{k},{c},p,{action['pwp'][(m,d,k,c)]}", file=logging_file)
