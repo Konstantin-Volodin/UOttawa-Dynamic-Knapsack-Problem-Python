@@ -3,18 +3,22 @@ library(here)
 
 warm <- 250
 dur <- 1250 
-path <- "R1R2"
+repl <- 30
+path <- "R1R2R3"
 
-generate_summary <- function(path, dur, warm) {
+generate_summary <- function(path, dur, warm, repl) {
   
   # Data
   data <- read_data(path)
   
   # Generate Wait Time
-  avg_pw <- analyse_wait(data, dur, warm)
+  avg_pw <- analyse_wait(data, dur, warm, repl)
   # Generate Wait List
+  avg_wtl <- analyse_wait_list(data, dur, warm, repl)
+  # Generate Utilization
+  avg_util <- analyse_util(data, dur, warm, repl)
   
-}
+gf}
 
 
 
@@ -60,7 +64,7 @@ read_data <- function(path) {
   
 }
 ### Analyses Wait Time
-analyse_wait <- function(data, dur, warm) {
+analyse_wait <- function(data, dur, warm, repl) {
   state <- data$state
   
   # Post Warm-up Arrivals
@@ -84,17 +88,28 @@ analyse_wait <- function(data, dur, warm) {
     select(policy, repl, period, id, priority, complexity, surgery, arrived_on, final_sched) %>%
     mutate(wait = final_sched - arrived_on)
 
+  # Average wait time
   pw_avg <- pwu_arr_nc %>%
     filter(period > warm) %>% group_by(policy) %>%
     summarize(w_m = mean(wait), w_sd = sd(wait)) %>%
-    mutate(w_moe = 1.96 * w_sd / sqrt(30)) %>%
+    mutate(w_moe = 1.96 * w_sd / sqrt(repl)) %>%
     mutate(surgery = 'overall')
+  
+  # Surgery wait time
   pw_srg <- pwu_arr_nc %>% 
     filter(period > warm) %>% group_by(policy, surgery) %>%
     summarize(w_m = mean(wait), w_sd = sd(wait)) %>%
-    mutate(w_moe = 1.96 * w_sd / sqrt(30))  
+    mutate(w_moe = 1.96 * w_sd / sqrt(repl))  
+  
+  # All data
   pw <- bind_rows(pw_avg, pw_srg) %>% 
     select(policy, surgery, w_m, w_moe) %>%
+    mutate(surgery = case_when(
+      surgery == 'overall' ~ "Overall",
+      surgery == "1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR" ~ "Surgery1",
+      surgery == "4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR" ~ "Surgery4",
+      surgery == "6. SPINE POSTERIOR DISCECTOMY LUMBAR" ~ "Surgery6"
+    )) %>%
     mutate(val = paste0(round(w_m,2), " += ", round(w_moe,2))) %>%
     select(policy, surgery, val) %>% 
     pivot_wider(names_from = surgery, values_from = val)
@@ -119,33 +134,151 @@ analyse_wait <- function(data, dur, warm) {
   # 
 }
 ### Analyses Wait List
-analyse_wait_list <- function(data, dur, warm) {
+analyse_wait_list <- function(data, dur, warm, repl) {
   log <- data$log
+  
+  # Post-warmup waitlist
+  pwu_wtl <- bind_rows(
+    data$log %>% filter(st_ac == 'post-state' & value == 'psp' & t > 1),
+    data$log %>% filter(st_ac == 'post-state' & value == 'pwp')
+  ) %>% group_by(policy, repl, period, c) %>%
+    summarize(wl = sum(val)) %>% ungroup() %>%
+    complete(policy, repl, c, period) %>%
+    replace_na(list(wl = 0)) %>%
+    rename(surgery = c) %>%
+    filter(period > warm)
+
+  # Average wait list
+  wtl_avg <- pwu_wtl %>% 
+    group_by(policy, repl, period) %>%
+    summarize(wl_t = sum(wl)) %>%
+    group_by(policy) %>%
+    summarize(wl_m = mean(wl_t), wl_sd = sd(wl_t)) %>%
+    mutate(wl_moe = 1.96 * wl_sd / sqrt(repl)) %>%
+    mutate(surgery = 'overall')
+  
+  # Surgery wait list
+  wtl_srg <- pwu_wtl %>% 
+    group_by(policy, surgery) %>%
+    summarize(wl_m = mean(wl), wl_sd = sd(wl)) %>%
+    mutate(wl_moe = 1.96 * wl_sd / sqrt(repl))
+  
+  wtl <- bind_rows(wtl_avg, wtl_srg) %>% 
+    select(policy, surgery, wl_m, wl_moe) %>%
+    mutate(surgery = case_when(
+      surgery == 'overall' ~ "Overall",
+      surgery == "1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR" ~ "Surgery1",
+      surgery == "4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR" ~ "Surgery4",
+      surgery == "6. SPINE POSTERIOR DISCECTOMY LUMBAR" ~ "Surgery6"
+    )) %>%
+    mutate(val = paste0(round(wl_m,2), " += ", round(wl_moe,2))) %>%
+    select(policy, surgery, val) %>% 
+    pivot_wider(names_from = surgery, values_from = val)
+  
+  return(wtl)
+  
+}
+### Analyses Utilization
+analyse_util <- function(data, dur, warm, repl) {
+  # Utilization
+  util <- data$util
+  
+  # Average Utilization
+  util_m <- util %>%
+    filter(period > warm) %>%
+    group_by(policy, resource) %>%
+    summarize(ut_m = mean(util), ut_sd = sd(util)) %>%
+    mutate(ut_moe = 1.96 * ut_sd / sqrt(repl)) %>% 
+    mutate(val = paste0(round(ut_m,2), " += ", round(ut_moe,2))) %>%
+    select(policy, resource, val) %>%
+    pivot_wider(names_from = resource, values_from = val)
+  
+  return(util_m)
+  
+  # bx_util_p <- ggplot(util %>% filter(period > warmup)) +
+  #   geom_boxplot(aes(y=util, x=resource, fill=policy)) +
+  #   theme_minimal()
+  # util %>% filter(period > warmup) %>%
+  #   group_by(policy, resource) %>%
+  #   summarize(util_m = mean(util), util_sd = sd(util)) %>%
+  #   mutate(util_me = 1.96 * util_sd / sqrt(30))
+}
+### Analysis of reschedules
+analyse_resch <- function(data, dur, warm, repl) {
   state <- data$state
   
-  wl_data <- tibble()
-  for (p in seq(dur)) {
-    print(p)
-    wait_data <- pwu_wait_nc %>%
-      group_by(policy, repl, .drop=FALSE) %>%
-      filter(arrived_on <= p & final_sched > p) %>% 
-      summarize(wt_size = n()) %>%
-      group_by(policy) %>%
-      summarize(wt_size_m = mean(wt_size), wt_size_sd = sd(wt_size)) %>%
-      mutate(period = p)
-    wl_data <- bind_rows(wl_data, wait_data)
-  }
-  wl_data %>% filter(period > warm) %>%
-    group_by(policy) %>% 
-    summarize(wt_m = mean(wt_size_m), wt_sd = sd(wt_size_sd))  %>%
-    mutate(wt_me = 1.96 * (wt_sd / sqrt(30)) )
+  # Post Warm Up Reschedules
+  pwu_rsc <- state %>% 
+    filter(action == 'rescheduled')  %>%
+    group_by(policy,surgery,repl,period) %>%
+    summarize(resch=n()) %>% 
+    ungroup() %>%
+    complete(policy, surgery, repl, period=seq(dur)) %>%
+    replace_na(list(resch = 0)) %>%
+    filter(period > warm)
   
-  bind_rows(
-    log %>% filter(st_ac == 'state' & value == 'ps'),
-    log %>% filter(st_ac == 'state' & value == 'pw')) %>% 
-    arrange(policy, repl, period) %>%
+  # Average Reschedules
+  rsc_avg <- pwu_rsc %>% 
     group_by(policy, repl, period) %>%
-    summarize(wl = sum(val)) %>%
+    summarize(rs = sum(resch)) %>%
     group_by(policy) %>%
-    summarize(wl_m = mean(wl))
+    summarize(rs_m = mean(rs), rs_sd = sd(rs)) %>%
+    mutate(rs_moe = 1.96 * rs_sd / sqrt(repl)) %>%
+    mutate(surgery = 'overall')
+  
+  # Surgery Reschedules
+  rsc_srg <- pwu_rsc %>% 
+    group_by(policy, surgery) %>%
+    summarize(rs_m = mean(resch), rs_sd = sd(resch)) %>%
+    mutate(rs_moe = 1.96 * rs_sd / sqrt(repl))
+  
+  rsc <- bind_rows(rsc_avg, rsc_srg) %>% 
+    select(policy, surgery, rs_m, rs_moe) %>%
+    mutate(surgery = case_when(
+      surgery == 'overall' ~ "Overall",
+      surgery == "1. SPINE POSTERIOR DECOMPRESSION/LAMINECTOMY LUMBAR" ~ "Surgery1",
+      surgery == "4. SPINE POST CERV DECOMPRESSION AND FUSION W INSTR" ~ "Surgery4",
+      surgery == "6. SPINE POSTERIOR DISCECTOMY LUMBAR" ~ "Surgery6"
+    )) %>%
+    mutate(val = paste0(round(rs_m,2), " += ", round(rs_moe,2))) %>%
+    select(policy, surgery, val) %>% 
+    pivot_wider(names_from = surgery, values_from = val)
+  
+  resch_data <- state %>% 
+    modify_if(is.character, as.factor) %>%
+    filter(action == 'rescheduled' & period > warmup) %>%
+    group_by(repl,policy, surgery) %>% 
+    summarize(resch = n()) %>%
+    ungroup()
+  arr_data <- state %>% 
+    modify_if(is.character, as.factor) %>%
+    filter(action == 'arrived' & period > warmup) %>%
+    group_by(repl,policy, surgery) %>%
+    summarize(arrv = n()) %>%
+    ungroup()
+  resch_data %>% left_join(arr_data) %>% mutate(resch_perc = resch/arrv * 100) %>%
+    group_by(policy, surgery) %>%
+    summarize(rs_m = mean(resch_perc), rs_sd = sd(resch_perc))
+  
+  resch_data <- state %>% 
+    modify_if(is.character, as.factor) %>%
+    filter(action == 'rescheduled' & period > warmup) %>%
+    group_by(repl,policy) %>% 
+    summarize(resch = n()) %>%
+    ungroup()
+  arr_data <- state %>% 
+    modify_if(is.character, as.factor) %>%
+    filter(action == 'arrived' & period > warmup) %>%
+    group_by(repl,policy) %>%
+    summarize(arrv = n()) %>%
+    ungroup()
+  resch_data %>% left_join(arr_data) %>% mutate(resch_perc = resch/arrv * 100) %>%
+    group_by(policy) %>%
+    summarize(rs_m = mean(resch_perc), rs_sd = sd(resch_perc))
+  
+  
+}
+### Analysis of transitions
+analyse_trans <- function(data, dur, warm, repl) {
+  
 }
