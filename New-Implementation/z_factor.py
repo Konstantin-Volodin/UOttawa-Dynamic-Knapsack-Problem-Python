@@ -18,7 +18,7 @@ test_modifier = "cw1-cc5-cv10-gam99-"
 data_type = "smaller-full"
 
 import_data =  f"Data/sens-data/{data_type}/{test_modifier}{data_type}-nopri-data.xlsx"
-import_beta = f"Data/sens-data/{data_type}/betas/{test_modifier}{data_type}-nopri-optimal-R1.pkl"
+import_beta = f"Data/sens-data/{data_type}/betas/{test_modifier}{data_type}-nopri-optimal-R1R2R3.pkl"
 
 my_path = os.getcwd()
 input_data = data_import.read_data(os.path.join(my_path, import_data))
@@ -207,17 +207,17 @@ for i in itertools.product(T,M,D,K,C):
     sc_coef[i] += mdv_ac_sc[i].Obj
 
 # Cost of Waiting
-# for t,m,d,k,c in itertools.product(T,M,D,K,C):
-#     sc_coef[(t,m,d,k,c)] -= cw[k]    
+for t,m,d,k,c in itertools.product(T,M,D,K,C):
+    sc_coef[(t,m,d,k,c)] -= cw[k]    
 
 # Cost of under utilization
-# for t,m,d,k,c in itertools.product(T,M,D,K,C):
-#     sc_coef[(t,m,d,k,c)] -= 1000 * U[('Admissions',d,c)]
+for t,m,d,k,c in itertools.product(T,M,D,K,C):
+    sc_coef[(t,m,d,k,c)] -= 1000 * U[('Admissions',d,c)]
 
 # Cost of over utilization
-# for t,m,d,k,c in itertools.product(T,M,D,K,C):
-#     for p in P:
-#         sc_coef[(t,m,d,k,c)] += cv * U[(p,d,c)]
+for t,m,d,k,c in itertools.product(T,M,D,K,C):
+    for p in P:
+        sc_coef[(t,m,d,k,c)] += cv * U[(p,d,c)]
 
 # ul
 for p,m,d,k,c in itertools.product(P, M, D, K, C):
