@@ -4,6 +4,7 @@ library(gridExtra)
 library(here)
 library(scales)
 library(gridExtra)
+library(plotly)
 
 source(here('data_funcs.R'))
 
@@ -31,6 +32,31 @@ ggplot(sched_dat) +
   geom_text(aes(x=t, y=mean, label=round(mean,1)), size=2) +
   facet_grid(c+d ~ policy, scales="fixed") + 
   labs(x='Time (Week)', y='Count (Sched)', title='Average Scheduling Numbers')
+
+# Rescheduling
+rsc_dat <- dat %>% filter(value == 'rsc') %>%
+  filter(period >= warm) %>%
+  group_by(policy, repl, c, d,t ,tp) %>%
+  summarize(avg = sum(val)) %>%
+  group_by(policy, c, d, t, tp) %>%
+  summarize(mean = mean(avg), sd = sd(avg)) %>%
+  separate(c, sep=' ', into=c('c')) %>%
+  mutate(t = as.numeric(t), tp = as.numeric(tp))
+
+(ggplot(rsc_dat %>% filter(t == 1)) +
+  geom_bar(aes(x=t, y=mean, fill=tp), stat = 'identity', position='dodge2') +
+  facet_grid(c+d ~ policy, scales='free') + 
+  labs(x='Time (Week)', y='Count (Sched)', title='Good Reschedules per Group') +
+  theme_minimal()) %>% ggplotly()
+
+ggplot(rsc_dat %>% filter(t != 1)) +
+  geom_bar(aes(x=t, y=mean, fill=tp), stat = 'identity', position='dodge2') +
+  facet_grid(c+d ~ policy, scales='free') + 
+  labs(x='Time (Week)', y='Count (Sched)', title='Bad Reschedules per Group') +
+  scale_color_brewer(palette = 'RdBu') +
+  theme_minimal()
+
+
 
 # Waitlist
 waitlist_dat <- dat %>% filter(value == 'pw') %>%
