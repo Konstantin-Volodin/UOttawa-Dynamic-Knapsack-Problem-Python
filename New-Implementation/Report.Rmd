@@ -31,17 +31,33 @@ warm <- 250
 dur <- 1250
 repl <- 30
 
-# path <- "R1R2"
-# R1R2 <- generate_summary(path, dur, warm, repl)
+path <- "R1R2"
+R1R2 <- generate_summary(path, dur, warm, repl)
+R1R2_sa <- generate_summary_sa(path, dur, warm, repl)
 R1R2_beta_file <- "Data/sens-data/smaller-full/betas/cw1-cc5-cv10-gam99-smaller-full-nopri-optimal-R1R2.pkl"
 return_data(R1R2_beta_file, FALSE, FALSE)
 return_data(R1R2_beta_file, FALSE, TRUE)
+temp1 <- read_csv("Report_Stuff/R2_basic.csv") %>% mutate(type = 'basic')
+temp2 <- read_csv("Report_Stuff/R2_prio.csv") %>% mutate(type = 'prio')
+R1R2_beta_data_mdp <- bind_rows(temp1, temp2) %>% mutate(pol = 'mdp')
+temp1 <- read_csv("Report_Stuff/R2_basic_myopic.csv") %>% mutate(type = 'basic')
+temp2 <- read_csv("Report_Stuff/R2_prio_myopic.csv") %>% mutate(type = 'prio')
+R1R2_beta_data_myopic <- bind_rows(temp1, temp2) %>% mutate(pol = 'myopic')
+R1R2_beta_data <- bind_rows(R1R2_beta_data_mdp, R1R2_beta_data_myopic)
 
-# path <- "R1R2R3"
-# R1R2R3 <- generate_summary(path, dur, warm, repl)
+path <- "R1R2R3"
+R1R2R3 <- generate_summary(path, dur, warm, repl)
+R1R2R3_sa <- generate_summary_sa(path, dur, warm, repl)
 R1R2R3_beta_file <- "Data/sens-data/smaller-full/betas/cw1-cc5-cv10-gam99-smaller-full-nopri-optimal-R1R2R3.pkl"
 return_data(R1R2R3_beta_file, TRUE, FALSE)
 return_data(R1R2R3_beta_file, TRUE, TRUE)
+temp1 <- read_csv("Report_Stuff/R3_basic.csv") %>% mutate(type = 'basic')
+temp2 <- read_csv("Report_Stuff/R3_prio.csv") %>% mutate(type = 'prio')
+R1R2R3_beta_data_mdp <- bind_rows(temp1, temp2) %>% mutate(pol = 'mdp')
+temp1 <- read_csv("Report_Stuff/R3_basic_myopic.csv") %>% mutate(type = 'basic')
+temp2 <- read_csv("Report_Stuff/R3_prio_myopic.csv") %>% mutate(type = 'prio')
+R1R2R3_beta_data_myopic <- bind_rows(temp1, temp2) %>% mutate(pol = 'myopic')
+R1R2R3_beta_data <- bind_rows(R1R2R3_beta_data_mdp, R1R2R3_beta_data_myopic)
 
 arrival_rate <- data.frame(
   Surgery = c('Surgery 1', 'Surgery 1', 'Surgery 4', 'Surgery 4', 'Surgery 6', 'Surgery 6'),
@@ -64,25 +80,19 @@ resource_capacity <- data.frame(
   Unit = c("Patients Admitted per week", "OR Hours per week")
 )
 
-
-temp1 <- read_csv("Report_Stuff/R2_basic.csv") %>% mutate(type = 'basic')
-temp2 <- read_csv("Report_Stuff/R2_prio.csv") %>% mutate(type = 'prio')
-R1R2_beta_data <- bind_rows(temp1, temp2)
-
-temp1 <- read_csv("Report_Stuff/R2_basic_myopic.csv") %>% mutate(type = 'basic')
-temp2 <- read_csv("Report_Stuff/R2_prio_myopic.csv") %>% mutate(type = 'prio')
-R1R2_beta_data_myopic <- bind_rows(temp1, temp2)
-
 ### Generate Plots
 R1R2_policy <- (ggplot(R1R2_beta_data %>% filter(M == 0), aes(x=T, y=Val, color=C, shape=D, linetype=D)) +
     geom_line() + geom_point() +
-    facet_wrap(. ~ type, scales='free') +
+    facet_wrap(pol ~ type, scales='free') +
     scale_x_continuous(breaks=seq(0,10), limits = c(1,10))) %>% ggplotly()
-R1R2_policy_myopic <- (ggplot(R1R2_beta_data_myopic %>% filter(M == 0), aes(x=T, y=Val, color=C, shape=D, linetype=D)) +
+
+R1R2R3_policy <- (ggplot(R1R2R3_beta_data %>% filter(M == 0), aes(x=T, y=Val, color=C, shape=D, linetype=D)) +
     geom_line() + geom_point() +
-    facet_wrap(. ~ type, scales='free') +
+    facet_wrap(pol ~ type, scales='free') +
     scale_x_continuous(breaks=seq(0,10), limits = c(1,10))) %>% ggplotly()
 ```
+
+
 
 # Parameters 
 
@@ -106,13 +116,11 @@ This model is a smaller instance of the full problem:
 
 ## Arrival Rate
 It was set to be 95% of the capacity, however due to transitions, the resource usage should be higher than 95% 
-  
 ``` {r echo=FALSE, cache=FALSE}
 kable(arrival_rate)
 ```
 
 ## Resource Usage
-
 Usage of the resources
 ```{r echo=FALSE, cache=FALSE}
 kable(resource_usage)
@@ -123,42 +131,115 @@ kable(resource_usage)
 kable(resource_capacity)
 ```
 
+
+
 # R1R2 Report
 This model is the default model that does not penalize bed under utilization
 
 ## Policy Description
-
 The description will be based on the following graphs (both of them are for M of 0 only):
-
 ```{r echo=FALSE, cache=FALSE}
 R1R2_policy
 ```
-```{r echo=FALSE, xcache=FALSE}
-R1R2_policy_myopic
+
+The top graphs show MDP policy, and the graphs below show Myopic policy.
+
+The graph on the left shows in which days the policy will allow scheduling. If the value is below 0 - the model will allow scheduling, otherwise the model will keep patients in the waitlist. Thus this policy **will only schedule into week 1 and week 2**. The plot on the right shows the approximate priority of different surgeries. The lower the surgery is on the list the more likely it is to be scheduled first. The following is the order:
+
+- Surgery 6, Complexity 2
+- Surgery 6, Complexity 1
+- Surgery 1, Complexity 1
+- Surgery 1, Complexity 2
+- Surgery 4, Complexity 1
+- Surgery 4, Complexity 2
+
+For Myopic, it is changed such that the entire horizon is filled. And the graph on the right shows the approximate order of scheduling priority. It appears to be very similar to MDP.
+
+Additionally the following graphs give some insights on how the policy makes decision
+```{r echo=FALSE, cache=FALSE}
+R1R2_sa$res_plot$sched_plt
 ```
 
-The graph on the left shows in which days the MDP policy will allow scheduling. If the value is below 0 - the model will allow scheduling, otherwise the model will keep patients in the waitlist. Thus this policy **will only schedule into week 1 and week 2**
-
-The plot on the right shows the approximate priority of different surgeries. The lower the surgery is on the list the more likely it is to be scheduled first.    
-
 ## Policy Results
+### Wait Times in weeks
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2$results$pw)
+```
+
+### Wait List Size
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2$results$wtl)
+```
+```{r echo=FALSE, cache=FALSE}
+R1R2_sa$res_plot$waitlist_plt
+```
+
+### Utilization
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2$results$util)
+```
+
+### Reschedules as percentage of arrivals & Total Reschedules
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2$results$rsc)
+```
+```{r echo=FALSE, cache=FALSE}
+R1R2_sa$res_plot$rsc_plt %>% ggplotly()
+```
+
+### Transitions per week
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2$results$tr)
+```
+
 
 
 # R1R2R3 Report
 In addition to the parameters above, this model penalizes bed under utilization in the first period
 
 ## Policy Description
-
-The description will be based on the following graphs:
-
+<!-- The description will be based on the following graphs: -->
 ```{r echo=FALSE, cache=FALSE}
-R1R2_policy
+R1R2R3_policy
+```
+
+Additionally the following graphs give some insights on how the policy makes decision
+```{r echo=FALSE, cache=FALSE}
+R1R2R3_sa$res_plot$sched_plt
 ```
 
 ## Policy Results
 
+### Wait Times in weeks
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2R3$results$pw)
+```
 
-The policy description is based on the following graphs.
+### Wait List Size
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2R3$results$wtl)
+```
+```{r echo=FALSE, cache=FALSE}
+R1R2R3_sa$res_plot$waitlist_plt
+```
+
+### Utilization
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2R3$results$util)
+```
+
+### Reschedules as percentage of arrivals & Total Reschedules
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2R3$results$rsc)
+```
+```{r echo=FALSE, cache=FALSE}
+R1R2R3_sa$res_plot$rsc_plt %>% ggplotly()
+```
+
+### Transitions per week
+```{r echo=FALSE, cache=FALSE}
+kable(R1R2R3$results$tr)
+```
 
 
 

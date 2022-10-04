@@ -1,11 +1,7 @@
 library(tidyverse)
 library(here)
 
-path <- "R1R2"
-dur <- 1250
-warm <- 250
-repl <- 30
-
+# Generate Summary From Patient Level Data
 generate_summary <- function(path, dur, warm, repl) {
   
   # Data
@@ -35,9 +31,6 @@ generate_summary <- function(path, dur, warm, repl) {
   
   return (results)
 }
-
-
-
 ### Reads all relevant data
 read_data <- function(path) {
   
@@ -333,3 +326,76 @@ analyse_trans <- function(data, dur, warm, repl) {
   return(trp)
 }
 
+
+
+# Generate Summary From State-Action Data
+generate_summary_sa <- function(path, dur, warm, repl) {
+  my_dat <- read_csv(here(paste0("simulation_data/SA-my-",path,".txt"))) %>% mutate(policy = 'my')
+  md_dat <- read_csv(here(paste0("simulation_data/SA-md-",path,".txt"))) %>% mutate(policy = 'md')
+  dat <-bind_rows(my_dat, md_dat)
+  
+  # Scheduling
+  sched_dat <- dat %>% filter(`state-aciton` == 'action' & value == 'sc') %>%
+    filter(period >= warm) %>%
+    mutate(t = as.numeric(t)) %>%
+    group_by(repl, policy, t, c, d) %>% 
+    summarize(count = sum(val) / (dur-warm)) %>% 
+    group_by(policy, t,c,d) %>%
+    summarize(mean = mean(count), sd = sd(count)) %>%
+    mutate(mean_log = log(mean)) %>%
+    separate(c, sep=" ", into=c('c')) %>%
+    mutate(c = paste0('S',c))
+  
+  sched_plt <- ggplot(sched_dat) +
+    geom_bar(aes(x=t, y=mean, fill=c), stat='identity') +
+    geom_text(aes(x=t, y=mean, label=round(mean,1)), size=2) +
+    facet_grid(c+d ~ policy, scales="fixed") + 
+    labs(x='Time (Week)', y='Count (Sched)', title='Average Scheduling Numbers')
+  
+  # Rescheduling
+  rsc_dat <- dat %>% filter(value == 'rsc') %>%
+    filter(period >= warm) %>%
+    group_by(policy, repl, c, d,t ,tp) %>%
+    summarize(avg = sum(val)) %>%
+    group_by(policy, c, d, t, tp) %>%
+    summarize(mean = mean(avg), sd = sd(avg)) %>%
+    separate(c, sep=' ', into=c('c')) %>%
+    mutate(gb = ifelse(tp==1, 'Good','Bad'))
+  
+  
+  rsc_plt <- ggplot(rsc_dat) +
+    geom_bar(aes(x=t, y=mean, fill=tp), stat = 'identity', position='stack') +
+    facet_grid(c+d ~ gb+policy, scales='free') + 
+    labs(x='Time (Week)', y='Count (Sched)', title='Reschedules per Group')
+  
+  
+  
+  # Waitlist
+  waitlist_dat <- dat %>% filter(value == 'pw') %>%
+    filter(period >= warm) %>%
+    group_by(policy, repl, c, d, m) %>% 
+    summarize(avg = sum(val)/(dur-warm)) %>% 
+    group_by(policy, c,d, m) %>%
+    summarize(mean = mean(avg), sd = sd(avg)) %>%
+    separate(c, sep=" ", into=c('c'))
+  
+  wtl_plt <- ggplot(waitlist_dat) +
+    geom_bar(aes(x=m, y=mean, fill=c), stat = 'identity') +
+    geom_text(aes(x=m, y=mean, label=round(mean,1)), size=2) +
+    facet_grid(c+d ~ policy, scales='free') + 
+    labs(x='Time (Week)', y='Count (Sched)', title='Average Waitlist Size by Group')
+  
+  return( list(
+    'data' = dat,
+    'res_data' = list(
+      'sched_data' = sched_dat,
+      'rsc_data' = rsc_dat,
+      'waitlist_data' = waitlist_dat
+    ),
+    'res_plot' = list(
+      'sched_plt' = sched_plt,
+      'rsc_plt' = rsc_plt,
+      'waitlist_plt' = wtl_plt
+    )
+  ))
+}
