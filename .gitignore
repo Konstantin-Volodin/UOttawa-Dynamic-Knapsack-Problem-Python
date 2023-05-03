@@ -5,3 +5,4 @@
 *.txt
 *.RData
 *.Rhistory
+*.DS_Store
