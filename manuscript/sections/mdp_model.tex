@@ -1,0 +1,305 @@
+\section{MDP Model}
+
+\subsection{Decision Epochs}
+Decisions are made at the beginning of each time period. There are 3 relevant time intervals to look at:
+\begin{itemize}
+	\item Pre-decision state ($S$)
+	\begin{itemize}
+		\item Pre-decision state defines the initial state on which a decision is required
+		\item This information drives decision making
+	\end{itemize}
+	
+	\item Post-decision state ($\hat{S}$)
+	\begin{itemize}
+		\item Post-decision state is the time when the decision has been executed, but no new info came in
+		\item This state defines the immediate cost of an action
+	\end{itemize} 
+	
+	\item Post-transition state ($S'$)
+	\begin{itemize}
+		\item This is the state when new information has come in (transition randomness). Defines next pre decision state
+		\item It is primarily used to generate expectation for the ADP
+	\end{itemize}
+\end{itemize}
+
+\subsection{State Space}
+\subsubsection{Description}
+State is defined by carried over resources, deviation from expected resources, patient waitlist/demand, and patients already scheduled
+\[  \vec{S}  = (\vec{ul}, \vec{pw}, \vec{ps}) \]
+\begin{itemize}
+	\item $\vec{ul} = ul_{p}$ - Units left over from previous period for resource $p$ plus deviation for that unit for period 1.
+	\item $\vec{pw} = pw_{mdkc}$ - Patients of complexity $d$, priority $k$, surgery type $c$, on a wait list for $m$ periods ($m$ of 0 - just arrived)
+	\item $\vec{ps} = ps_{tmdkc}$ - Patients of complexity $d$, priority $k$,  surgery type $c$, scheduled to period $t$, waiting for $m$ periods
+\end{itemize}
+
+\subsection{Action Sets}
+\subsubsection{Description}
+Actions consist of rescheduling currently scheduled patients, and scheduling patients on wait list. There are also some goal and auxiliary variables
+\[  \vec{A} = (\vec{sc}, \vec{rsc}, \text{auxiliary variables}) \] 
+\begin{itemize}
+	\item $\vec{sc} = sc_{tmdkc}$ - Patients of complexity $d$, priority $k$,  surgery type $c$, waiting for $m$, to schedule in period $t$
+	\item $\vec{rsc} = rsc_{tt'mdkc}$ -Patients of complexity $d$, priority $k$, surgery type $c$, waiting for $m$, reschedule from $t$ to $t'$
+\end{itemize}
+
+\subsubsection{Auxiliary Variables}
+\begin{itemize}
+	\item $\vec{uv} = uv_{tp}$ - goal variable, violation on number of resources used for period $t$, of resource $p$
+	\item $uvb_{tp}$ - binary variable to enforce $uv$ variable without objective function
+	\item $\hat{ul}_{p \in p\_co}$ - post-decision unit leftover at period 1
+	\item $ulb_{p \in p\_co}$ - binary variable to enforce $ul$ variable without objective function
+	\item $\hat{uu}_{tp}$ - post-decision units used
+	\item $\hat{pw}_{mdkc}$ - post-decision patients waiting
+	\item $\hat{ps}_{tmdkc}$ - post-decision patients scheduled
+	\item $pwt\_d_{mdkc}$ - patients waiting transitioned in complexity
+	\item $pwt\_k_{mdkc}$ - patients waiting transitioned in priority
+	\item $pst\_d_{tmdkc}$ - patients scheduled transitioned in complexity
+	\item $pst\_k_{tmdkc}$ - patients scheduled transitioned in priority
+	\item $uu_{tp}, \quad \forall p \in {\text{Admission}}$ - units underutilized for resource p, time t
+	\item $uub_{tp}, \quad \forall p \in {\text{Admission}}$ - binary variable to enforce $uu$ without using objective function
+\end{itemize}
+\subsubsection{Auxiliary Variable Definition}
+\label{auxiliary constraints}
+\begin{alignat}{10}
+	& \hat{uu}_{tp} 
+		&& =  \sum_{mdkc} U_{pdc} \hat{ps}_{tmdkc} \quad
+		&& \forall tp \\ 
+	& \hat{pw}_{mdkc} 
+		&& = pw_{mdkc} - \sum_{t} sc_{tmdkc} \quad 
+		&& \forall mdkc \\ 
+	& \hat{ps}_{tmdkc} 
+		&& = ps_{tmdkc} + sc_{tmdkc} + 
+		\sum_{t} rsc_{tt'mdkc} - \sum_{t'} rsc_{tt'mdkc} \quad 
+		&& \forall tmdkc \\
+	& pwt\_d_{mdkc} 
+		&& = ptp\_d_{dc} * \hat{pw}_{mdkc} \quad
+		&& \forall mdkc \\
+	& pwt\_k_{mdkc} 
+		&& = ptp\_k_{kc} * ( \hat{pw}_{mdkc} + pwt\_d_{md-1kc} - pwt\_d_{mdkc} )  \quad
+		&& \forall mdkc \\
+	& pst\_d_{tmdkc} 
+		&& = ptp\_d_{dc} * \hat{ps}_{tmdkc} \quad
+		&& \forall tmdkc \\
+	& pst\_k_{tmdkc} 
+		&& = ptp\_k_{kc} * ( \hat{ps}_{tmdkc} + pst\_d_{tmd-1kc} - pst\_d_{tmdkc} )  \quad
+		&& \forall tmdkc
+\end{alignat}
+
+\begin{itemize}
+	\item Define Resource Violation Variable
+	\begin{alignat}{10}
+		& uv_{1p} 
+			&& = max\{0 , \hat{uu}_{1p} - p\_ue_{p} - ul_{p}\} \quad 
+			&& \forall p \\ 
+		& uv_{tp} 
+			&& = max\{0 , \hat{uu}_{tp} - p\_ue_{p}\} \quad
+			&& \forall t \in \{2..T\} p \\ \\
+		& uv_{tp} 
+			&&\ge 0 \quad
+			&& \forall tp \\
+		& uv_{tp} 
+			&& \le  M(uvb_{tp}) \quad
+			&& \forall tp \\
+		& uv_{1p} 
+			&&\ge \hat{uu}_{1p} - p\_ue_{p} - ul_{p} \quad
+			&& \forall p \\
+		& uv_{1p} 
+		&& \le  (\hat{uu}_{1p} - p\_ue_{p} - ul_{p}) + M(1-uvb_{tp}) \quad
+		&& \forall p \\
+		& uv_{tp} 
+			&&\ge \hat{uu}_{tp} - p\_ue_{p} \quad
+			&& \forall t \in \{2..T \} p \\
+		& uv_{tp} 
+		&& \le  (\hat{uu}_{tp} - p\_ue_{p}) + M(1-uvb_{tp}) \quad
+		&& \forall t \in \{ 2..T \} p \\
+	\end{alignat}
+	
+	\item Define Units Left Over Variable
+	\begin{alignat}{10}
+		& \hat{ul}_{p} 
+			&& = max \{0, p\_ue_{p} + ul_{p} - \hat{uu}_{1p} \}
+			&& \forall p \in \{p_co\} \\ \\
+		& \hat{ul}_{p} 
+			&& \ge 0 \quad 
+			&& \forall p  \in p\_co \\
+		& \hat{ul}_{p} 
+			&& \le M (ulb_{p}) \quad 
+			&& \forall p  \in p\_co\\
+		& \hat{ul}_{p} 
+			&& \ge p\_ue_{p} + ul_{p} - \hat{uu}_{1p} \quad 
+			&& \forall p  \in p\_co\\
+		& \hat{ul}_{p} 
+			&& \le (p\_ue_{p} + ul_{p} - \hat{uu}_{1p}) + M(1-ulb_{p}) \quad 
+			&& \forall p  \in p\_co
+	\end{alignat}
+	
+	\item Define Resource Underutilized
+	\begin{alignat}{10}
+		& uu_{1p} 
+			&& = max\{0 , p\_ue_{p} + ul_{p} - \hat{uu}_{1p}\} \quad 
+			&& \forall p \in {\text{Admissions}} \\ 
+		& uu_{tp} 
+			&& = max\{0 , p\_ue_{p} - \hat{uu}_{tp}\} \quad
+			&& \forall t \in \{2..T\} p \in {\text{Admissions}} \\ \\
+		& uu_{tp} 
+			&&\ge 0 \quad
+			&& \forall tp \\
+		& uu_{tp} 
+			&& \le  M(uub_{tp}) \quad
+			&& \forall tp \\
+		& uu_{1p} 
+			&&\ge p\_ue_{p} + ul_{p} - \hat{uu}_{1p} \quad
+			&& \forall p \\
+		& uu_{1p} 
+		&& \le  (p\_ue_{p} + ul_{p} - \hat{uu}_{1p}) + M(1-uub_{tp}) \quad
+		&& \forall p \\
+		& uu_{tp} 
+			&&\ge p\_ue_{p} - \hat{uu}_{tp}\ \quad
+			&& \forall t \in \{2..T \} p \\
+		& uu_{tp} 
+		&& \le  (p\_ue_{p} - \hat{uu}_{tp}\ + M(1-uub_{tp}) \quad
+		&& \forall t \in \{ 2..T \} p \\
+	\end{alignat}
+\end{itemize}
+
+\subsubsection{State-Action Constraints}
+\label{state-action constraints}
+\begin{itemize}
+	
+	\item Resource Usage Constraint
+	\begin{alignat}{10}
+		& \hat{uu}_{1p} 
+			&& \le p\_ue_{p} + ul_{p} + uv_{1p} \quad 
+			&& \forall p \\
+		& \hat{uu}_{tp} 
+			&& \le p\_ue_{p} + uv_{tp} \quad
+			&& \forall t \in \{ 2..T \}p 
+	\end{alignat}
+	
+	\item Custom bounds on when reschedules are allowed
+	\begin{alignat}{10}
+		& rsc_{tt'mdkc} && = 0 \quad && \forall t \in \{ 2...T \}, t' \in \{2...T\} mdkc \\
+		% & rsc_{tt'mdkc} && = 0 \quad && \forall t \in \{ 1 \}, t'\in \{ 3...T \} mdkc  \\
+		& rsc_{tt'mdkc} && = 0 \quad && \forall tt'mdkc, \text{where } t=t'=1 
+	\end{alignat}  
+	
+	\item Bounds on Schedules/Reschedules
+	\begin{alignat}{10}
+		& \sum_{t'} rsc_{tt'mdkc} 	&& \le ps_{tmdkc} \quad  && \forall tmdkc  \\
+		& \sum_{t} sc_{tmdkc} 		&& \le pw_{mdkc} \quad 	&& \forall mdkc 
+	\end{alignat}  
+	
+	\item Bounds on states (not sure about the rationale on that)
+	\begin{alignat}{10}
+		& ul_{p} 	&& \le p\_ue_{p} \quad 			&& \forall p \\
+		& pw_{mdkc} 	&& \le pea_{dkc} * 2 \quad 			&& \forall mdkc \\
+		& ps_{tmdkc} && \le pea_{dkc} \quad 			&& \forall tmdkc
+	\end{alignat}
+\end{itemize}
+
+\subsection{Transition}
+
+In this section we will have the following:
+\begin{itemize}
+	\item $p\_ued$ will represent the random variable from $p\_ued$ distribution 
+	\item $pea$ will represent the random variable from $pea$ distribution. 
+	\item $pwt$ and $pst$, will represent number transitioned in complexity/priority on waitlist and currently scheduled list.
+\end{itemize}
+
+
+\begin{enumerate}
+	\item Transition from $\vec{ul}$ to $\vec{ul'}$ - Resource Carry Over
+	\begin{alignat}{10}
+		& ul'_{p} 
+		&& = \hat{ul}_{p} + p\_ued_{p} \quad 
+		&& \forall p \in \{ p\_co \} \\
+		& ul'_{p} 
+		&& = p\_ued_{p} \quad 
+		&& \forall p \in \{ p\_nco \} 
+	\end{alignat} 
+	
+	
+	\item Transition from $\vec{pw}$ to $\vec{pw'}$ - Flow of patients on waitlist
+	\begin{alignat}{10}
+		& pw'_{0dkc} 
+			&& = pea_{dkc} \quad
+			&& \forall dc \\  
+		& pw'_{mdkc} 
+			&& = \hat{pw}_{m-1,dkc}
+			&& \forall m \in \{ 1...(TL_{c}-1) \} dkc \\  
+		& pw'_{mdkc} 
+			&& = \hat{pw}_{m-1,dkc} + 
+				\overbrace{pwt\_d_{m-1,d-1,c} - pwt\_d_{d}}^\text{
+				change in complexities} +  
+				\overbrace{pwt\_k_{k-1} - pwt\_k_{k}}^\text{
+				change in priorities}\quad 
+			&& \forall m \in \{ TL_{c}...M-1 \} dkc \\  
+		& pw'_{Mdc} 
+			&& = \sum_{M-1}^{M} \big( 
+				\hat{pw}_{mdc} + 
+				\overbrace{pwt\_d_{md-1,c} - pwt\_d_{d}}^\text{
+				change in complexities} +  
+				\overbrace{pwt\_k_{k-1} - pwt\_k_{k}}^\text{
+				change in priorities} \big) \quad
+			&& \forall dc
+	\end{alignat}
+	
+	
+	\item Transition from $\vec{ps}$ to $\vec{ps'}$ - Flow of patiensts scheduled
+	\begin{alignat}{10}
+		& ps'_{t0dkc} 
+			&& = 0 \quad
+			&& \forall tdkc \\  
+		& ps'_{Tmdkc} 
+			&& = 0 \quad
+			&& \forall mdkc \\  
+		& ps'_{tmdkc} 
+			&& = \hat{ps}_{t+1,m-1,dkc} \quad 
+			&& \forall t \ne T m \in \{ 1... TL-1 \} dkc \\ 
+		& ps'_{tmdkc} 
+			&& = \hat{ps}_{t+1,m-1,dkc} + 
+			\overbrace{pst\_d_{t+1,m-1,d-1,c} - pst\_d_{d}}^\text{
+				change in complexities}  + 
+			\overbrace{pst\_k_{k-1} - pst\_k_{k}}^\text{
+				change in priorities} \quad 
+			&& \forall t \ne T m \in \{ TL_{c}...M-1 \} dkc \\  
+		& ps'_{tMdkc} 
+			&& = \sum_{M-1}^{M} \big( 
+			\hat{ps}_{t+1mdc} + 
+			\overbrace{pst\_d_{t+1,md-1,c} - pst\_d_{d}}^\text{
+				change in complexities} + 
+			\overbrace{pst\_k_{k-1} - pst\_k_{k}}^\text{
+				change in priorities} \big) \quad
+			&& \forall t \ne T dkc
+	\end{alignat}
+\end{enumerate}
+
+\subsection{Costs}
+
+\begin{itemize}
+	\item $cs_{tk} = \sum_t (\alpha^t * cw_{k})$
+	\item $cuu = 0$ if R3 not used, $M$ otherwise
+\end{itemize}
+
+\begin{equation}\begin{alignedat}{10}
+		& C = c(\vec{\hat{pw}}, \vec{\hat{ps}}, \vec{rsc}, \vec{uv}) = 
+			&& 	\overbrace{
+					\sum_{mdkc} cw_{k} (\hat{pw}_{mdkc}) 
+				}^\text{ Cost of waiting} 
+				+ \overbrace{ 
+					\sum_{tmdkc} cs_{tk} (sc_{tmdkc}) 
+				}^\text{Prefer earlier appointments} \\ 
+		&	&& 	+ \overbrace{ 
+					\sum_{ \substack{tt`mdkc \\ t' > t}} 
+					(cs_{t'-t, k} + cc) * (rsc_{tt'mdc})
+				}^\text{Bad reschedule} 
+				- \overbrace{ 
+					\sum_{ \substack{tt`mdkc \\ t' < t}} 
+					(cs_{t-t', k} - cc) * (rsc_{tt'mdc})
+				}^\text{Good reschedule} \\
+		& 	&& 	+ \overbrace{
+					cv \sum_{tp} uv_{tp}
+				}^\text{Unit violation}
+			 	+ \overbrace{
+					cuu \sum_{tp} (uu_{tp})
+				}^\text{(R3) Underutilization}
+\end{alignedat}\end{equation}

@@ -3,24 +3,6 @@
 - make it so complexity and priority change in different periods
 	- in order to assess impact of each 
 
-maybe compute canada as well
-there is a person teaching tutorials regarding compute canada at uottawa
-
-1) try parameters
-	- Performed GUROBI Tune
-		- ~2% improvement?
-	- interior point
-		- Interior point seems to make no difference		
-	- relax feasibility in subproblem
-		speeds up iterations, but improves bound slower
-		- need to compare how long to reach ceraint bound for 2 methods
-	- added warm - up and saving optimization progress
-3) try simulation to generate ~10000 - ~20000 using myopic  
-	- todo
-4) compute canada
-	- done
-5) try MET servers
-	- done
 
 
 
@@ -28,15 +10,11 @@ DIFFERENT COSTS PARAMETERS LEAD TO DIFFERENT MODEL PERFORMANCE
 	- higher cost of rescheduling and unit violation - results in MDP performing worse
 	- lower cost - MDP performs better - does that even make sense??
 
-p c
-h h
-h l
-l h
-l l 
 
 
-cv 1000 - try that
-try to get coefficient for action for MDP - completely non factored
+STUFF TO DO (2023-04-01)
+
+
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
