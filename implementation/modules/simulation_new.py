@@ -42,8 +42,8 @@ class simulation_handler:
     def read_data(self):
         self.input_data = data_import.read_data(os.path.join(self.my_path, self.import_data))
         
-        self.export_state_my = os.path.join(self.my_path,self.export_state_my)
-        self.export_state_md = os.path.join(self.my_path,self.export_state_md)
+        # self.export_state_my = os.path.join(self.my_path,self.export_state_my)
+        # self.export_state_md = os.path.join(self.my_path,self.export_state_md)
 
         # Quick Assess to Various Parameters
         self.TL = self.input_data.transition.wait_limit
@@ -401,14 +401,22 @@ class simulation_handler:
         self.my_sim_cost = []
         self.my_sim_disc = []
 
-        self.state_file = open(self.export_state_my, 'w', newline="")
-        self.state_action_file = open(self.export_sa_my, 'w', newline="")
-        self.cost_file = open(self.export_cost_my, 'w', newline="")
-        self.util_file = open(self.export_util_my, 'w', newline="")
+        try: self.state_file = open(self.export_state_my,'x', newline="")
+        except: self.state_file = open(self.export_state_my,'w', newline="")
+
+        try: self.sa_file = open(self.export_sa_my,'x', newline="")
+        except: self.sa_file = open(self.export_sa_my,'w', newline="")
+
+        try: self.cost_file = open(self.export_cost_my,'x', newline="")
+        except: self.cost_file = open(self.export_cost_my,'w', newline="")
+
+        try: self.util_file = open(self.export_util_my,'x', newline="")
+        except: self.util_file = open(self.export_util_my,'w', newline="")
+
         print(f"repl,period,policy,id,priority,complexity,surgery,action,arrived_on,sched_to,resch_from,resch_to,transition", file=self.state_file)
         print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv,cost_cuu", file=self.cost_file)
         print(f"repl,period,horizon_period,usage_admin,usage_OR", file=self.util_file)
-        print(f"repl,period,state-aciton,value,t,tp,m,d,k,c,p,val", file=self.state_action_file)
+        print(f"repl,period,state-aciton,value,t,tp,m,d,k,c,p,val", file=self.sa_file)
 
         # Simulation
         for repl in trange(self.replications, desc='Myopic'):
@@ -494,19 +502,19 @@ class simulation_handler:
 
                 # Log State / Action
                 for m,d,k,c in itertools.product(self.M,self.D,self.K,self.C): 
-                    if state['pw'][(m,d,k,c)] != 0: print(f"{repl},{day},state,pw,t,tp,{m},{d},{k},{c},p,{state['pw'][(m,d,k,c)]}", file=self.state_action_file)
+                    if state['pw'][(m,d,k,c)] != 0: print(f"{repl},{day},state,pw,t,tp,{m},{d},{k},{c},p,{state['pw'][(m,d,k,c)]}", file=self.sa_file)
                 for t,m,d,k,c in itertools.product(self.T,self.M,self.D,self.K,self.C): 
-                    if state['ps'][(t,m,d,k,c)] != 0: print(f"{repl},{day},state,ps,{t},tp,{m},{d},{k},{c},p,{state['ps'][(t,m,d,k,c)]}", file=self.state_action_file)
+                    if state['ps'][(t,m,d,k,c)] != 0: print(f"{repl},{day},state,ps,{t},tp,{m},{d},{k},{c},p,{state['ps'][(t,m,d,k,c)]}", file=self.sa_file)
 
                 for t,m,d,k,c in itertools.product(self.T,self.M,self.D,self.K,self.C): 
-                    if action['sc'][(t,m,d,k,c)] != 0: print(f"{repl},{day},action,sc,{t},tp,{m},{d},{k},{c},p,{action['sc'][(t,m,d,k,c)]}", file=self.state_action_file)
+                    if action['sc'][(t,m,d,k,c)] != 0: print(f"{repl},{day},action,sc,{t},tp,{m},{d},{k},{c},p,{action['sc'][(t,m,d,k,c)]}", file=self.sa_file)
                 for t,tp,m,d,k,c in itertools.product(self.T,self.T,self.M,self.D,self.K,self.C): 
-                    if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},{day},action,rsc,{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=self.state_action_file)
+                    if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},{day},action,rsc,{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=self.sa_file)
                 
                 for m,d,k,c in itertools.product(self.M,self.D,self.K,self.C): 
-                    if action['pwp'][(m,d,k,c)] != 0: print(f"{repl},{day},post-state,pwp,t,tp,{m},{d},{k},{c},p,{action['pwp'][(m,d,k,c)]}", file=self.state_action_file)
+                    if action['pwp'][(m,d,k,c)] != 0: print(f"{repl},{day},post-state,pwp,t,tp,{m},{d},{k},{c},p,{action['pwp'][(m,d,k,c)]}", file=self.sa_file)
                 for t,m,d,k,c in itertools.product(self.T,self.M,self.D,self.K,self.C): 
-                    if action['psp'][(t,m,d,k,c)] != 0: print(f"{repl},{day},post-state,psp,{t},tp,{m},{d},{k},{c},p,{action['psp'][(t,m,d,k,c)]}", file=self.state_action_file)
+                    if action['psp'][(t,m,d,k,c)] != 0: print(f"{repl},{day},post-state,psp,{t},tp,{m},{d},{k},{c},p,{action['psp'][(t,m,d,k,c)]}", file=self.sa_file)
                 
                 # Save Action Data for Logging
                 # Add entries for schedulings
@@ -812,14 +820,22 @@ class simulation_handler:
         self.md_sim_cost = []
         self.md_sim_disc = []
 
-        self.state_file = open(self.export_state_md, 'w', newline="")
-        self.state_action_file = open(self.export_sa_md, 'w', newline="")
-        self.cost_file = open(self.export_cost_md, 'w', newline="")
-        self.util_file = open(self.export_util_md, 'w', newline="")
+        try: self.state_file = open(self.export_state_md,'x', newline="")
+        except: self.state_file = open(self.export_state_md,'w', newline="")
+
+        try: self.sa_file = open(self.export_sa_md,'x', newline="")
+        except: self.sa_file = open(self.export_sa_md,'w', newline="")
+
+        try: self.cost_file = open(self.export_cost_md,'x', newline="")
+        except: self.cost_file = open(self.export_cost_md,'w', newline="")
+
+        try: self.util_file = open(self.export_util_md,'x', newline="")
+        except: self.util_file = open(self.export_util_md,'w', newline="")
+
         print(f"repl,period,policy,id,priority,complexity,surgery,action,arrived_on,sched_to,resch_from,resch_to,transition", file=self.state_file)
         print(f"repl,period,cost,cost_cw,cost_cs,cost_brsc,cost_grsc,cost_cv,cost_cuu", file=self.cost_file)
         print(f"repl,period,horizon_period,usage_admin,usage_OR", file=self.util_file)
-        print(f"repl,period,state-aciton,value,t,tp,m,d,k,c,p,val", file=self.state_action_file)
+        print(f"repl,period,state-aciton,value,t,tp,m,d,k,c,p,val", file=self.sa_file)
 
         # Simulation
         for repl in trange(self.replications, desc='MDP'):
@@ -923,19 +939,19 @@ class simulation_handler:
 
                 # Log State / Action
                 for m,d,k,c in itertools.product(self.M,self.D,self.K,self.C): 
-                    if state['pw'][(m,d,k,c)] != 0: print(f"{repl},{day},state,pw,t,tp,{m},{d},{k},{c},p,{state['pw'][(m,d,k,c)]}", file=self.state_action_file)
+                    if state['pw'][(m,d,k,c)] != 0: print(f"{repl},{day},state,pw,t,tp,{m},{d},{k},{c},p,{state['pw'][(m,d,k,c)]}", file=self.sa_file)
                 for t,m,d,k,c in itertools.product(self.T,self.M,self.D,self.K,self.C): 
-                    if state['ps'][(t,m,d,k,c)] != 0: print(f"{repl},{day},state,ps,{t},tp,{m},{d},{k},{c},p,{state['ps'][(t,m,d,k,c)]}", file=self.state_action_file)
+                    if state['ps'][(t,m,d,k,c)] != 0: print(f"{repl},{day},state,ps,{t},tp,{m},{d},{k},{c},p,{state['ps'][(t,m,d,k,c)]}", file=self.sa_file)
 
                 for t,m,d,k,c in itertools.product(self.T,self.M,self.D,self.K,self.C): 
-                    if action['sc'][(t,m,d,k,c)] != 0: print(f"{repl},{day},action,sc,{t},tp,{m},{d},{k},{c},p,{action['sc'][(t,m,d,k,c)]}", file=self.state_action_file)
+                    if action['sc'][(t,m,d,k,c)] != 0: print(f"{repl},{day},action,sc,{t},tp,{m},{d},{k},{c},p,{action['sc'][(t,m,d,k,c)]}", file=self.sa_file)
                 for t,tp,m,d,k,c in itertools.product(self.T,self.T,self.M,self.D,self.K,self.C): 
-                    if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},{day},action,rsc,{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=self.state_action_file)
+                    if action['rsc'][(t,tp,m,d,k,c)] != 0: print(f"{repl},{day},action,rsc,{t},{tp},{m},{d},{k},{c},p,{action['rsc'][(t,tp,m,d,k,c)]}", file=self.sa_file)
                 
                 for m,d,k,c in itertools.product(self.M,self.D,self.K,self.C): 
-                    if action['pwp'][(m,d,k,c)] != 0: print(f"{repl},{day},post-state,pwp,t,tp,{m},{d},{k},{c},p,{action['pwp'][(m,d,k,c)]}", file=self.state_action_file)
+                    if action['pwp'][(m,d,k,c)] != 0: print(f"{repl},{day},post-state,pwp,t,tp,{m},{d},{k},{c},p,{action['pwp'][(m,d,k,c)]}", file=self.sa_file)
                 for t,m,d,k,c in itertools.product(self.T,self.M,self.D,self.K,self.C): 
-                    if action['psp'][(t,m,d,k,c)] != 0: print(f"{repl},{day},post-state,psp,{t},tp,{m},{d},{k},{c},p,{action['psp'][(t,m,d,k,c)]}", file=self.state_action_file)
+                    if action['psp'][(t,m,d,k,c)] != 0: print(f"{repl},{day},post-state,psp,{t},tp,{m},{d},{k},{c},p,{action['psp'][(t,m,d,k,c)]}", file=self.sa_file)
 
                 # Save Action Data for Logging
                 # Add entries for schedulings
