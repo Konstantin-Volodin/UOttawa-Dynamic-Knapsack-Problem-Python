@@ -8,7 +8,6 @@ import pickle
 from copy import deepcopy
 import numpy as np
 from tqdm.auto import trange
-import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import pandas as pd
@@ -96,54 +95,7 @@ class simulation_handler:
             self.betas = pickle.load(handle)
 
 
-    ##### Misc Functions #####
-    def non_zero_state(self, state):
-        ret_str = ""
-        non_zero_st = {'ul': {}, 'pw': {}, 'ps': {}}
-        for k,v in state['ul'].items(): 
-            if v != 0: 
-                ret_str += f'\tState - Units Left Over - {k} - {v}\n'
-                # print(f'\tState - Units Left Over - {k} - {v}')
-                # non_zero_st['ul'][k] = v
-        for k,v in state['pw'].items(): 
-            if v != 0: 
-                ret_str += f'\tState - Patients Waiting - {k} - {v}\n'
-                # print(f'\tState - Patients Waiting - {k} - {v}')
-                # non_zero_st['pw'][k] = v
-        for k,v in state['ps'].items(): 
-            if v != 0: 
-                ret_str += f'\tState - Patients Scheduled - {k} - {v}\n'
-                # print(f'\tState - Patients Scheduled - {k} - {v}')
-                # non_zero_st['ps'][k] = v
-        return(ret_str)
-
-
-    def non_zero_action(self, action):
-        ret_str = ""
-        non_zero_ac = {'sc':{}, 'rsc':{}, 'uv': {}, 'ulp': {}, 'uup': {}, 'pwp':{}, 'psp': {}}
-        for k,v in action['sc'].items():
-            if v != 0: 
-                ret_str += f'\tAction - Schedule Patients - {k} - {v}\n'
-                # print(f'\tAction - Schedule Patients - {k} - {v}')
-                # non_zero_ac['sc'][k] = v
-        for k,v in action['rsc'].items():
-            if v != 0: 
-                ret_str += f'\tAction - Reschedule Patients - {k} - {v}\n'
-                # print(f'\tAction - Reschedule Patients - {k} - {v}')
-                # non_zero_ac['rsc'][k] = v
-        for k,v in action['uv'].items():
-            if v != 0: ret_str += f'\tAction - Units Violated - {k} - {v}\n'
-        for k,v in action['ulp'].items():
-            if v != 0: ret_str += f'\tPost Action - Units Left Over - {k} - {v}\n'
-        for k,v in action['pwp'].items():
-            if v != 0: ret_str += f'\tPost Action - Patients Waiting - {k} - {v}\n'
-        for k,v in action['psp'].items():
-            if v != 0: ret_str += f'\tPost Action - Patients Scheduled - {k} - {v}\n'
-        for k,v in action['uup'].items():
-            if v != 0: ret_str += f'\tPost Action - Units Used - {k} - {v}\n'
-        return(ret_str)
-    
-
+    ##### Misc Function #####
     def retrive_surg_subset(self, df, d, k, c, m, day):
         '''
         ### Given a patient dataset, retrieves patient who are specific surgery type (accomodates transitions)
@@ -439,7 +391,7 @@ class simulation_handler:
             patient_id_count = 0
 
             # Single Replication
-            for day in trange(self.duration):
+            for day in trange(self.duration, leave=False):
 
                 # Init Patient Data
                 patient_data = {'repl': [], 'period': [], 'policy': [], 'id': [], 'priority': [], 'complexity': [], 'surgery': [], 'action': [], 'arrived_on': [], 'sched_to': [], 'resch_from': [], 'resch_to': [], 'transition': []}
@@ -462,7 +414,6 @@ class simulation_handler:
                             patient_id_count += 1
                     patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
                     patient_data = {k : [] for k in patient_data}
-
 
                 # Generate Action (With slightly different logic)
                 for k in self.K: self.myv_cost_cw[k].UB = self.cv-1; self.myv_cost_cw[k].LB = self.cv-1;
@@ -556,8 +507,6 @@ class simulation_handler:
                         if action['rsc'][(t,tp,m,d,k,c)] >= 0.001: skip = False
                     if skip == True: continue
 
-                    pass
-
                     # Finds all scheduled patients based on t,m,d,k,c
                     pat_subset = self.retrive_surg_subset(patient_data_df, d, k ,c, m, day)
                     pat_sched = pat_subset.query(f"action != 'transition'").groupby('id').filter(lambda x: len(x) >= 2).groupby('id').tail(1).reset_index()
@@ -581,10 +530,6 @@ class simulation_handler:
                             patient_data['resch_to'].append(tp+day-1)
                             patient_data['transition'].append(pd.NA)
                             resched += 1
-
-                    # with open(export_state_my, 'w') as text_file:
-                    # text_file.write(f'{non_zero_action(action)}\n')
-                    # text_file.write(f'\tCost: {myo_cost.getValue()}\n')
 
                 # Save Data to dataframe
                 patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
@@ -739,7 +684,7 @@ class simulation_handler:
                             patient_data['resch_to'].append(pd.NA)
                             patient_data['transition'].append('complexity')
 
-                    # Save Data to dataframe
+                # Save Data to dataframe
                 patient_data_df = pd.concat([patient_data_df, pd.DataFrame.from_dict(patient_data)])
                 patient_data = {k : [] for k in patient_data}
 
@@ -857,7 +802,7 @@ class simulation_handler:
             patient_data_df = pd.DataFrame( columns=['repl', 'period', 'policy', 'id','priority', 'complexity', 'surgery','action','arrived_on','sched_to', 'resch_from', 'resch_to', 'transition'] )
             patient_id_count = 0
 
-            for day in trange(self.duration):
+            for day in trange(self.duration, leave=False):
 
                 # Init Patient Data
                 patient_data = {'repl': [], 'period': [], 'policy': [], 'id': [], 'priority': [], 'complexity': [], 'surgery': [], 'action': [], 'arrived_on': [], 'sched_to': [], 'resch_from': [], 'resch_to': [], 'transition': []}

@@ -460,7 +460,8 @@ class optimization_handler:
             # Solve Subproblem
             # if self.iter%500 == 0: sub_prob.write(f'p2s.lp')
             self.sub_prob.optimize()
-            print(f"PHASE 2 Sub Iter {self.iter}:\t\t{self.sub_prob.ObjVal}")
+            if self.iter%250 == 0:
+                print(f"PHASE 2 Sub Iter {self.iter}:\t\t{self.sub_prob.ObjVal}")
 
 
             # Update Master
@@ -504,13 +505,13 @@ class optimization_handler:
             else: count_same = 0
 
             # Trim State - Actions
-            if self.iter%500 == 0:
-                init_len = len(self.master.getVars())
-                for i in self.master.getVars(): 
-                    if i.X == 0 and np.random.random() >= 0.8: 
-                        self.master.remove(i)
-                final_len = len(self.master.getVars())
-                print(f'Trimmed \t{init_len - final_len}')
+            # if self.iter%500 == 0:
+            #     init_len = len(self.master.getVars())
+            #     for i in self.master.getVars(): 
+            #         if i.X == 0 and np.random.random() >= 0.8: 
+            #             self.master.remove(i)
+            #     final_len = len(self.master.getVars())
+            #     print(f'PHASE 2 ITER {self.iter} Trimmed: \t{init_len - final_len}')
 
             self.iter += 1
 
