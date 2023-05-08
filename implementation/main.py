@@ -2,6 +2,8 @@
 # INITIALIZATION AND DATA PARAMETERS
 from modules.optimization_new import optimization_handler
 from modules.simulation_new import simulation_handler
+import os.path
+
 
 # MODEL DATA
 test_modifier = ''
@@ -21,9 +23,9 @@ for cuu_sn in cuu_sens:
                     'beta_function': [(0, 0.9),
                                       (3000, 0.99)],
                     'subproblem_mip_gap': 0.1}
-        optim_paths = {'import_params': f'data/{data_type}/input/{test_modifier}{data_type}-np-dt.xlsx',
-                    'export_betas': f'data/{data_type}/input/betas/{test_modifier}{data_type}-np-opt-{cuu_sn}-{or_sn}.pkl',
-                    'export_model': f'data/{data_type}/input/model/{test_modifier}{data_type}-np-md-{cuu_sn}-{or_sn}.lp'}
+        optim_paths = {'import_params': os.path.join('data',data_type,'input',f'{test_modifier}{data_type}-np-dt.xlsx'),
+                       'export_betas': os.path.join('data',data_type, 'input', 'betas', f'{test_modifier}{data_type}-np-opt-{cuu_sn}-{or_sn}.pkl'),
+                       'export_model': os.path.join('data',data_type, 'input', 'model', f'{test_modifier}{data_type}-np-opt-{cuu_sn}-{or_sn}.lp'),}
 
 
         # EXECUTE OPTIMIZER
@@ -43,18 +45,18 @@ for cuu_sn in cuu_sens:
         sim_param = {'replications': 30,
                     'warm_up': 250,
                     'duration': 1000}
-        sim_paths = {'import_params': f'data/{data_type}/input/{test_modifier}{data_type}-np-dt.xlsx',
-                    'import_betas': f'data/{data_type}/input/betas/{test_modifier}{data_type}-np-opt-{cuu_sn}-{or_sn}.pkl',
-                    'export_summary_costs': f'data/{data_type}/res/{test_modifier}{data_type}-res-{cuu_sn}-{or_sn}.txt',
-                    'export_summary_picture': f'data/{data_type}/res/{test_modifier}{data_type}-res-{cuu_sn}-{or_sn}.html',
-                    'export_state_myopic': f'data/{data_type}/res/state/{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt',
-                    'export_state_mdp': f'data/{data_type}/res/state/{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt',
-                    'export_cost_myopic': f'data/{data_type}/res/cost/{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt',
-                    'export_cost_mdp': f'data/{data_type}/res/cost/{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt',
-                    'export_util_myopic': f'data/{data_type}/res/util/{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt',
-                    'export_util_mdp': f'data/{data_type}/res/util/{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt',
-                    'export_sa_myopic': f'data/{data_type}/res/sa/{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt',
-                    'export_sa_mdp': f'data/{data_type}/res/sa/{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt',}
+        sim_paths = {'import_params': os.path.join('data',data_type,'input',f'{test_modifier}{data_type}-np-dt.xlsx'),
+                     'import_betas': os.path.join('data',data_type, 'input', 'betas', f'{test_modifier}{data_type}-np-opt-{cuu_sn}-{or_sn}.pkl'),
+                     'export_summary_costs': os.path.join('data',{data_type},'res',f'{test_modifier}{data_type}-res-{cuu_sn}-{or_sn}.txt'),
+                     'export_summary_picture': os.path.join('data',{data_type},'res',f'{test_modifier}{data_type}-res-{cuu_sn}-{or_sn}.html'),
+                     'export_state_myopic': os.path.join('data',{data_type},'res','state',f'{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt'),
+                     'export_state_mdp': os.path.join('data',{data_type},'res','state',f'{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt'),
+                     'export_cost_myopic': os.path.join('data',{data_type},'res','cost',f'{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt'),
+                     'export_cost_mdp': os.path.join('data',{data_type},'res','cost',f'{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt'),
+                     'export_util_myopic': os.path.join('data',{data_type},'res','util',f'{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt'),
+                     'export_util_mdp': os.path.join('data',{data_type},'res','util',f'{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt'),
+                     'export_sa_myopic': os.path.join('data',{data_type},'res','sa',f'{test_modifier}{data_type}-res-my-{cuu_sn}-{or_sn}.txt'),
+                     'export_sa_mdp': os.path.join('data',{data_type},'res','sa',f'{test_modifier}{data_type}-res-mdp-{cuu_sn}-{or_sn}.txt'),}
 
         # EXECUTE SIMULATOR
         simulator = simulation_handler(sim_param = sim_param,
