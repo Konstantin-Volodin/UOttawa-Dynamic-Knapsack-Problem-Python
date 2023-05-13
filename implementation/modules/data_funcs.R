@@ -1,5 +1,5 @@
-reticulate::use_condaenv('uOttawa-dyn-knap-R', required=TRUE)
-reticulate::source_python(here("modules","z_factor.py"))
+library(tidyverse)
+library(here)
 
 # Generate Summary From Patient Level Data
 generate_summary <- function(path, modif, dur, warm, repl) {
@@ -357,7 +357,7 @@ generate_summary_sa <- function(path, modif, dur, warm, repl) {
     geom_bar(aes(x=t, y=mean, fill=c), stat='identity') +
     geom_text(aes(x=t, y=mean, label=round(mean,1)), size=2) +
     facet_grid(c+d ~ policy, scales="fixed") + 
-    labs(x='Time (Week)', y='Count (Sched)', title='Average Scheduling Numbers')
+    labs(x='Time (Week)', y='Count (Sched)', title='Scheduling Numbers')
   
   # Rescheduling
   rsc_dat <- dat %>% filter(value == 'rsc') %>%
@@ -390,7 +390,7 @@ generate_summary_sa <- function(path, modif, dur, warm, repl) {
     geom_bar(aes(x=m, y=mean, fill=c), stat = 'identity') +
     geom_text(aes(x=m, y=mean, label=round(mean,1)), size=2) +
     facet_grid(c+d ~ policy, scales='free') + 
-    labs(x='Time (Week)', y='Count (Sched)', title='Average Waitlist Size by Group')
+    labs(x='Time (Week)', y='Count (Sched)', title='Waitlist Size by Group')
   
   return( list(
     'data' = dat,
@@ -411,9 +411,9 @@ generate_summary_sa <- function(path, modif, dur, warm, repl) {
 
 # Generate Policy From Z-Scores
 generate_summary_zs <- function(path, modif, cuu) {
-  # Generate Data
-  generate_z_score(path, modif, TRUE, cuu)
-  generate_z_score(path, modif, FALSE, cuu)
+  # # Generate Data
+  # generate_z_score(path, modif, TRUE, cuu)
+  # generate_z_score(path, modif, FALSE, cuu)
   
   # Read Data
   dat_my <- read_csv(here(path,'res','z_fact', paste0('full-sm-res-my-',modif,'.csv'))) %>% mutate(policy='myopic')
@@ -429,8 +429,7 @@ generate_summary_zs <- function(path, modif, cuu) {
   zf_plt <- ggplot(dat %>% filter(M == 0),
                           aes(x=T, y=Val, color=C, linetype=D, shape=D)) +
     geom_line() + geom_point() + 
-    facet_grid(Type ~ policy, scales='free_y') + 
-    scale_x_continuous(breaks=seq(0,10), limits = c(1,10)) +
+    facet_grid(Type ~ policy) + 
     theme_minimal()
 
   return(list(
