@@ -19,6 +19,7 @@ library(tidyverse)
 library(readr)
 library(plotly)
 library(tidyverse)
+library(here)
 knitr::opts_chunk$set(cache = TRUE)
 source(here('modules','data_funcs.R'))
 
@@ -178,7 +179,18 @@ The policy description is based on a graph to the right
 * The bottom row shows in which days the policy will allow scheduling.
 * The top row shows approximate order of patient scheduling.
 
-Additionally the far right graph shows the approximate decision making 
+Additionally the far right graph shows the approximate decision making.
+
+Policy:
+
+* MDP will schedule into the first 2 days only. 
+* In this approximate order:
+
+  * Surgery 6, Complexity 1
+  * Surgery 1, Complexity 1
+  * Surgery 6, Complexity 2
+  * Surgery 4, Complexity 2
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
 
 ### Policy Math Graph
 
@@ -253,6 +265,18 @@ The policy description is based on a graph to the right
 
 Additionally the far right graph shows the approximate decision making 
 
+Policy: 
+
+* MDP will schedule into the first 2 days only. 
+* In this approximate order:
+
+  * Surgery 6, Complexity 1
+  * Surgery 6, Complexity 2
+  * Surgery 1, Complexity 1
+  * Surgery 4, Complexity 2
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
+
+
 ### Policy Math Graph
 
 ```{r echo=FALSE}
@@ -325,6 +349,17 @@ The policy description is based on a graph to the right
 * The top row shows approximate order of patient scheduling.
 
 Additionally the far right graph shows the approximate decision making 
+
+Policy: 
+
+* MDP will schedule into the first 2 days only. 
+* In this approximate order:
+
+  * Surgery 6, Complexity 1
+  * Surgery 6, Complexity 2
+  * Surgery 1, Complexity 1
+  * Surgery 4, Complexity 2
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
 
 ### Policy Math Graph
 
@@ -399,6 +434,17 @@ The policy description is based on a graph to the right
 
 Additionally the far right graph shows the approximate decision making 
 
+Policy: 
+
+* MDP will schedule into the first 2 days only. 
+* In this approximate order:
+
+  * Surgery 6, Complexity 1
+  * Surgery 6, Complexity 2
+  * Surgery 1, Complexity 1
+  * Surgery 4, Complexity 2
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
+
 ### Policy Math Graph
 
 ```{r echo=FALSE}
@@ -471,6 +517,18 @@ The policy description is based on a graph to the right
 * The top row shows approximate order of patient scheduling.
 
 Additionally the far right graph shows the approximate decision making 
+
+Policy: 
+
+* MDP will schedule S6 and S1C1 into the first 2 days only. S4 and S1C2 will be scheduled into the entire planning horizon.
+* In this approximate order:
+
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
+  * Surgery 4, Complexity 2
+  * Surgery 6, Complexity 1
+  * Surgery 6, Complexity 2
+  * Surgery 1, Complexity 1
+
 
 ### Policy Math Graph
 
@@ -545,6 +603,17 @@ The policy description is based on a graph to the right
 
 Additionally the far right graph shows the approximate decision making 
 
+Policy: 
+
+* MDP will schedule S6 and S1C1 into the first 2 days only. S4 and S1C2 will be scheduled into the entire planning horizon.
+* In this approximate order:
+
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
+  * Surgery 4, Complexity 2
+  * Surgery 6, Complexity 1
+  * Surgery 1, Complexity 1
+  * Surgery 6, Complexity 2
+
 ### Policy Math Graph
 
 ```{r echo=FALSE}
@@ -618,6 +687,17 @@ The policy description is based on a graph to the right
 
 Additionally the far right graph shows the approximate decision making 
 
+Policy: 
+
+* MDP will schedule S6 and S1C1 into the first 2 days only. S4 and S1C2 will be scheduled into the entire planning horizon.
+* In this approximate order:
+
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
+  * Surgery 4, Complexity 2
+  * Surgery 6, Complexity 1
+  * Surgery 1, Complexity 1
+  * Surgery 6, Complexity 2
+
 ### Policy Math Graph
 
 ```{r echo=FALSE}
@@ -690,6 +770,17 @@ The policy description is based on a graph to the right
 * The top row shows approximate order of patient scheduling.
 
 Additionally the far right graph shows the approximate decision making 
+
+Policy: 
+
+* MDP will schedule S6 and S1C1 into the first 2 days only. S4 and S1C2 will be scheduled into the entire planning horizon.
+* In this approximate order:
+
+  * Surgery 4, Complexity 1 / Surgery 1, Complexity 2
+  * Surgery 4, Complexity 2
+  * Surgery 6, Complexity 1
+  * Surgery 1, Complexity 1
+  * Surgery 6, Complexity 2
 
 ### Policy Math Graph
 
