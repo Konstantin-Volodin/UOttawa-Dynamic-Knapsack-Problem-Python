@@ -1,37 +1,7 @@
-- try an m of 10
-- try a cheap rescheduling (maybe that could change the behaviour)
-- make it so complexity and priority change in different periods
-	- in order to assess impact of each 
+- change the frequency of one of the surgeries
+	- 4 to 3
 
-
-
-
-DIFFERENT COSTS PARAMETERS LEAD TO DIFFERENT MODEL PERFORMANCE
-	- higher cost of rescheduling and unit violation - results in MDP performing worse
-	- lower cost - MDP performs better - does that even make sense??
-
-
-
-STUFF TO DO (2023-04-01)
-
-
-
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-THE WAY MODEL IS FORMULATED M HAS TO BE max(TL)+1
-	- because the way it is formulated - patients will always be assumed to transition starting on second last wait list
-
-
-
-Description of policies:
-	NP,1:
-		-  
-		-
-	NP,1.1
-	NP,1.2
-	NP,1.3
-	
-	P,1
-	P,1.1
-	P,1.2
-	P,1.3
+- 3 scenarios
+	- baseline policy
+	- optimal - don't penalize beds
+	- optimal - penalize beds
